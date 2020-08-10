@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,8 +33,19 @@ namespace BotCore.Data
         [Required]
         public DateTime CreatedDateTime { get; set; }
 
-        [Required]
         [MaxLength(200)]
         public string Stat { get; set; }
+
+        [Required]
+        [MaxLength(100)]
+        public string OrderId { get; set; }
+
+        [Required]
+        public int TrySendCount { get; set; }
+        
+        public DateTime LastTrySendTime { get; set; }
+
+        [Required]
+        public bool Done { get; set; }
     }
 }
