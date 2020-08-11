@@ -88,7 +88,10 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.tb_username);
             this.Controls.Add(this.label1);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "Account";
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Account";
             this.TopMost = true;

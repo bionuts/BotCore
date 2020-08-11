@@ -14,7 +14,6 @@ namespace BCore.Data
             optionsBuilder.UseSqlite($"Filename={path}");
         }
         public DbSet<BOrder> BOrders { get; set; }
-        public DbSet<BCookie> BCookies { get; set; }
         public DbSet<BSymbole> BSymboles { get; set; }
         public DbSet<BSetting> BSettings { get; set; }
     }

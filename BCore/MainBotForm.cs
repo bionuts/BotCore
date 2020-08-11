@@ -1,6 +1,7 @@
 ﻿using BCore.Data;
 using BCore.DataModel;
 using BCore.Forms;
+using BCore.Lib;
 using BotCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -39,13 +40,14 @@ namespace BCore
         private async void MainBotForm_Load(object sender, EventArgs e)
         {
             // LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).ToListAsync();
+            var junk = await db.BSettings.ToListAsync();
         }
 
         private async void btn_load_Click(object sender, EventArgs e)
         {
             lv_orders.Items.Clear();
             LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).ToListAsync();
-            ApiToken = (await db.BCookies.Where(c => c.Name == "apitoken").FirstOrDefaultAsync()).Value;
+            ApiToken = (await db.BSettings.Where(c => c.Key == "apitoken").FirstOrDefaultAsync()).Value;
             if (LoadedOrders.Any())
             {
                 LoadOrdersToListView();
@@ -55,7 +57,7 @@ namespace BCore
                 foreach (var order in LoadedOrders)
                 {
                     OrdersTasksList.Add(new Task(() => SendOrderTask(
-                        GetPresetHttpClientForSendOrders(),
+                        Utilities.GetPresetHttpClientForSendOrders(), // GetPresetHttpClientForSendOrders(),
                         order,
                         _EndTime,
                         int.Parse(tb_interval.Text.Trim()),
@@ -140,7 +142,7 @@ namespace BCore
                 maxShow = 0,
                 orderId = 0,
                 isin = order.SymboleCode,
-                orderSide = (order.TypeOrder == "SELL" ? "86" : "65"), // SELL(86) , BUY(65)
+                orderSide = (order.OrderType == "SELL" ? "86" : "65"), // SELL(86) , BUY(65)
                 orderValidity = 74,
                 orderValiditydate = null,
                 shortSellIsEnabled = false,
@@ -163,8 +165,8 @@ namespace BCore
                             order.Count.ToString("N0"),
                             order.Price.ToString("N0"),
                             (order.Count * order.Price).ToString("N0"),
-                            order.TypeOrder,
-                            order.Stat
+                            order.OrderType,
+                            order.Status
                 };
                 var lv_item = new ListViewItem(row);
                 lv_orders.Items.Add(lv_item);
@@ -224,8 +226,26 @@ namespace BCore
         }
         private void AccountMenuItemClick(object sender, EventArgs e)
         {
-            Form accountForm = new Account();
+            Account accountForm = new Account();
             accountForm.ShowDialog();
+        }
+
+        private void LoginMenuItemClick(object sender, EventArgs e)
+        {
+            Login loginForm = new Login();
+            loginForm.ShowDialog();
+        }
+
+        private void SymboleMenuItemClick(object sender, EventArgs e)
+        {
+            SymboleForm symForm = new SymboleForm();
+            symForm.ShowDialog();
+        }
+
+        private void OrderMenuItemClick(object sender, EventArgs e)
+        {
+            OrderForm orderForm = new OrderForm();
+            orderForm.ShowDialog();
         }
     }
 }

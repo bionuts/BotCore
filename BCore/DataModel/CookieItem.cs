@@ -7,41 +7,20 @@ using System.Threading.Tasks;
 
 namespace BotCore.Data
 {
-    public class BCookie
+    public class CookieItem
     {
-        [Key]
-        public int Id { get; set; }
-
-        [Required]
-        [MaxLength(300)]
-        public string Name { get; set; }
-
-        [Required]
-        [MaxLength(1000)]
-        public string Value { get; set; }
-
-        [MaxLength(200)]
-        public string Expires { get; set; }
-
-        [MaxLength(50)]
-        public string MaxAge { get; set; }
-
-        [MaxLength(200)]
-        public string Domain { get; set; }
-
-        [MaxLength(200)]
-        public string Path { get; set; }
-
-        [MaxLength(15)]
-        public string SameSite { get; set; } // Strict , Lax , None
-
-        [MaxLength(15)]
-        public string Secure { get; set; }
-
-        [MaxLength(15)]
-        public string HttpOnly { get; set; }
-
         // Multiple attributes are also possible, for example:
         // Set-Cookie: <cookie-name>=<cookie-value>; Domain=<domain-value>; Secure; HttpOnly
+
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Value { get; set; }
+        public string Expires { get; set; }
+        public string MaxAge { get; set; }
+        public string Domain { get; set; }
+        public string Path { get; set; }
+        public string SameSite { get; set; } // Strict , Lax , None
+        public string Secure { get; set; }
+        public string HttpOnly { get; set; }
     }
 }

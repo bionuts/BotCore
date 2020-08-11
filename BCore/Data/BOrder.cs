@@ -13,15 +13,12 @@ namespace BotCore.Data
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(10)]
-        public string TypeOrder { get; set; }
+        public string OrderType { get; set; }
 
         [Required]
-        [MaxLength(100)]
         public string SymboleName { get; set; }
 
         [Required]
-        [MaxLength(100)]
         public string SymboleCode { get; set; }
 
         [Required]
@@ -33,19 +30,9 @@ namespace BotCore.Data
         [Required]
         public DateTime CreatedDateTime { get; set; }
 
-        [MaxLength(200)]
-        public string Stat { get; set; }
+        public string Status { get; set; }
 
         [Required]
-        [MaxLength(100)]
         public string OrderId { get; set; }
-
-        [Required]
-        public int TrySendCount { get; set; }
-        
-        public DateTime LastTrySendTime { get; set; }
-
-        [Required]
-        public bool Done { get; set; }
     }
 }

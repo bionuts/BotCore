@@ -12,11 +12,9 @@ namespace BotCore.Data
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(100)]
-        public string SymboleName { get; set; }
+        public string SymName { get; set; }
 
         [Required]
-        [MaxLength(100)]
-        public string SymboleCode { get; set; }
+        public string SymCode { get; set; }
     }
 }
