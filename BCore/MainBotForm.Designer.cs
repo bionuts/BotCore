@@ -51,7 +51,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.tb_interval = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
+            this.lbl_starttime = new System.Windows.Forms.Label();
             this.tb_hh = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -59,7 +59,7 @@
             this.label6 = new System.Windows.Forms.Label();
             this.tb_ss = new System.Windows.Forms.TextBox();
             this.tb_ms = new System.Windows.Forms.TextBox();
-            this.lbl_startTime = new System.Windows.Forms.Label();
+            this.lbl_endTime = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btn_start
@@ -190,7 +190,7 @@
             this.tb_interval.Name = "tb_interval";
             this.tb_interval.Size = new System.Drawing.Size(47, 27);
             this.tb_interval.TabIndex = 2;
-            this.tb_interval.Text = "20";
+            this.tb_interval.Text = "50";
             this.tb_interval.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label2
@@ -202,14 +202,15 @@
             this.label2.TabIndex = 5;
             this.label2.Text = "Interval(ms):";
             // 
-            // label3
+            // lbl_starttime
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(548, 17);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(80, 20);
-            this.label3.TabIndex = 5;
-            this.label3.Text = "Start Time:";
+            this.lbl_starttime.AutoSize = true;
+            this.lbl_starttime.Location = new System.Drawing.Point(548, 17);
+            this.lbl_starttime.Name = "lbl_starttime";
+            this.lbl_starttime.Size = new System.Drawing.Size(80, 20);
+            this.lbl_starttime.TabIndex = 5;
+            this.lbl_starttime.Text = "Start Time:";
+            this.lbl_starttime.Click += new System.EventHandler(this.lbl_starttime_Click);
             // 
             // tb_hh
             // 
@@ -282,15 +283,16 @@
             this.tb_ms.Text = "900";
             this.tb_ms.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // lbl_startTime
+            // lbl_endTime
             // 
-            this.lbl_startTime.AutoSize = true;
-            this.lbl_startTime.ForeColor = System.Drawing.Color.DarkGreen;
-            this.lbl_startTime.Location = new System.Drawing.Point(833, 17);
-            this.lbl_startTime.Name = "lbl_startTime";
-            this.lbl_startTime.Size = new System.Drawing.Size(15, 20);
-            this.lbl_startTime.TabIndex = 8;
-            this.lbl_startTime.Text = "-";
+            this.lbl_endTime.AutoSize = true;
+            this.lbl_endTime.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lbl_endTime.ForeColor = System.Drawing.Color.DarkGreen;
+            this.lbl_endTime.Location = new System.Drawing.Point(833, 17);
+            this.lbl_endTime.Name = "lbl_endTime";
+            this.lbl_endTime.Size = new System.Drawing.Size(15, 20);
+            this.lbl_endTime.TabIndex = 8;
+            this.lbl_endTime.Text = "-";
             // 
             // MainBotForm
             // 
@@ -298,7 +300,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1113, 620);
-            this.Controls.Add(this.lbl_startTime);
+            this.Controls.Add(this.lbl_endTime);
             this.Controls.Add(this.tb_ss);
             this.Controls.Add(this.tb_mm);
             this.Controls.Add(this.tb_hh);
@@ -308,7 +310,7 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.tb_logs);
             this.Controls.Add(this.lv_orders);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.lbl_starttime);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.tb_interval);
             this.Controls.Add(this.label1);
@@ -351,7 +353,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox tb_interval;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label lbl_starttime;
         private System.Windows.Forms.TextBox tb_hh;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
@@ -359,6 +361,6 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox tb_ss;
         private System.Windows.Forms.TextBox tb_ms;
-        private System.Windows.Forms.Label lbl_startTime;
+        private System.Windows.Forms.Label lbl_endTime;
     }
 }
