@@ -60,11 +60,16 @@
             this.tb_ss = new System.Windows.Forms.TextBox();
             this.tb_ms = new System.Windows.Forms.TextBox();
             this.lbl_endTime = new System.Windows.Forms.Label();
+            this.MainMenuStrip = new System.Windows.Forms.MenuStrip();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.MainMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // btn_start
             // 
-            this.btn_start.Location = new System.Drawing.Point(158, 13);
+            this.btn_start.Location = new System.Drawing.Point(158, 87);
             this.btn_start.Name = "btn_start";
             this.btn_start.Size = new System.Drawing.Size(94, 29);
             this.btn_start.TabIndex = 0;
@@ -86,7 +91,7 @@
             this.lv_orders.GridLines = true;
             this.lv_orders.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lv_orders.HideSelection = false;
-            this.lv_orders.Location = new System.Drawing.Point(12, 49);
+            this.lv_orders.Location = new System.Drawing.Point(12, 122);
             this.lv_orders.Name = "lv_orders";
             this.lv_orders.Size = new System.Drawing.Size(1089, 191);
             this.lv_orders.TabIndex = 2;
@@ -138,16 +143,16 @@
             // tb_logs
             // 
             this.tb_logs.AcceptsReturn = true;
-            this.tb_logs.Location = new System.Drawing.Point(12, 266);
+            this.tb_logs.Location = new System.Drawing.Point(12, 339);
             this.tb_logs.Multiline = true;
             this.tb_logs.Name = "tb_logs";
             this.tb_logs.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.tb_logs.Size = new System.Drawing.Size(1089, 346);
+            this.tb_logs.Size = new System.Drawing.Size(1089, 273);
             this.tb_logs.TabIndex = 0;
             // 
             // btn_load
             // 
-            this.btn_load.Location = new System.Drawing.Point(12, 13);
+            this.btn_load.Location = new System.Drawing.Point(12, 87);
             this.btn_load.Name = "btn_load";
             this.btn_load.Size = new System.Drawing.Size(140, 29);
             this.btn_load.TabIndex = 4;
@@ -158,7 +163,7 @@
             // lbl_status
             // 
             this.lbl_status.AutoSize = true;
-            this.lbl_status.Location = new System.Drawing.Point(12, 243);
+            this.lbl_status.Location = new System.Drawing.Point(12, 316);
             this.lbl_status.Name = "lbl_status";
             this.lbl_status.Size = new System.Drawing.Size(43, 20);
             this.lbl_status.TabIndex = 5;
@@ -166,18 +171,18 @@
             // 
             // tb_duration
             // 
-            this.tb_duration.Location = new System.Drawing.Point(350, 14);
+            this.tb_duration.Location = new System.Drawing.Point(350, 88);
             this.tb_duration.MaxLength = 3;
             this.tb_duration.Name = "tb_duration";
             this.tb_duration.Size = new System.Drawing.Size(47, 27);
             this.tb_duration.TabIndex = 1;
-            this.tb_duration.Text = "2";
+            this.tb_duration.Text = "3";
             this.tb_duration.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(258, 17);
+            this.label1.Location = new System.Drawing.Point(258, 91);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(86, 20);
             this.label1.TabIndex = 5;
@@ -185,18 +190,18 @@
             // 
             // tb_interval
             // 
-            this.tb_interval.Location = new System.Drawing.Point(495, 14);
+            this.tb_interval.Location = new System.Drawing.Point(495, 88);
             this.tb_interval.MaxLength = 3;
             this.tb_interval.Name = "tb_interval";
             this.tb_interval.Size = new System.Drawing.Size(47, 27);
             this.tb_interval.TabIndex = 2;
-            this.tb_interval.Text = "50";
+            this.tb_interval.Text = "30";
             this.tb_interval.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(403, 17);
+            this.label2.Location = new System.Drawing.Point(403, 91);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(90, 20);
             this.label2.TabIndex = 5;
@@ -205,7 +210,7 @@
             // lbl_starttime
             // 
             this.lbl_starttime.AutoSize = true;
-            this.lbl_starttime.Location = new System.Drawing.Point(548, 17);
+            this.lbl_starttime.Location = new System.Drawing.Point(548, 91);
             this.lbl_starttime.Name = "lbl_starttime";
             this.lbl_starttime.Size = new System.Drawing.Size(80, 20);
             this.lbl_starttime.TabIndex = 5;
@@ -215,7 +220,7 @@
             // tb_hh
             // 
             this.tb_hh.BackColor = System.Drawing.Color.LightYellow;
-            this.tb_hh.Location = new System.Drawing.Point(637, 14);
+            this.tb_hh.Location = new System.Drawing.Point(637, 88);
             this.tb_hh.MaxLength = 2;
             this.tb_hh.Name = "tb_hh";
             this.tb_hh.Size = new System.Drawing.Size(36, 27);
@@ -226,7 +231,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(674, 17);
+            this.label4.Location = new System.Drawing.Point(674, 91);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(12, 20);
             this.label4.TabIndex = 7;
@@ -235,7 +240,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(721, 17);
+            this.label5.Location = new System.Drawing.Point(721, 91);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(12, 20);
             this.label5.TabIndex = 7;
@@ -244,7 +249,7 @@
             // tb_mm
             // 
             this.tb_mm.BackColor = System.Drawing.Color.LightYellow;
-            this.tb_mm.Location = new System.Drawing.Point(686, 14);
+            this.tb_mm.Location = new System.Drawing.Point(686, 88);
             this.tb_mm.MaxLength = 2;
             this.tb_mm.Name = "tb_mm";
             this.tb_mm.Size = new System.Drawing.Size(36, 27);
@@ -255,7 +260,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(770, 17);
+            this.label6.Location = new System.Drawing.Point(770, 91);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(12, 20);
             this.label6.TabIndex = 7;
@@ -264,7 +269,7 @@
             // tb_ss
             // 
             this.tb_ss.BackColor = System.Drawing.Color.LightYellow;
-            this.tb_ss.Location = new System.Drawing.Point(734, 14);
+            this.tb_ss.Location = new System.Drawing.Point(734, 88);
             this.tb_ss.MaxLength = 2;
             this.tb_ss.Name = "tb_ss";
             this.tb_ss.Size = new System.Drawing.Size(36, 27);
@@ -275,7 +280,7 @@
             // tb_ms
             // 
             this.tb_ms.BackColor = System.Drawing.Color.LightYellow;
-            this.tb_ms.Location = new System.Drawing.Point(784, 14);
+            this.tb_ms.Location = new System.Drawing.Point(784, 88);
             this.tb_ms.MaxLength = 3;
             this.tb_ms.Name = "tb_ms";
             this.tb_ms.Size = new System.Drawing.Size(42, 27);
@@ -288,11 +293,43 @@
             this.lbl_endTime.AutoSize = true;
             this.lbl_endTime.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_endTime.ForeColor = System.Drawing.Color.DarkGreen;
-            this.lbl_endTime.Location = new System.Drawing.Point(833, 17);
+            this.lbl_endTime.Location = new System.Drawing.Point(833, 91);
             this.lbl_endTime.Name = "lbl_endTime";
             this.lbl_endTime.Size = new System.Drawing.Size(15, 20);
             this.lbl_endTime.TabIndex = 8;
             this.lbl_endTime.Text = "-";
+            // 
+            // MainMenuStrip
+            // 
+            this.MainMenuStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.MainMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem2,
+            this.toolStripMenuItem3,
+            this.toolStripMenuItem1});
+            this.MainMenuStrip.Location = new System.Drawing.Point(0, 0);
+            this.MainMenuStrip.Name = "MainMenuStrip";
+            this.MainMenuStrip.Size = new System.Drawing.Size(1113, 28);
+            this.MainMenuStrip.TabIndex = 9;
+            this.MainMenuStrip.Text = "menuStrip1";
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(60, 24);
+            this.toolStripMenuItem2.Text = "Login";
+            // 
+            // toolStripMenuItem3
+            // 
+            this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(61, 24);
+            this.toolStripMenuItem3.Text = "Order";
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(77, 24);
+            this.toolStripMenuItem1.Text = "Account";
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.AccountMenuItemClick);
             // 
             // MainBotForm
             // 
@@ -318,12 +355,15 @@
             this.Controls.Add(this.lbl_status);
             this.Controls.Add(this.btn_load);
             this.Controls.Add(this.btn_start);
+            this.Controls.Add(this.MainMenuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "MainBotForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Bot Console";
             this.Load += new System.EventHandler(this.MainBotForm_Load);
+            this.MainMenuStrip.ResumeLayout(false);
+            this.MainMenuStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -362,5 +402,9 @@
         private System.Windows.Forms.TextBox tb_ss;
         private System.Windows.Forms.TextBox tb_ms;
         private System.Windows.Forms.Label lbl_endTime;
+        private System.Windows.Forms.MenuStrip MainMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BCore.Data;
 using BCore.DataModel;
+using BCore.Forms;
 using BotCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -37,7 +38,7 @@ namespace BCore
 
         private async void MainBotForm_Load(object sender, EventArgs e)
         {
-            LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).ToListAsync();
+            // LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).ToListAsync();
         }
 
         private async void btn_load_Click(object sender, EventArgs e)
@@ -75,7 +76,7 @@ namespace BCore
                 while (TimeSpan.Compare(DateTime.Now.TimeOfDay, _StartTime.TimeOfDay) < 0) ; // -1  if  t1 is shorter than t2.                
                 foreach (var orderTask in OrdersTasksList)
                     orderTask.Start();
-                AppendTextBox($"Started: {DateTime.Now:HH:mm:ss.fff}");
+                AppendTextBox($"[ Started: {DateTime.Now:HH:mm:ss.fff} ]");
             }, TaskCreationOptions.LongRunning);
         }
 
@@ -89,7 +90,7 @@ namespace BCore
                 if (DateTime.Now.Subtract(LastTrySendTime).TotalMilliseconds >= interval)
                 {
                     _http.SendAsync(InitOrderReqHeader(order, ApiToken));
-                    output += $"\nCode:{order.SymboleCode}, Sent=> {DateTime.Now:HH:mm:ss.fff}\n";
+                    output += $"\nCode:{order.SymboleCode}, Sent=> {DateTime.Now:HH:mm:ss.fff}";
                     LastTrySendTime = DateTime.Now;
                     sentCount++;
                 }
@@ -220,6 +221,11 @@ namespace BCore
                 return;
             }
             tb_logs.Text += value.Replace("\n", Environment.NewLine);
+        }
+        private void AccountMenuItemClick(object sender, EventArgs e)
+        {
+            Form accountForm = new Account();
+            accountForm.ShowDialog();
         }
     }
 }

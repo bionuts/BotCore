@@ -10,10 +10,12 @@ namespace BCore.Data
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Data Source=.;Initial Catalog=BcoreDB;Integrated Security=True");
+            string path = System.IO.Path.Combine(Environment.CurrentDirectory, "Mobin.db");
+            optionsBuilder.UseSqlite($"Filename={path}");
         }
         public DbSet<BOrder> BOrders { get; set; }
         public DbSet<BCookie> BCookies { get; set; }
         public DbSet<BSymbole> BSymboles { get; set; }
+        public DbSet<BSetting> BSettings { get; set; }
     }
 }
