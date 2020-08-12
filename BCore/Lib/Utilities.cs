@@ -1,6 +1,8 @@
 ﻿using BCore.Data;
+using BCore.DataModel;
 using BotCore.Data;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -43,6 +45,29 @@ namespace BCore.Lib
             HttpClientForSendOrder.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36");
             HttpClientForSendOrder.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
             return HttpClientForSendOrder;
+        }
+
+        public static HttpClient GetPresetHttpClientForOpenOrders()
+        {
+            HttpClient OpenOrders = new HttpClient
+            {
+                BaseAddress = new Uri("https://api2.mobinsb.com")
+            };
+            OpenOrders.DefaultRequestHeaders.Add("Accept", "*/*");
+            OpenOrders.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
+            OpenOrders.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9,la;q=0.8,fa;q=0.7,ar;q=0.6,fr;q=0.5");
+            OpenOrders.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
+            OpenOrders.DefaultRequestHeaders.Add("Connection", "keep-alive");
+            OpenOrders.DefaultRequestHeaders.Add("Host", "api2.mobinsb.com");
+            OpenOrders.DefaultRequestHeaders.Add("Origin", "https://silver.mobinsb.com");
+            OpenOrders.DefaultRequestHeaders.Add("Pragma", "no-cache");
+            OpenOrders.DefaultRequestHeaders.Add("Referer", "https://silver.mobinsb.com/Home/Default/page-1");
+            OpenOrders.DefaultRequestHeaders.Add("Sec-Fetch-Dest", "empty");
+            OpenOrders.DefaultRequestHeaders.Add("Sec-Fetch-Mode", "cors");
+            OpenOrders.DefaultRequestHeaders.Add("Sec-Fetch-Site", "same-site");
+            OpenOrders.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36");
+            OpenOrders.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
+            return OpenOrders;
         }
 
         public static HttpClient GetPresetHttpClientForInitCookies()
@@ -130,6 +155,45 @@ namespace BCore.Lib
             HttpResponseMessage httpResponse = await httpClient.SendAsync(request);
             var cookies = ExtractCookiesFromHeader(httpResponse.Headers);
             await SaveCookiesToDataBase(cookies);
+        }
+
+        public static HttpRequestMessage InitOrderReqHeader(BOrder order, string ApiToken)
+        {
+            // https://api2.mobinsb.com/Web/V1/Order/Post
+            HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, "/Web/V1/Order/Post");
+            req.Headers.Add("Authorization", $"BasicAuthentication {ApiToken}");
+
+            var payload = new OrderPayload
+            {
+                IsSymbolCautionAgreement = false,
+                CautionAgreementSelected = false,
+                IsSymbolSepahAgreement = false,
+                SepahAgreementSelected = false,
+                orderCount = order.Count,
+                orderPrice = order.Price,
+                FinancialProviderId = 1,
+                minimumQuantity = 0,
+                maxShow = 0,
+                orderId = 0,
+                isin = order.SymboleCode,
+                orderSide = (order.OrderType == "SELL" ? "86" : "65"), // SELL(86) , BUY(65)
+                orderValidity = 74,
+                orderValiditydate = null,
+                shortSellIsEnabled = false,
+                shortSellIncentivePercent = 0
+            };
+
+            string str_payload = JsonConvert.SerializeObject(payload);
+            req.Content = new StringContent(str_payload, System.Text.Encoding.UTF8, "application/json");
+            return req;
+        }
+
+        public static HttpRequestMessage InitGetOpenOrdersReqHeader(string ApiToken)
+        {
+            // https://api2.mobinsb.com/Web/V1/Order/GetOpenOrder/OpenOrder
+            HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, "/Web/V1/Order/GetOpenOrder/OpenOrder");
+            req.Headers.Add("Authorization", $"BasicAuthentication {ApiToken}");            
+            return req;
         }
 
         private async Task SaveCookiesToDataBase(List<CookieItem> cookies)

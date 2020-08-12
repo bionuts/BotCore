@@ -41,23 +41,23 @@ namespace BCore
         {
             // LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).ToListAsync();
             var junk = await db.BSettings.ToListAsync();
+            await LoadOrdersToListView();
         }
 
         private async void btn_load_Click(object sender, EventArgs e)
         {
-            lv_orders.Items.Clear();
             LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).ToListAsync();
             ApiToken = (await db.BSettings.Where(c => c.Key == "apitoken").FirstOrDefaultAsync()).Value;
             if (LoadedOrders.Any())
             {
-                LoadOrdersToListView();
+                await LoadOrdersToListView();
                 LoadStartAndEndTime(tb_hh.Text.Trim(), tb_mm.Text.Trim(), tb_ss.Text.Trim(), tb_ms.Text.Trim(), tb_duration.Text.Trim());
                 lbl_endTime.Text = $"End: {_EndTime:HH:mm:ss.fff}";
                 OrdersTasksList = new List<Task>();
                 foreach (var order in LoadedOrders)
                 {
                     OrdersTasksList.Add(new Task(() => SendOrderTask(
-                        Utilities.GetPresetHttpClientForSendOrders(), // GetPresetHttpClientForSendOrders(),
+                        Utilities.GetPresetHttpClientForSendOrders(),
                         order,
                         _EndTime,
                         int.Parse(tb_interval.Text.Trim()),
@@ -154,19 +154,22 @@ namespace BCore
             return req;
         }
 
-        private void LoadOrdersToListView()
+        public async Task LoadOrdersToListView()
         {
+            lv_orders.Items.Clear();
+            LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).ToListAsync();
             foreach (var order in LoadedOrders)
             {
                 var row = new string[]
                 {
-                            order.SymboleCode,
-                            order.SymboleName,
-                            order.Count.ToString("N0"),
-                            order.Price.ToString("N0"),
-                            (order.Count * order.Price).ToString("N0"),
-                            order.OrderType,
-                            order.Status
+                    order.Id.ToString(),
+                    order.SymboleCode,
+                    order.SymboleName,
+                    order.Count.ToString("N0"),
+                    order.Price.ToString("N0"),
+                    (order.Count * order.Price).ToString("N0"),
+                    order.OrderType,
+                    order.Status
                 };
                 var lv_item = new ListViewItem(row);
                 lv_orders.Items.Add(lv_item);
@@ -224,6 +227,7 @@ namespace BCore
             }
             tb_logs.Text += value.Replace("\n", Environment.NewLine);
         }
+
         private void AccountMenuItemClick(object sender, EventArgs e)
         {
             Account accountForm = new Account();
@@ -246,6 +250,30 @@ namespace BCore
         {
             OrderForm orderForm = new OrderForm();
             orderForm.ShowDialog();
+        }
+
+        private void TestSendOrderOpenOrderMenuItemClick(object sender, EventArgs e)
+        {
+            SendOrderForm sendOrderForm = new SendOrderForm();
+            sendOrderForm.ShowDialog();
+        }
+
+        private async void btn_delete_orders_Click(object sender, EventArgs e)
+        {
+            if (lv_orders.SelectedItems.Count > 0)
+            {
+                foreach (ListViewItem sitem in lv_orders.SelectedItems)
+                {
+                    var id = int.Parse(sitem.SubItems[0].Text);
+                    var item = await db.BOrders.FindAsync(id);
+                    if (item != null)
+                    {
+                        db.BOrders.Remove(item);
+                    }
+                }
+                await db.SaveChangesAsync();
+                await LoadOrdersToListView();
+            }
         }
     }
 }

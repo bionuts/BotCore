@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -61,6 +62,8 @@ namespace BCore.Forms
                         tb_price.Text = "";
                         lbl_total.Text = "Total: 0";
                     }
+                    var mainForm = Application.OpenForms.OfType<MainBotForm>().FirstOrDefault();
+                    await mainForm.LoadOrdersToListView();
                 }
                 catch (Exception ex)
                 {
@@ -72,7 +75,7 @@ namespace BCore.Forms
         private void tb_count_price_TextChanged(object sender, EventArgs e)
         {
             if (tb_count.Text != "" && tb_price.Text != "")
-                lbl_total.Text = $"Total: {int.Parse(tb_count.Text.Trim()) * int.Parse(tb_price.Text.Trim())}";
+                lbl_total.Text = $"Total: {(int.Parse(tb_count.Text.Trim()) * int.Parse(tb_price.Text.Trim())).ToString("N0")}";
         }
     }
 }
