@@ -68,6 +68,7 @@
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
             this.btn_delete_orders = new System.Windows.Forms.Button();
+            this.lbl_path = new System.Windows.Forms.Label();
             this.MainMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -371,12 +372,21 @@
             this.btn_delete_orders.UseVisualStyleBackColor = true;
             this.btn_delete_orders.Click += new System.EventHandler(this.btn_delete_orders_Click);
             // 
+            // lbl_path
+            // 
+            this.lbl_path.AutoSize = true;
+            this.lbl_path.Location = new System.Drawing.Point(450, 238);
+            this.lbl_path.Name = "lbl_path";
+            this.lbl_path.Size = new System.Drawing.Size(0, 20);
+            this.lbl_path.TabIndex = 11;
+            // 
             // MainBotForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1113, 620);
+            this.Controls.Add(this.lbl_path);
             this.Controls.Add(this.btn_delete_orders);
             this.Controls.Add(this.lbl_endTime);
             this.Controls.Add(this.tb_ss);
@@ -451,5 +461,6 @@
         private System.Windows.Forms.Button btn_delete_orders;
         private System.Windows.Forms.ColumnHeader orderId;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
+        private System.Windows.Forms.Label lbl_path;
     }
 }

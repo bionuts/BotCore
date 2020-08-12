@@ -42,6 +42,7 @@ namespace BCore
             // LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).ToListAsync();
             var junk = await db.BSettings.ToListAsync();
             await LoadOrdersToListView();
+            lbl_path.Text = System.IO.Path.Combine(Environment.CurrentDirectory, "db.sqlite3");
         }
 
         private async void btn_load_Click(object sender, EventArgs e)

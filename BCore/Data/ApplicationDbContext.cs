@@ -10,7 +10,7 @@ namespace BCore.Data
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string path = System.IO.Path.Combine(Environment.CurrentDirectory, "Mobin.db");
+            string path = System.IO.Path.Combine(Environment.CurrentDirectory, "db.sqlite3");
             optionsBuilder.UseSqlite($"Filename={path}");
         }
         public DbSet<BOrder> BOrders { get; set; }
