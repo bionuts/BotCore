@@ -296,6 +296,7 @@ namespace BCore
         private void button1_Click(object sender, EventArgs e)
         {
             // var a = serviceProvider.GetRequiredService<IBotDatabaseRepository>();
+            // done
             tb_logs.Text = botDatabase.Hello();
         }
     }
