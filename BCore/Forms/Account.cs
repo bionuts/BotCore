@@ -1,5 +1,7 @@
-﻿using BCore.Data;
+﻿using BCore.Contracts;
+using BCore.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,11 +16,13 @@ namespace BCore.Forms
     public partial class Account : Form
     {
         private readonly ApplicationDbContext db;
+        private readonly IBotDatabaseRepository botDatabase;
 
-        public Account()
+        public Account(IBotDatabaseRepository botDatabase)
         {
-            InitializeComponent();
+            this.botDatabase = botDatabase;
             db = new ApplicationDbContext();
+            InitializeComponent();
         }
 
         private async void Account_Load(object sender, EventArgs e)
@@ -37,6 +41,12 @@ namespace BCore.Forms
             db.BSettings.Update(password);
             await db.SaveChangesAsync();
             this.Close();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            // var bot = provider.GetRequiredService<IBotDatabaseRepository>();
+            botDatabase.Hello();
         }
     }
 }

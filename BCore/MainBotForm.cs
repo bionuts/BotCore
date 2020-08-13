@@ -1,10 +1,12 @@
-﻿using BCore.Data;
+﻿using BCore.Contracts;
+using BCore.Data;
 using BCore.DataModel;
 using BCore.Forms;
 using BCore.Lib;
 using BotCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -30,11 +32,25 @@ namespace BCore
         private List<Task> OrdersTasksList;
         private DateTime _StartTime;
         private DateTime _EndTime;
+        private ServiceCollection services;
+        private ServiceProvider serviceProvider;
+        private BotDatabaseRepository botDatabase;
 
         public MainBotForm()
         {
-            InitializeComponent();
+            botDatabase = new BotDatabaseRepository();
             db = new ApplicationDbContext();
+           /* ConfigureServices();
+            serviceProvider = services.BuildServiceProvider();*/
+            InitializeComponent();
+        }
+
+        private void ConfigureServices()
+        {
+            services = new ServiceCollection();
+            services.AddSingleton<IBotDatabaseRepository, BotDatabaseRepository>();
+            services.AddScoped<IMobinBroker, MobinBroker>();
+            services.AddScoped<IMofidBroker, MofidBroker>();
         }
 
         private async void MainBotForm_Load(object sender, EventArgs e)
@@ -231,7 +247,7 @@ namespace BCore
 
         private void AccountMenuItemClick(object sender, EventArgs e)
         {
-            Account accountForm = new Account();
+            Account accountForm = new Account(botDatabase);
             accountForm.ShowDialog();
         }
 
@@ -275,6 +291,12 @@ namespace BCore
                 await db.SaveChangesAsync();
                 await LoadOrdersToListView();
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            // var a = serviceProvider.GetRequiredService<IBotDatabaseRepository>();
+            tb_logs.Text = botDatabase.Hello();
         }
     }
 }

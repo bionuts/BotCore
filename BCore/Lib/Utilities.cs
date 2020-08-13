@@ -5,12 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BCore.Lib
@@ -109,7 +111,7 @@ namespace BCore.Lib
         {
             HttpClientHandler httpClientHandler = new HttpClientHandler
             {
-                AllowAutoRedirect = false // , UseCookies
+                AllowAutoRedirect = false, // , UseCookies                
             };
             HttpClient HttpClientForMobinLogin = new HttpClient(httpClientHandler)
             {
@@ -192,7 +194,7 @@ namespace BCore.Lib
         {
             // https://api2.mobinsb.com/Web/V1/Order/GetOpenOrder/OpenOrder
             HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, "/Web/V1/Order/GetOpenOrder/OpenOrder");
-            req.Headers.Add("Authorization", $"BasicAuthentication {ApiToken}");            
+            req.Headers.Add("Authorization", $"BasicAuthentication {ApiToken}");
             return req;
         }
 
@@ -376,6 +378,49 @@ namespace BCore.Lib
             string t4 = tmp4.Key + "=" + tmp4.Value + "; ";
 
             return (t1 + t2 + t3 + t4).Trim();
+        }
+
+        private void StartSendingOrder(BOrder order, string token, int interval, DateTime stopTime)
+        {
+            // Timer timer = new Timer(                );
+            HttpClient httpClient = GetPresetHttpClientForSendOrders();
+            DateTime LastTrySendTime = DateTime.Now.AddMilliseconds(-interval);
+            HttpRequestMessage orderReq = InitOrderReqHeader(order, token);
+
+            do
+            {
+                if (DateTime.Now.Subtract(LastTrySendTime).TotalMilliseconds >= interval)
+                {
+                    Task.Run(() => httpClient.SendAsync(orderReq));
+                    LastTrySendTime = DateTime.Now;
+                }
+            } while (TimeSpan.Compare(DateTime.Now.TimeOfDay, stopTime.TimeOfDay) < 0);
+        }
+
+        private async Task<string> SendOrderItem(BOrder order, string ApiToken)
+        {
+            HttpClient _http = Utilities.GetPresetHttpClientForSendOrders();
+            string output = "";
+            var req = Utilities.InitOrderReqHeader(order, ApiToken);
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            HttpResponseMessage httpResponse = await _http.SendAsync(req);
+            
+            // if (httpResponse.StatusCode == HttpStatusCode.OK)
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                stopwatch.Stop();
+                output += $"Elapsed-Time: {stopwatch.ElapsedMilliseconds} ms" + Environment.NewLine;
+
+                var resContent = await httpResponse.Content.ReadAsStringAsync();
+                // {"Data":{"OrderId":0},"MessageDesc":null,"IsSuccessfull":true,"MessageCode":null,"Version":0}
+                OrderRespond orderRespond = JsonConvert.DeserializeObject<OrderRespond>(resContent);
+                if (orderRespond.IsSuccessfull)
+                {
+                    output += $"Return Data => {resContent}";
+                }
+            }
+            return output;
         }
     }
 }

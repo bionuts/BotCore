@@ -1,4 +1,5 @@
-﻿using BCore.Data;
+﻿using BCore.Contracts;
+using BCore.Data;
 using BotCore.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -19,8 +20,8 @@ namespace BCore.Forms
 
         public OrderForm()
         {
-            InitializeComponent();
             db = new ApplicationDbContext();
+            InitializeComponent();
         }
 
         private async void OrderForm_Load(object sender, EventArgs e)

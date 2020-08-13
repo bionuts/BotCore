@@ -6,7 +6,7 @@ namespace BCore.DataModel
 {
     class GetOpenOrder
     {
-        public GetOpenOrderData?[] Data { get; set; }
+        public GetOpenOrderData[] Data { get; set; }
         public string MessageDesc { get; set; }
         public bool IsSuccessfull { get; set; }
         public int? MessageCode { get; set; }
