@@ -1,5 +1,4 @@
-﻿using BCore.Contracts;
-using BCore.Data;
+﻿using BCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -16,11 +15,9 @@ namespace BCore.Forms
     public partial class Account : Form
     {
         private readonly ApplicationDbContext db;
-        private readonly IBotDatabaseRepository botDatabase;
 
-        public Account(IBotDatabaseRepository botDatabase)
+        public Account()
         {
-            this.botDatabase = botDatabase;
             db = new ApplicationDbContext();
             InitializeComponent();
         }
@@ -46,7 +43,7 @@ namespace BCore.Forms
         private void button1_Click(object sender, EventArgs e)
         {
             // var bot = provider.GetRequiredService<IBotDatabaseRepository>();
-            botDatabase.Hello();
+            // botDatabase.Hello();
         }
     }
 }

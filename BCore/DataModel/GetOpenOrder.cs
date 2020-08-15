@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BCore.DataModel
 {
-    class GetOpenOrder
+    public class GetOpenOrder
     {
         public GetOpenOrderData[] Data { get; set; }
         public string MessageDesc { get; set; }

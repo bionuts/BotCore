@@ -2,7 +2,6 @@
 using BCore.DataModel;
 using BotCore.Data;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,6 +11,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,7 +30,7 @@ namespace BCore.Lib
         {
             HttpClient HttpClientForSendOrder = new HttpClient
             {
-                BaseAddress = new Uri("https://api2.mobinsb.com")
+                BaseAddress = new Uri("https://api2.mobinsb.com"),
             };
             HttpClientForSendOrder.DefaultRequestHeaders.Add("Accept", "*/*");
             HttpClientForSendOrder.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
@@ -185,8 +185,8 @@ namespace BCore.Lib
                 shortSellIncentivePercent = 0
             };
 
-            string str_payload = JsonConvert.SerializeObject(payload);
-            req.Content = new StringContent(str_payload, System.Text.Encoding.UTF8, "application/json");
+            string str_payload = JsonSerializer.Serialize(payload); // JsonConvert.SerializeObject(payload);
+            req.Content = new StringContent(str_payload, Encoding.UTF8, "application/json");
             return req;
         }
 
@@ -412,9 +412,9 @@ namespace BCore.Lib
                 stopwatch.Stop();
                 output += $"Elapsed-Time: {stopwatch.ElapsedMilliseconds} ms" + Environment.NewLine;
 
-                var resContent = await httpResponse.Content.ReadAsStringAsync();
+                var resContent = await httpResponse.Content.ReadAsStreamAsync(); //ReadAsStringAsync();
                 // {"Data":{"OrderId":0},"MessageDesc":null,"IsSuccessfull":true,"MessageCode":null,"Version":0}
-                OrderRespond orderRespond = JsonConvert.DeserializeObject<OrderRespond>(resContent);
+                OrderRespond orderRespond = await JsonSerializer.DeserializeAsync<OrderRespond>(resContent); // JsonConvert.DeserializeObject<OrderRespond>(resContent);
                 if (orderRespond.IsSuccessfull)
                 {
                     output += $"Return Data => {resContent}";

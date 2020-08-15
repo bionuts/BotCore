@@ -1,5 +1,4 @@
-﻿using BCore.Contracts;
-using BCore.Data;
+﻿using BCore.Data;
 using BCore.DataModel;
 using BCore.Forms;
 using BCore.Lib;
@@ -7,7 +6,6 @@ using BotCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,7 +15,9 @@ using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -32,25 +32,12 @@ namespace BCore
         private List<Task> OrdersTasksList;
         private DateTime _StartTime;
         private DateTime _EndTime;
-        private ServiceCollection services;
-        private ServiceProvider serviceProvider;
-        private BotDatabaseRepository botDatabase;
+        private IServiceProvider BotServiceProvider { get; set; }
 
         public MainBotForm()
         {
-            botDatabase = new BotDatabaseRepository();
             db = new ApplicationDbContext();
-           /* ConfigureServices();
-            serviceProvider = services.BuildServiceProvider();*/
             InitializeComponent();
-        }
-
-        private void ConfigureServices()
-        {
-            services = new ServiceCollection();
-            services.AddSingleton<IBotDatabaseRepository, BotDatabaseRepository>();
-            services.AddScoped<IMobinBroker, MobinBroker>();
-            services.AddScoped<IMofidBroker, MofidBroker>();
         }
 
         private async void MainBotForm_Load(object sender, EventArgs e)
@@ -117,29 +104,6 @@ namespace BCore
             AppendTextBox(output);
         }
 
-        /*private async Task<bool> SendOrderItem(BOrder order, string apiToken)
-        {
-            DateTime sent = DateTime.Now;
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
-            HttpRequestMessage req = InitOrderReqHeader(order, apiToken);
-            var httpClient = httpClientFactory.CreateClient();
-            HttpResponseMessage httpResponse = await httpClient.SendAsync(req);
-            if (httpResponse.StatusCode == HttpStatusCode.OK)
-            {
-                stopwatch.Stop();
-                // Console.WriteLine($"Sym: {order.SymboleCode}, Sent: {sent:HH:mm:ss.fff}, Elapsed: { stopwatch.ElapsedMilliseconds }");
-                var t = httpResponse.Content.ReadAsStringAsync().Result;
-                OrderRespond orderRespond = JsonConvert.DeserializeObject<OrderRespond>(t);
-                Console.WriteLine("msg", $"Sym: {order.SymboleCode}, Sent: {sent:HH:mm:ss.fff}, Elapsed: { stopwatch.ElapsedMilliseconds }, Desc: {orderRespond.MessageDesc}");
-                if (orderRespond.IsSuccessfull)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }*/
-
         private static HttpRequestMessage InitOrderReqHeader(BOrder order, string ApiToken)
         {
             // https://api2.mobinsb.com/Web/V1/Order/Post
@@ -166,7 +130,7 @@ namespace BCore
                 shortSellIncentivePercent = 0
             };
 
-            string str_payload = JsonConvert.SerializeObject(payload);
+            var str_payload = JsonSerializer.Serialize(payload);// JsonConvert.SerializeObject(payload);
             req.Content = new StringContent(str_payload, System.Text.Encoding.UTF8, "application/json");
             return req;
         }
@@ -204,29 +168,6 @@ namespace BCore
             this._EndTime = _StartTime.AddSeconds((duration != "" ? double.Parse(duration) : 2.2));
         }
 
-        private static HttpClient GetPresetHttpClientForSendOrders()
-        {
-            HttpClient HttpClientForSendOrder = new HttpClient
-            {
-                BaseAddress = new Uri("https://api2.mobinsb.com"),
-            };
-            HttpClientForSendOrder.DefaultRequestHeaders.Add("Accept", "*/*");
-            HttpClientForSendOrder.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
-            HttpClientForSendOrder.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9,la;q=0.8,fa;q=0.7,ar;q=0.6,fr;q=0.5");
-            HttpClientForSendOrder.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
-            HttpClientForSendOrder.DefaultRequestHeaders.Add("Connection", "keep-alive");
-            HttpClientForSendOrder.DefaultRequestHeaders.Add("Host", "api2.mobinsb.com");
-            HttpClientForSendOrder.DefaultRequestHeaders.Add("Origin", "https://silver.mobinsb.com");
-            HttpClientForSendOrder.DefaultRequestHeaders.Add("Pragma", "no-cache");
-            HttpClientForSendOrder.DefaultRequestHeaders.Add("Referer", "https://silver.mobinsb.com/Home/Default/page-1");
-            HttpClientForSendOrder.DefaultRequestHeaders.Add("Sec-Fetch-Dest", "empty");
-            HttpClientForSendOrder.DefaultRequestHeaders.Add("Sec-Fetch-Mode", "cors");
-            HttpClientForSendOrder.DefaultRequestHeaders.Add("Sec-Fetch-Site", "same-site");
-            HttpClientForSendOrder.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36");
-            HttpClientForSendOrder.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
-            return HttpClientForSendOrder;
-        }
-
         private void lbl_starttime_Click(object sender, EventArgs e)
         {
             tb_hh.Text = DateTime.Now.Hour.ToString();
@@ -247,7 +188,7 @@ namespace BCore
 
         private void AccountMenuItemClick(object sender, EventArgs e)
         {
-            Account accountForm = new Account(botDatabase);
+            Account accountForm = new Account();
             accountForm.ShowDialog();
         }
 
@@ -272,6 +213,7 @@ namespace BCore
         private void TestSendOrderOpenOrderMenuItemClick(object sender, EventArgs e)
         {
             SendOrderForm sendOrderForm = new SendOrderForm();
+            // SendOrderForm sendOrderForm = BotServiceProvider.GetRequiredService<SendOrderForm>();
             sendOrderForm.ShowDialog();
         }
 
@@ -297,7 +239,7 @@ namespace BCore
         {
             // var a = serviceProvider.GetRequiredService<IBotDatabaseRepository>();
             // done
-            tb_logs.Text = botDatabase.Hello();
+            // tb_logs.Text = botDatabase.Hello();
         }
     }
 }

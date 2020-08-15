@@ -3,7 +3,6 @@ using BCore.DataModel;
 using BCore.Lib;
 using BotCore.Data;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,6 +14,7 @@ using System.Net;
 using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -23,13 +23,12 @@ namespace BCore.Forms
     public partial class SendOrderForm : Form
     {
         private readonly ApplicationDbContext db;
-        private Utilities util;
+        private MobinBroker mobin;
 
         public SendOrderForm()
         {
-            InitializeComponent();
             db = new ApplicationDbContext();
-            util = new Utilities(db);
+            InitializeComponent();
         }
 
         private async void SendOrderForm_Load(object sender, EventArgs e)
@@ -56,7 +55,13 @@ namespace BCore.Forms
                         OrderId = "0"
                     };
                     var token = await db.BSettings.Where(s => s.Key == "apitoken").FirstOrDefaultAsync();
-                    tb_response.Text = await SendOrderTask(order, token.Value);
+                    mobin = new MobinBroker
+                    {
+                        Token = token.Value,
+                        Order = order
+                    };
+                    await mobin.SendOrder();
+                    tb_response.Text = $"ElapsedTime: {mobin.ElapsedTime} {mobin.MessageDesc}";
                 }
                 catch (Exception ex)
                 {
@@ -84,8 +89,8 @@ namespace BCore.Forms
                 stopwatch.Stop();
                 output += $"Elapsed-Time: {stopwatch.ElapsedMilliseconds} ms" + Environment.NewLine;
 
-                var resContent = await httpResponse.Content.ReadAsStringAsync();
-                OrderRespond orderRespond = JsonConvert.DeserializeObject<OrderRespond>(resContent);
+                var resContent = await httpResponse.Content.ReadAsStreamAsync(); //  ReadAsStringAsync();
+                OrderRespond orderRespond = await JsonSerializer.DeserializeAsync<OrderRespond>(resContent); // JsonConvert.DeserializeObject<OrderRespond>(resContent);
                 if (orderRespond.IsSuccessfull)
                 {
                     output += $"Return Data => {resContent}";
@@ -107,14 +112,14 @@ namespace BCore.Forms
                 stopwatch.Stop();
                 output += $"Elapsed-Time: {stopwatch.ElapsedMilliseconds} ms" + Environment.NewLine;
 
-                string res = await httpResponse.Content.ReadAsStringAsync();
-                GetOpenOrder getOpenOrders = JsonConvert.DeserializeObject<GetOpenOrder>(res);
+                var res = await httpResponse.Content.ReadAsStreamAsync(); // ReadAsStringAsync();
+                GetOpenOrder getOpenOrders = await JsonSerializer.DeserializeAsync<GetOpenOrder>(res); // JsonConvert.DeserializeObject<GetOpenOrder>(res);
                 if (getOpenOrders.IsSuccessfull && getOpenOrders.Data.Length > 0)
                 {
                     foreach (var o in getOpenOrders.Data)
                     {
-                        output += $"ORDER => {o.symbol} ,TYPE: {o.orderside} ,CountPrice: [{o.qunatity}/{o.orderprice}] ," + 
-                            $"OrderId: {o.orderid}, DateTime: {o.dtime}/{o.time} ,ExpectedQuantity/Executed: {o.ExpectedQuantity}/{o.excuted} ," + 
+                        output += $"ORDER => {o.symbol} ,TYPE: {o.orderside} ,CountPrice: [{o.qunatity}/{o.orderprice}] ," +
+                            $"OrderId: {o.orderid}, DateTime: {o.dtime}/{o.time} ,ExpectedQuantity/Executed: {o.ExpectedQuantity}/{o.excuted} ," +
                             $"Status: {o.status}" + Environment.NewLine;
                     }
                 }
@@ -134,7 +139,10 @@ namespace BCore.Forms
         private async void btn_get_open_orders_Click(object sender, EventArgs e)
         {
             var token = await db.BSettings.Where(s => s.Key == "apitoken").FirstOrDefaultAsync();
-            tb_response.Text = await GetOpenOrderTask(token.Value);
+            /*var a = new MobinBroker(http);
+            a.Token = token.Value;
+            GetOpenOrder openOrder = await a.GetOpenOrders();
+            tb_response.Text = await GetOpenOrderTask(token.Value);*/
         }
     }
 }

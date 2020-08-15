@@ -7,7 +7,7 @@ namespace BCore.DataModel
     public class OrderRespond
     {
         public OrderRespondData Data { get; set; }
-        public string MessageDesc { get; set; }
+        public string MessageDesc { get; set; } = "";
         public bool IsSuccessfull { get; set; }
         public int? MessageCode { get; set; }
         public int Version { get; set; }
@@ -15,6 +15,6 @@ namespace BCore.DataModel
 
     public class OrderRespondData
     {
-        public string OrderId { get; set; }
+        public int OrderId { get; set; }
     }
 }

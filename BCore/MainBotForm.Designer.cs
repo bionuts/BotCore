@@ -508,7 +508,7 @@
         private System.Windows.Forms.TextBox tb_ss;
         private System.Windows.Forms.TextBox tb_ms;
         private System.Windows.Forms.Label lbl_endTime;
-        private System.Windows.Forms.MenuStrip MainMenuStrip;
+        // private System.Windows.Forms.MenuStrip MainMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
