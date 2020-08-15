@@ -2,12 +2,7 @@
 using BotCore.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -50,7 +45,7 @@ namespace BCore.Forms
                         SymboleCode = cb_symboles.SelectedValue.ToString(),
                         OrderType = (button.Name == "btn_buy" ? "BUY" : "SELL"),
                         Count = int.Parse(tb_count.Text.Trim()),
-                        Price = int.Parse(tb_price.Text.Trim()),
+                        Price = decimal.Parse(tb_price.Text.Trim()),
                         CreatedDateTime = DateTime.Now,
                         Status = "",
                         OrderId = "0"
@@ -75,7 +70,10 @@ namespace BCore.Forms
         private void tb_count_price_TextChanged(object sender, EventArgs e)
         {
             if (tb_count.Text != "" && tb_price.Text != "")
-                lbl_total.Text = $"Total: {(int.Parse(tb_count.Text.Trim()) * int.Parse(tb_price.Text.Trim())).ToString("N0")}";
+            {
+                var tot = long.Parse(tb_count.Text.Trim()) * long.Parse(tb_price.Text.Trim());
+                lbl_total.Text = $"Total: {tot:N0}";
+            }
         }
     }
 }

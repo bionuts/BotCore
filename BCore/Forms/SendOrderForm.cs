@@ -4,17 +4,8 @@ using BCore.Lib;
 using BotCore.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -24,6 +15,7 @@ namespace BCore.Forms
     {
         private readonly ApplicationDbContext db;
         private MobinBroker mobin;
+        private string token;
 
         public SendOrderForm()
         {
@@ -35,6 +27,7 @@ namespace BCore.Forms
         private async void SendOrderForm_Load(object sender, EventArgs e)
         {
             await ReloadSymboles();
+            token = (await db.BSettings.Where(s => s.Key == "apitoken").FirstOrDefaultAsync()).Value;
         }
 
         private async void btn_send_order_Click(object sender, EventArgs e)
@@ -44,25 +37,40 @@ namespace BCore.Forms
             {
                 try
                 {
-                    var order = new BOrder
+                    mobin.Token = token;
+                    var order1 = new BOrder
                     {
-                        SymboleName = cb_symboles.GetItemText(cb_symboles.SelectedItem),
-                        SymboleCode = cb_symboles.SelectedValue.ToString(),
-                        OrderType = (button.Name == "btn_buy" ? "BUY" : "SELL"),
+                        SymboleName = "ABADA",
+                        SymboleCode = "IRO1NBAB0001",
+                        OrderType = "BUY",
                         Count = int.Parse(tb_count.Text.Trim()),
                         Price = int.Parse(tb_price.Text.Trim()),
                         CreatedDateTime = DateTime.Now,
                         Status = "",
                         OrderId = "0"
                     };
-                    var token = await db.BSettings.Where(s => s.Key == "apitoken").FirstOrDefaultAsync();
-                    mobin = new MobinBroker
+                    mobin.Order = order1;
+                    mobin.PresetSendingOrderReqMsg();
+                    //var str = DateTime.Now.Millisecond.ToString("D3");
+                    mobin.SendOrder();
+                    //tb_response.Text += $"S_{str}, ElapsedTime: {mobin.SendingOrderElapsedTime}, Desc: {mobin.SendingOrderMessageDesc}{Environment.NewLine}";
+                    await Task.Delay(250);
+                    var order2 = new BOrder
                     {
-                        Token = token.Value,
-                        Order = order
+                        SymboleName = "WebSA",
+                        SymboleCode = "IRO1BSDR0001",
+                        OrderType = "BUY",
+                        Count = int.Parse(tb_count.Text.Trim()),
+                        Price = int.Parse(tb_price.Text.Trim()),
+                        CreatedDateTime = DateTime.Now,
+                        Status = "",
+                        OrderId = "0"
                     };
-                    await mobin.SendOrder();
-                    tb_response.Text = $"ElapsedTime: {mobin.SendingOrderElapsedTime} {mobin.SendingOrderMessageDesc}";
+                    mobin.Order = order2;
+                    mobin.PresetSendingOrderReqMsg();
+                    //str = DateTime.Now.Millisecond.ToString("D3");
+                    mobin.SendOrder();
+                    //tb_response.Text += $"S_{str}, ElapsedTime: {mobin.SendingOrderElapsedTime}, Desc: {mobin.SendingOrderMessageDesc}{Environment.NewLine}";
                 }
                 catch (Exception ex)
                 {
@@ -89,10 +97,13 @@ namespace BCore.Forms
         private async void btn_get_open_orders_Click(object sender, EventArgs e)
         {
             var token = await db.BSettings.Where(s => s.Key == "apitoken").FirstOrDefaultAsync();
-            /*var a = new MobinBroker(http);
-            a.Token = token.Value;
-            GetOpenOrder openOrder = await a.GetOpenOrders();
-            tb_response.Text = await GetOpenOrderTask(token.Value);*/
+            mobin.Token = token.Value;
+            GetOpenOrder openOrder = await mobin.GetOpenOrders();
+            tb_response.Text = mobin.SendingOrderMessageDesc + Environment.NewLine;
+            foreach (var o in openOrder.Data)
+            {
+                tb_response.Text += o.symbol + Environment.NewLine;
+            }
         }
     }
 }

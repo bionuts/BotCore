@@ -32,13 +32,13 @@
             this.btn_start = new System.Windows.Forms.Button();
             this.lv_orders = new System.Windows.Forms.ListView();
             this.orderId = new System.Windows.Forms.ColumnHeader();
-            this.symCode = new System.Windows.Forms.ColumnHeader();
             this.symName = new System.Windows.Forms.ColumnHeader();
-            this.countprice = new System.Windows.Forms.ColumnHeader();
+            this.count = new System.Windows.Forms.ColumnHeader();
             this.price = new System.Windows.Forms.ColumnHeader();
             this.total = new System.Windows.Forms.ColumnHeader();
             this.orderType = new System.Windows.Forms.ColumnHeader();
-            this.sendingtimes = new System.Windows.Forms.ColumnHeader();
+            this.times = new System.Windows.Forms.ColumnHeader();
+            this.hit = new System.Windows.Forms.ColumnHeader();
             this.orderStatus = new System.Windows.Forms.ColumnHeader();
             this.tb_logs = new System.Windows.Forms.TextBox();
             this.btn_load = new System.Windows.Forms.Button();
@@ -57,7 +57,6 @@
             this.tb_ms = new System.Windows.Forms.TextBox();
             this.lbl_endTime = new System.Windows.Forms.Label();
             this.btn_delete_orders = new System.Windows.Forms.Button();
-            this.lbl_path = new System.Windows.Forms.Label();
             this.MainConsoleMenu = new System.Windows.Forms.MenuStrip();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
@@ -66,6 +65,7 @@
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
+            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
             this.MainConsoleMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -81,15 +81,17 @@
             // 
             // lv_orders
             // 
+            this.lv_orders.Activation = System.Windows.Forms.ItemActivation.OneClick;
+            this.lv_orders.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lv_orders.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.orderId,
-            this.symCode,
             this.symName,
-            this.countprice,
+            this.count,
             this.price,
             this.total,
             this.orderType,
-            this.sendingtimes,
+            this.times,
+            this.hit,
             this.orderStatus});
             this.lv_orders.FullRowSelect = true;
             this.lv_orders.GridLines = true;
@@ -106,51 +108,50 @@
             // 
             this.orderId.Name = "orderId";
             this.orderId.Text = "ID";
-            this.orderId.Width = 50;
-            // 
-            // symCode
-            // 
-            this.symCode.Name = "symCode";
-            this.symCode.Text = "SymCode[X]";
-            this.symCode.Width = 130;
+            this.orderId.Width = 70;
             // 
             // symName
             // 
             this.symName.Name = "symName";
             this.symName.Text = "Symbole";
+            this.symName.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.symName.Width = 120;
             // 
-            // countprice
+            // count
             // 
-            this.countprice.Name = "countprice";
-            this.countprice.Text = "Count/Price";
-            this.countprice.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.countprice.Width = 110;
+            this.count.Name = "count";
+            this.count.Text = "Count";
+            this.count.Width = 70;
             // 
             // price
             // 
             this.price.Name = "price";
             this.price.Text = "Price";
-            this.price.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.price.Width = 100;
+            this.price.Width = 110;
             // 
             // total
             // 
             this.total.Name = "total";
             this.total.Text = "Total";
-            this.total.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.total.Width = 120;
+            this.total.Width = 160;
             // 
             // orderType
             // 
             this.orderType.Name = "orderType";
             this.orderType.Text = "Type";
+            this.orderType.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // sendingtimes
+            // times
             // 
-            this.sendingtimes.Name = "sendingtimes";
-            this.sendingtimes.Text = "Times / Hit";
-            this.sendingtimes.Width = 100;
+            this.times.Name = "times";
+            this.times.Text = "Times";
+            this.times.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // hit
+            // 
+            this.hit.Name = "hit";
+            this.hit.Text = "Hits";
+            this.hit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // orderStatus
             // 
@@ -194,7 +195,7 @@
             this.tb_duration.Name = "tb_duration";
             this.tb_duration.Size = new System.Drawing.Size(47, 27);
             this.tb_duration.TabIndex = 1;
-            this.tb_duration.Text = "2.65";
+            this.tb_duration.Text = "2";
             this.tb_duration.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label1
@@ -213,7 +214,7 @@
             this.tb_interval.Name = "tb_interval";
             this.tb_interval.Size = new System.Drawing.Size(47, 27);
             this.tb_interval.TabIndex = 2;
-            this.tb_interval.Text = "200";
+            this.tb_interval.Text = "305";
             this.tb_interval.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label2
@@ -303,7 +304,7 @@
             this.tb_ms.Name = "tb_ms";
             this.tb_ms.Size = new System.Drawing.Size(42, 27);
             this.tb_ms.TabIndex = 6;
-            this.tb_ms.Text = "350";
+            this.tb_ms.Text = "300";
             this.tb_ms.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // lbl_endTime
@@ -326,14 +327,6 @@
             this.btn_delete_orders.Text = "Delete Orders";
             this.btn_delete_orders.UseVisualStyleBackColor = true;
             this.btn_delete_orders.Click += new System.EventHandler(this.btn_delete_orders_Click);
-            // 
-            // lbl_path
-            // 
-            this.lbl_path.AutoSize = true;
-            this.lbl_path.Location = new System.Drawing.Point(304, 274);
-            this.lbl_path.Name = "lbl_path";
-            this.lbl_path.Size = new System.Drawing.Size(0, 20);
-            this.lbl_path.TabIndex = 11;
             // 
             // MainConsoleMenu
             // 
@@ -406,7 +399,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1115, 660);
-            this.Controls.Add(this.lbl_path);
             this.Controls.Add(this.btn_delete_orders);
             this.Controls.Add(this.lbl_endTime);
             this.Controls.Add(this.tb_ss);
@@ -445,10 +437,8 @@
         private System.Windows.Forms.Button btn_start;
         private System.Windows.Forms.ListView lv_orders;
         private System.Windows.Forms.TextBox tb_logs;
-        private System.Windows.Forms.ColumnHeader symCode;
         private System.Windows.Forms.ColumnHeader symName;
-        private System.Windows.Forms.ColumnHeader countprice;
-        private System.Windows.Forms.ColumnHeader price;
+        private System.Windows.Forms.ColumnHeader count;
         private System.Windows.Forms.ColumnHeader total;
         private System.Windows.Forms.ColumnHeader orderType;
         private System.Windows.Forms.ColumnHeader orderStatus;
@@ -470,8 +460,7 @@
         //private System.Windows.Forms.MenuStrip MainMenuStrip;
         private System.Windows.Forms.Button btn_delete_orders;
         private System.Windows.Forms.ColumnHeader orderId;
-        private System.Windows.Forms.Label lbl_path;
-        private System.Windows.Forms.ColumnHeader sendingtimes;
+        private System.Windows.Forms.ColumnHeader times;
         private System.Windows.Forms.MenuStrip MainConsoleMenu;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
@@ -480,5 +469,8 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem6;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem7;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
+        private System.Windows.Forms.ColumnHeader price;
+        private System.Windows.Forms.ColumnHeader hit;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
     }
 }

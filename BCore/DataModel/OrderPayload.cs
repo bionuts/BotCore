@@ -11,7 +11,7 @@ namespace BCore.DataModel
         public bool IsSymbolSepahAgreement { get; set; }
         public bool SepahAgreementSelected { get; set; }
         public int orderCount { get; set; }
-        public int orderPrice { get; set; }
+        public decimal orderPrice { get; set; }
         public int FinancialProviderId { get; set; }
         public int minimumQuantity { get; set; }
         public int maxShow { get; set; }

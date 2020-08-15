@@ -29,7 +29,7 @@ namespace BCore
         private readonly ApplicationDbContext db;
         private List<BOrder> LoadedOrders;
         private string ApiToken;
-        private List<Task> OrdersTasksList;
+        private List<Task> orderTasks;
         private DateTime _StartTime;
         private DateTime _EndTime;
 
@@ -41,86 +41,86 @@ namespace BCore
 
         private async void MainBotForm_Load(object sender, EventArgs e)
         {
-            // LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).ToListAsync();
-            var junk = await db.BSettings.ToListAsync();
             await LoadOrdersToListView();
-            lbl_path.Text = System.IO.Path.Combine(Environment.CurrentDirectory, "db.sqlite3");
         }
 
         private async void btn_load_Click(object sender, EventArgs e)
         {
-            LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).ToListAsync();
+            LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).OrderBy(d => d.CreatedDateTime).ToListAsync();
             ApiToken = (await db.BSettings.Where(c => c.Key == "apitoken").FirstOrDefaultAsync()).Value;
             if (LoadedOrders.Any())
             {
                 await LoadOrdersToListView();
-                /*LoadStartAndEndTime(tb_hh.Text.Trim(), tb_mm.Text.Trim(), tb_ss.Text.Trim(), tb_ms.Text.Trim(), tb_duration.Text.Trim());
+                LoadStartAndEndTime(tb_hh.Text.Trim(), tb_mm.Text.Trim(), tb_ss.Text.Trim(), tb_ms.Text.Trim(), tb_duration.Text.Trim());
                 lbl_endTime.Text = $"End: {_EndTime:HH:mm:ss.fff}";
-                OrdersTasksList = new List<Task>();
+                orderTasks = new List<Task>();
+                int step = int.Parse(tb_interval.Text.Trim()) / LoadedOrders.Count;
+                int dot = 0;
                 foreach (var order in LoadedOrders)
                 {
-                    OrdersTasksList.Add(new Task(() => SendOrderTask(
-                        Utilities.GetPresetHttpClientForSendOrders(),
-                        order,
-                        _EndTime,
-                        int.Parse(tb_interval.Text.Trim()),
-                        ApiToken), TaskCreationOptions.LongRunning));
-                }*/
+                    var st = _StartTime.AddMilliseconds(dot);
+                    var en = _EndTime.AddMilliseconds(dot);
+                    dot += step;
+                    orderTasks.Add(new Task(() => SendOrderTask(
+                        new MobinBroker(ApiToken, order),
+                        st, en,
+                        int.Parse(tb_interval.Text.Trim()))
+                    , TaskCreationOptions.LongRunning));
+                }
             }
         }
 
         private void btn_start_Click(object sender, EventArgs e)
         {
-            StartService();
+            foreach (var t in orderTasks)
+                t.Start();
         }
 
-        private void StartService()
+        private void SendOrderTask(MobinBroker mobin, DateTime startTime, DateTime endTime, int interval)
         {
-            Task.Factory.StartNew(() =>
-            {
-                while (TimeSpan.Compare(DateTime.Now.TimeOfDay, _StartTime.TimeOfDay) < 0) ; // -1  if  t1 is shorter than t2.                
-                foreach (var orderTask in OrdersTasksList)
-                    orderTask.Start();
-                AppendTextBox($"[ Started: {DateTime.Now:HH:mm:ss.fff} ]");
-            }, TaskCreationOptions.LongRunning);
-        }
-
-        private void SendOrderTask(HttpClient _http, BOrder order, DateTime endTime, int interval, string ApiToken)
-        {
-            /*DateTime LastTrySendTime = DateTime.Now.AddMilliseconds(-interval);
-            string output = "";
+            string output = "S_" + startTime.Millisecond.ToString("D3") + " , ";
+            bool ceasefire = false;
+            DateTime LastTrySendTime = DateTime.Now.AddMilliseconds(-interval);
             int sentCount = 0;
+            while (TimeSpan.Compare(DateTime.Now.TimeOfDay, startTime.TimeOfDay) < 0) ; // -1  if  t1 is shorter than t2. 
             do
             {
                 if (DateTime.Now.Subtract(LastTrySendTime).TotalMilliseconds >= interval)
                 {
-                    _http.SendAsync(InitOrderReqHeader(order, ApiToken));
-                    output += $"\nCode:{order.SymboleCode}, Sent=> {DateTime.Now:HH:mm:ss.fff}";
+                    mobin.SendOrder();
+                    output += DateTime.Now.Millisecond.ToString("D3") + " , ";
                     LastTrySendTime = DateTime.Now;
                     sentCount++;
                 }
-            } while (TimeSpan.Compare(DateTime.Now.TimeOfDay, endTime.TimeOfDay) < 0);
-            AppendTextBox(output);*/
+            } while ((TimeSpan.Compare(DateTime.Now.TimeOfDay, endTime.TimeOfDay) < 0) && !ceasefire);
+            output = $"\ntryCount: {sentCount}, timeVector: {output} {mobin.Order.SymboleName}";
+            AppendTextBox(output);
         }
 
         public async Task LoadOrdersToListView()
         {
             lv_orders.Items.Clear();
-            LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).ToListAsync();
+            LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).OrderBy(d => d.CreatedDateTime).ToListAsync();
             foreach (var order in LoadedOrders)
             {
+                decimal templong = order.Count * order.Price;
                 var row = new string[]
                 {
                     order.Id.ToString(),
-                    order.SymboleCode,
                     order.SymboleName,
                     order.Count.ToString("N0"),
                     order.Price.ToString("N0"),
-                    (order.Count * order.Price).ToString("N0"),
+                    templong.ToString("N0"),
                     order.OrderType,
+                    "0",
+                    "0",
                     order.Status
                 };
-                var lv_item = new ListViewItem(row);
+                var lv_item = new ListViewItem(row)
+                {
+                    UseItemStyleForSubItems = false
+                };
+                lv_item.SubItems[5].BackColor = order.OrderType == "BUY" ? Color.LightGreen : Color.Red;
                 lv_orders.Items.Add(lv_item);
             }
         }

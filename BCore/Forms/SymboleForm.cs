@@ -1,13 +1,7 @@
 ﻿using BCore.Data;
 using BotCore.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 

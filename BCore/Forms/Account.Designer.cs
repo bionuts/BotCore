@@ -33,7 +33,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.tb_password = new System.Windows.Forms.TextBox();
             this.btn_save = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -78,23 +77,12 @@
             this.btn_save.UseVisualStyleBackColor = true;
             this.btn_save.Click += new System.EventHandler(this.btn_save_Click);
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(12, 182);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(94, 29);
-            this.button1.TabIndex = 3;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // Account
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(500, 223);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.btn_save);
             this.Controls.Add(this.tb_password);
             this.Controls.Add(this.label2);
@@ -120,6 +108,5 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox tb_password;
         private System.Windows.Forms.Button btn_save;
-        private System.Windows.Forms.Button button1;
     }
 }

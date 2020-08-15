@@ -25,7 +25,7 @@ namespace BotCore.Data
         public int Count { get; set; }
 
         [Required]
-        public int Price { get; set; }
+        public decimal Price { get; set; }
 
         [Required]
         public DateTime CreatedDateTime { get; set; }

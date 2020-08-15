@@ -9,7 +9,7 @@ namespace BCore.DataModel
         public OrderRespondData Data { get; set; }
         public string MessageDesc { get; set; } = "";
         public bool IsSuccessfull { get; set; }
-        public int? MessageCode { get; set; }
+        public string MessageCode { get; set; } = "";
         public int Version { get; set; }
     }
 

@@ -28,8 +28,6 @@ namespace BCore.Lib
 
         public string Token { get; set; }
         public BOrder Order { get; set; }
-        public List<BOrder> Orders { get; set; }
-
         public long SendingOrderElapsedTime { get; private set; }
         public bool SendingOrderIsSuccessfull { get; private set; } = false;
         public string SendingOrderMessageDesc { get; private set; } = "";
@@ -48,22 +46,25 @@ namespace BCore.Lib
             };
             GeneralHttpClient = new HttpClient(httpHandler);
             SetHttpClientForSendingOrders();
-            CreateSendingOrderReqMsg();
         }
 
-        private void StartSendingOrder(BOrder order, string token, int interval, DateTime stopTime)
+        public MobinBroker(string token, BOrder order)
         {
-            /*DateTime LastTrySendTime = DateTime.Now.AddMilliseconds(-interval);
-            HttpRequestMessage orderReq = InitOrderReqHeader(order, token);
-
-            do
+            db = new ApplicationDbContext();
+            httpHandler = new HttpClientHandler()
             {
-                if (DateTime.Now.Subtract(LastTrySendTime).TotalMilliseconds >= interval)
-                {
-                    Task.Run(() => SendOpenHttpClient.SendAsync(orderReq));
-                    LastTrySendTime = DateTime.Now;
-                }
-            } while (TimeSpan.Compare(DateTime.Now.TimeOfDay, stopTime.TimeOfDay) < 0);*/
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli,
+                AllowAutoRedirect = false
+            };
+            serializeOptions = new JsonSerializerOptions
+            {
+                IgnoreNullValues = true,
+            };
+            GeneralHttpClient = new HttpClient(httpHandler);
+            SetHttpClientForSendingOrders();
+            Token = token;
+            Order = order;
+            PresetSendingOrderReqMsg();
         }
 
         public async Task<bool> InitCookies()
@@ -86,88 +87,6 @@ namespace BCore.Lib
                 return true;
             }
             return false;
-        }
-
-        private async Task SaveCookiesToDataBase(List<CookieItem> cookies)
-        {
-            foreach (var cookie in cookies)
-            {
-                if (cookie.Name == ".ASPXAUTH" && string.IsNullOrEmpty(cookie.Expires))
-                {
-                    var session = await db.BSettings.Where(s => s.Key == ".ASPXAUTH_").FirstOrDefaultAsync();
-                    if (session != null)
-                    {
-                        session.Value = cookie.Value;
-                        db.BSettings.Update(session);
-                    }
-                }
-                else
-                {
-                    var session = await db.BSettings.Where(s => s.Key == cookie.Name).FirstOrDefaultAsync();
-                    if (session != null)
-                    {
-                        session.Value = cookie.Value;
-                        db.BSettings.Update(session);
-                    }
-                }
-            }
-            await db.SaveChangesAsync();
-        }
-
-        private List<CookieItem> ExtractCookiesFromHeader(HttpResponseHeaders headers)
-        {
-            var cookies = new List<CookieItem>();
-            foreach (var header in headers)
-            {
-                if (header.Key == "Set-Cookie")
-                {
-                    foreach (var val in header.Value)
-                    {
-                        // ASP.NET_Session=uktcewouf3fdxvhdbungw5bl; path=/; HttpOnly; SameSite=Lax; Expires=Wed, 21 Oct 2015 07:28:00 GMT
-                        // "expires", "max-age", "path", "domain", "samesite", "HttpOnly", "Secure"
-                        var parts = val.Trim().Split("; ");
-                        var tcookie = new CookieItem
-                        {
-                            Name = parts[0].Substring(0, parts[0].IndexOf("=")),
-                            Value = parts[0].Substring(parts[0].IndexOf("=") + 1)
-                        };
-                        foreach (var p in parts)
-                        {
-                            if (p.ToLower().Contains("expires"))
-                            {
-                                tcookie.Expires = p.Substring(8);
-                            }
-                            else if (p.ToLower().Contains("max-age"))
-                            {
-                                tcookie.MaxAge = p.Substring(8);
-                            }
-                            else if (p.ToLower().Contains("path"))
-                            {
-                                // path=/
-                                tcookie.Path = p.Substring(5);
-                            }
-                            else if (p.ToLower().Contains("domain"))
-                            {
-                                tcookie.Domain = p.Substring(6);
-                            }
-                            else if (p.ToLower().Contains("samesite"))
-                            {
-                                tcookie.SameSite = p.Substring(9);
-                            }
-                            else if (p.ToLower().Contains("httponly"))
-                            {
-                                tcookie.HttpOnly = "HttpOnly";
-                            }
-                            else if (p.ToLower().Contains("secure"))
-                            {
-                                tcookie.Secure = "Secure";
-                            }
-                        }
-                        cookies.Add(tcookie);
-                    }
-                }
-            }
-            return cookies;
         }
 
         public async Task<Bitmap> GetCaptcha()
@@ -295,7 +214,7 @@ namespace BCore.Lib
             return (t1 + t2 + t3 + t4).Trim();
         }
 
-        private void CreateSendingOrderReqMsg()
+        public void PresetSendingOrderReqMsg()
         {
             SendOrderReqMsg = new HttpRequestMessage(HttpMethod.Post, "/Web/V1/Order/Post"); // [https]://api2.mobinsb.com/Web/V1/Order/Post
             SendOrderReqMsg.Headers.Add("Authorization", $"BasicAuthentication {Token}");
@@ -324,9 +243,8 @@ namespace BCore.Lib
 
         public async Task SendOrder()
         {
-            // {"Data":{"OrderId":0},"MessageDesc":null,"IsSuccessfull":true,"MessageCode":null,"Version":0}
-            // {"Data": null,"MessageDesc": "وضعیت گروه اجازه این فعالیت را نمی دهد","IsSuccessfull": false,"MessageCode": null,"Version": 0}
-
+            // 57__{"Data":null,"MessageDesc":"وضعیت گروه اجازه این فعالیت را نمی دهد..","IsSuccessfull":false,"MessageCode":null,"Version":0}
+            // 58__{"Data":null,"MessageDesc":"محدودیت ارسال سفارش در ثانیه","IsSuccessfull":false,"MessageCode":"OMS_2080","Version":0}
             stopwatch = Stopwatch.StartNew();
             HttpResponseMessage httpResponse = await SendHttpClient.SendAsync(SendOrderReqMsg);
             stopwatch.Stop();
@@ -366,6 +284,7 @@ namespace BCore.Lib
             {
                 stopwatch.Stop();
                 SendingOrderElapsedTime = stopwatch.ElapsedMilliseconds;
+                SendingOrderMessageDesc = "ElapsedTime: " + SendingOrderElapsedTime.ToString();
                 var res = await httpResponse.Content.ReadAsStringAsync();
                 openOrders = JsonSerializer.Deserialize<GetOpenOrder>(res);
             }
@@ -392,6 +311,88 @@ namespace BCore.Lib
             SendHttpClient.DefaultRequestHeaders.Add("Sec-Fetch-Site", "same-site");
             SendHttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36");
             SendHttpClient.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
+        }
+
+        private async Task SaveCookiesToDataBase(List<CookieItem> cookies)
+        {
+            foreach (var cookie in cookies)
+            {
+                if (cookie.Name == ".ASPXAUTH" && string.IsNullOrEmpty(cookie.Expires))
+                {
+                    var session = await db.BSettings.Where(s => s.Key == ".ASPXAUTH_").FirstOrDefaultAsync();
+                    if (session != null)
+                    {
+                        session.Value = cookie.Value;
+                        db.BSettings.Update(session);
+                    }
+                }
+                else
+                {
+                    var session = await db.BSettings.Where(s => s.Key == cookie.Name).FirstOrDefaultAsync();
+                    if (session != null)
+                    {
+                        session.Value = cookie.Value;
+                        db.BSettings.Update(session);
+                    }
+                }
+            }
+            await db.SaveChangesAsync();
+        }
+
+        private List<CookieItem> ExtractCookiesFromHeader(HttpResponseHeaders headers)
+        {
+            var cookies = new List<CookieItem>();
+            foreach (var header in headers)
+            {
+                if (header.Key == "Set-Cookie")
+                {
+                    foreach (var val in header.Value)
+                    {
+                        // ASP.NET_Session=uktcewouf3fdxvhdbungw5bl; path=/; HttpOnly; SameSite=Lax; Expires=Wed, 21 Oct 2015 07:28:00 GMT
+                        // "expires", "max-age", "path", "domain", "samesite", "HttpOnly", "Secure"
+                        var parts = val.Trim().Split("; ");
+                        var tcookie = new CookieItem
+                        {
+                            Name = parts[0].Substring(0, parts[0].IndexOf("=")),
+                            Value = parts[0].Substring(parts[0].IndexOf("=") + 1)
+                        };
+                        foreach (var p in parts)
+                        {
+                            if (p.ToLower().Contains("expires"))
+                            {
+                                tcookie.Expires = p.Substring(8);
+                            }
+                            else if (p.ToLower().Contains("max-age"))
+                            {
+                                tcookie.MaxAge = p.Substring(8);
+                            }
+                            else if (p.ToLower().Contains("path"))
+                            {
+                                // path=/
+                                tcookie.Path = p.Substring(5);
+                            }
+                            else if (p.ToLower().Contains("domain"))
+                            {
+                                tcookie.Domain = p.Substring(6);
+                            }
+                            else if (p.ToLower().Contains("samesite"))
+                            {
+                                tcookie.SameSite = p.Substring(9);
+                            }
+                            else if (p.ToLower().Contains("httponly"))
+                            {
+                                tcookie.HttpOnly = "HttpOnly";
+                            }
+                            else if (p.ToLower().Contains("secure"))
+                            {
+                                tcookie.Secure = "Secure";
+                            }
+                        }
+                        cookies.Add(tcookie);
+                    }
+                }
+            }
+            return cookies;
         }
     }
 }
