@@ -27,6 +27,7 @@ namespace BCore.Forms
 
         public SendOrderForm()
         {
+            mobin = new MobinBroker();
             db = new ApplicationDbContext();
             InitializeComponent();
         }
@@ -61,7 +62,7 @@ namespace BCore.Forms
                         Order = order
                     };
                     await mobin.SendOrder();
-                    tb_response.Text = $"ElapsedTime: {mobin.ElapsedTime} {mobin.MessageDesc}";
+                    tb_response.Text = $"ElapsedTime: {mobin.SendingOrderElapsedTime} {mobin.SendingOrderMessageDesc}";
                 }
                 catch (Exception ex)
                 {
@@ -74,57 +75,6 @@ namespace BCore.Forms
         {
             if (tb_count.Text != "" && tb_price.Text != "")
                 lbl_total.Text = $"Total: {(int.Parse(tb_count.Text.Trim()) * int.Parse(tb_price.Text.Trim())).ToString("N0")}";
-        }
-
-        private async Task<string> SendOrderTask(BOrder order, string ApiToken)
-        {
-            HttpClient _http = Utilities.GetPresetHttpClientForSendOrders();
-            string output = "";
-            var req = Utilities.InitOrderReqHeader(order, ApiToken);
-
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            HttpResponseMessage httpResponse = await _http.SendAsync(req);
-            if (httpResponse.StatusCode == HttpStatusCode.OK)
-            {
-                stopwatch.Stop();
-                output += $"Elapsed-Time: {stopwatch.ElapsedMilliseconds} ms" + Environment.NewLine;
-
-                var resContent = await httpResponse.Content.ReadAsStreamAsync(); //  ReadAsStringAsync();
-                OrderRespond orderRespond = await JsonSerializer.DeserializeAsync<OrderRespond>(resContent); // JsonConvert.DeserializeObject<OrderRespond>(resContent);
-                if (orderRespond.IsSuccessfull)
-                {
-                    output += $"Return Data => {resContent}";
-                }
-            }
-            return output;
-        }
-
-        private async Task<string> GetOpenOrderTask(string ApiToken)
-        {
-            HttpClient _http = Utilities.GetPresetHttpClientForOpenOrders();
-            string output = "";
-            var req = Utilities.InitGetOpenOrdersReqHeader(ApiToken);
-
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            HttpResponseMessage httpResponse = await _http.SendAsync(req);
-            if (httpResponse.StatusCode == HttpStatusCode.OK)
-            {
-                stopwatch.Stop();
-                output += $"Elapsed-Time: {stopwatch.ElapsedMilliseconds} ms" + Environment.NewLine;
-
-                var res = await httpResponse.Content.ReadAsStreamAsync(); // ReadAsStringAsync();
-                GetOpenOrder getOpenOrders = await JsonSerializer.DeserializeAsync<GetOpenOrder>(res); // JsonConvert.DeserializeObject<GetOpenOrder>(res);
-                if (getOpenOrders.IsSuccessfull && getOpenOrders.Data.Length > 0)
-                {
-                    foreach (var o in getOpenOrders.Data)
-                    {
-                        output += $"ORDER => {o.symbol} ,TYPE: {o.orderside} ,CountPrice: [{o.qunatity}/{o.orderprice}] ," +
-                            $"OrderId: {o.orderid}, DateTime: {o.dtime}/{o.time} ,ExpectedQuantity/Executed: {o.ExpectedQuantity}/{o.excuted} ," +
-                            $"Status: {o.status}" + Environment.NewLine;
-                    }
-                }
-            }
-            return output;
         }
 
         private async Task ReloadSymboles()

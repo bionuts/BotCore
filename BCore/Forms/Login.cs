@@ -17,13 +17,13 @@ namespace BCore.Forms
     public partial class Login : Form
     {
         private readonly ApplicationDbContext db;
-        private Utilities util;
+        private MobinBroker mobin;
 
         public Login()
         {
-            InitializeComponent();
             db = new ApplicationDbContext();
-            util = new Utilities(db);
+            mobin = new MobinBroker();
+            InitializeComponent();
         }
 
         private async void Login_Load(object sender, EventArgs e)
@@ -34,17 +34,20 @@ namespace BCore.Forms
 
         private async void btn_init_cookies_Click(object sender, EventArgs e)
         {
-            await util.InitCookies();
+            if (await mobin.InitCookies())
+                MessageBox.Show("init done.");
+            else
+                MessageBox.Show("init failed.");
         }
 
         private async void btn_refresh_Click(object sender, EventArgs e)
         {
-            pb_captcha.Image = await util.GetCaptcha();
+            pb_captcha.Image = await mobin.GetCaptcha();
         }
 
         private async void btn_login_Click(object sender, EventArgs e)
         {
-            string output = await util.LoginToMobinBroker(tb_username.Text, tb_password.Text, tb_captcha.Text.Trim());
+            string output = await mobin.Login(tb_username.Text, tb_password.Text, tb_captcha.Text.Trim());
             if (output != "")
             {
                 lbl_api_token.Text = "ApiToken: " + output.Substring(0, output.IndexOf("@@@"));

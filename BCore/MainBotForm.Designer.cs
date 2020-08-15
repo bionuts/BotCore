@@ -41,12 +41,6 @@
             this.sendingtimes = new System.Windows.Forms.ColumnHeader();
             this.orderStatus = new System.Windows.Forms.ColumnHeader();
             this.tb_logs = new System.Windows.Forms.TextBox();
-            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader6 = new System.Windows.Forms.ColumnHeader();
             this.btn_load = new System.Windows.Forms.Button();
             this.lbl_status = new System.Windows.Forms.Label();
             this.tb_duration = new System.Windows.Forms.TextBox();
@@ -62,20 +56,17 @@
             this.tb_ss = new System.Windows.Forms.TextBox();
             this.tb_ms = new System.Windows.Forms.TextBox();
             this.lbl_endTime = new System.Windows.Forms.Label();
-            this.MainMenuStrip = new System.Windows.Forms.MenuStrip();
+            this.btn_delete_orders = new System.Windows.Forms.Button();
+            this.lbl_path = new System.Windows.Forms.Label();
+            this.MainConsoleMenu = new System.Windows.Forms.MenuStrip();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem8 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem9 = new System.Windows.Forms.ToolStripMenuItem();
-            this.btn_delete_orders = new System.Windows.Forms.Button();
-            this.lbl_path = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.MainMenuStrip.SuspendLayout();
+            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
+            this.MainConsoleMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // btn_start
@@ -106,7 +97,7 @@
             this.lv_orders.HideSelection = false;
             this.lv_orders.Location = new System.Drawing.Point(12, 81);
             this.lv_orders.Name = "lv_orders";
-            this.lv_orders.Size = new System.Drawing.Size(1478, 183);
+            this.lv_orders.Size = new System.Drawing.Size(1089, 183);
             this.lv_orders.TabIndex = 2;
             this.lv_orders.UseCompatibleStateImageBehavior = false;
             this.lv_orders.View = System.Windows.Forms.View.Details;
@@ -326,86 +317,6 @@
             this.lbl_endTime.TabIndex = 8;
             this.lbl_endTime.Text = "-";
             // 
-            // MainMenuStrip
-            // 
-            this.MainMenuStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.MainMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItem2,
-            this.toolStripMenuItem3,
-            this.toolStripMenuItem4,
-            this.toolStripMenuItem1,
-            this.toolStripMenuItem5,
-            this.toolStripMenuItem6});
-            this.MainMenuStrip.Location = new System.Drawing.Point(0, 0);
-            this.MainMenuStrip.Name = "MainMenuStrip";
-            this.MainMenuStrip.Size = new System.Drawing.Size(1502, 28);
-            this.MainMenuStrip.TabIndex = 9;
-            this.MainMenuStrip.Text = "menuStrip1";
-            // 
-            // toolStripMenuItem2
-            // 
-            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(60, 24);
-            this.toolStripMenuItem2.Text = "Login";
-            this.toolStripMenuItem2.Click += new System.EventHandler(this.LoginMenuItemClick);
-            // 
-            // toolStripMenuItem3
-            // 
-            this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(61, 24);
-            this.toolStripMenuItem3.Text = "Order";
-            this.toolStripMenuItem3.Click += new System.EventHandler(this.OrderMenuItemClick);
-            // 
-            // toolStripMenuItem4
-            // 
-            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(87, 24);
-            this.toolStripMenuItem4.Text = "Symboles";
-            this.toolStripMenuItem4.Click += new System.EventHandler(this.SymboleMenuItemClick);
-            // 
-            // toolStripMenuItem1
-            // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(77, 24);
-            this.toolStripMenuItem1.Text = "Account";
-            this.toolStripMenuItem1.Click += new System.EventHandler(this.AccountMenuItemClick);
-            // 
-            // toolStripMenuItem5
-            // 
-            this.toolStripMenuItem5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(49, 24);
-            this.toolStripMenuItem5.Text = "Test";
-            this.toolStripMenuItem5.Click += new System.EventHandler(this.TestSendOrderOpenOrderMenuItemClick);
-            // 
-            // toolStripMenuItem6
-            // 
-            this.toolStripMenuItem6.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItem7,
-            this.toolStripMenuItem8,
-            this.toolStripMenuItem9});
-            this.toolStripMenuItem6.Name = "toolStripMenuItem6";
-            this.toolStripMenuItem6.Size = new System.Drawing.Size(76, 24);
-            this.toolStripMenuItem6.Text = "Settings";
-            // 
-            // toolStripMenuItem7
-            // 
-            this.toolStripMenuItem7.Name = "toolStripMenuItem7";
-            this.toolStripMenuItem7.Size = new System.Drawing.Size(156, 26);
-            this.toolStripMenuItem7.Text = "Account";
-            // 
-            // toolStripMenuItem8
-            // 
-            this.toolStripMenuItem8.Name = "toolStripMenuItem8";
-            this.toolStripMenuItem8.Size = new System.Drawing.Size(156, 26);
-            this.toolStripMenuItem8.Text = "Login";
-            // 
-            // toolStripMenuItem9
-            // 
-            this.toolStripMenuItem9.Name = "toolStripMenuItem9";
-            this.toolStripMenuItem9.Size = new System.Drawing.Size(156, 26);
-            this.toolStripMenuItem9.Text = "Symboles";
-            // 
             // btn_delete_orders
             // 
             this.btn_delete_orders.Location = new System.Drawing.Point(961, 270);
@@ -424,23 +335,77 @@
             this.lbl_path.Size = new System.Drawing.Size(0, 20);
             this.lbl_path.TabIndex = 11;
             // 
-            // button1
+            // MainConsoleMenu
             // 
-            this.button1.Location = new System.Drawing.Point(861, 270);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(94, 29);
-            this.button1.TabIndex = 12;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.MainConsoleMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.MainConsoleMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem1,
+            this.toolStripMenuItem2,
+            this.toolStripMenuItem3,
+            this.toolStripMenuItem4,
+            this.toolStripMenuItem5});
+            this.MainConsoleMenu.Location = new System.Drawing.Point(0, 0);
+            this.MainConsoleMenu.Name = "MainConsoleMenu";
+            this.MainConsoleMenu.Size = new System.Drawing.Size(1115, 28);
+            this.MainConsoleMenu.TabIndex = 12;
+            this.MainConsoleMenu.Text = "menuStrip1";
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(61, 24);
+            this.toolStripMenuItem1.Text = "Order";
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.OrderMenuItemClick);
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(87, 24);
+            this.toolStripMenuItem2.Text = "Symboles";
+            this.toolStripMenuItem2.Click += new System.EventHandler(this.SymboleMenuItemClick);
+            // 
+            // toolStripMenuItem3
+            // 
+            this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(49, 24);
+            this.toolStripMenuItem3.Text = "Test";
+            this.toolStripMenuItem3.Click += new System.EventHandler(this.TestSendOrderOpenOrderMenuItemClick);
+            // 
+            // toolStripMenuItem4
+            // 
+            this.toolStripMenuItem4.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem6,
+            this.toolStripMenuItem7});
+            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(52, 24);
+            this.toolStripMenuItem4.Text = "User";
+            // 
+            // toolStripMenuItem6
+            // 
+            this.toolStripMenuItem6.Name = "toolStripMenuItem6";
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(146, 26);
+            this.toolStripMenuItem6.Text = "Account";
+            this.toolStripMenuItem6.Click += new System.EventHandler(this.AccountMenuItemClick);
+            // 
+            // toolStripMenuItem7
+            // 
+            this.toolStripMenuItem7.Name = "toolStripMenuItem7";
+            this.toolStripMenuItem7.Size = new System.Drawing.Size(146, 26);
+            this.toolStripMenuItem7.Text = "Login";
+            this.toolStripMenuItem7.Click += new System.EventHandler(this.LoginMenuItemClick);
+            // 
+            // toolStripMenuItem5
+            // 
+            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(76, 24);
+            this.toolStripMenuItem5.Text = "Settings";
             // 
             // MainBotForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1502, 660);
-            this.Controls.Add(this.button1);
+            this.ClientSize = new System.Drawing.Size(1115, 660);
             this.Controls.Add(this.lbl_path);
             this.Controls.Add(this.btn_delete_orders);
             this.Controls.Add(this.lbl_endTime);
@@ -461,15 +426,15 @@
             this.Controls.Add(this.lbl_status);
             this.Controls.Add(this.btn_load);
             this.Controls.Add(this.btn_start);
-            this.Controls.Add(this.MainMenuStrip);
+            this.Controls.Add(this.MainConsoleMenu);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "MainBotForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "WineoBot";
             this.Load += new System.EventHandler(this.MainBotForm_Load);
-            this.MainMenuStrip.ResumeLayout(false);
-            this.MainMenuStrip.PerformLayout();
+            this.MainConsoleMenu.ResumeLayout(false);
+            this.MainConsoleMenu.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -487,12 +452,6 @@
         private System.Windows.Forms.ColumnHeader total;
         private System.Windows.Forms.ColumnHeader orderType;
         private System.Windows.Forms.ColumnHeader orderStatus;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
-        private System.Windows.Forms.ColumnHeader columnHeader3;
-        private System.Windows.Forms.ColumnHeader columnHeader4;
-        private System.Windows.Forms.ColumnHeader columnHeader5;
-        private System.Windows.Forms.ColumnHeader columnHeader6;
         private System.Windows.Forms.Button btn_load;
         private System.Windows.Forms.Label lbl_status;
         private System.Windows.Forms.TextBox tb_duration;
@@ -508,20 +467,18 @@
         private System.Windows.Forms.TextBox tb_ss;
         private System.Windows.Forms.TextBox tb_ms;
         private System.Windows.Forms.Label lbl_endTime;
-        // private System.Windows.Forms.MenuStrip MainMenuStrip;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem4;
+        //private System.Windows.Forms.MenuStrip MainMenuStrip;
         private System.Windows.Forms.Button btn_delete_orders;
         private System.Windows.Forms.ColumnHeader orderId;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
         private System.Windows.Forms.Label lbl_path;
+        private System.Windows.Forms.ColumnHeader sendingtimes;
+        private System.Windows.Forms.MenuStrip MainConsoleMenu;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem6;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem7;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem8;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem9;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.ColumnHeader sendingtimes;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
     }
 }

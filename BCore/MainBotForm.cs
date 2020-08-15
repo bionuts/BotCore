@@ -32,7 +32,6 @@ namespace BCore
         private List<Task> OrdersTasksList;
         private DateTime _StartTime;
         private DateTime _EndTime;
-        private IServiceProvider BotServiceProvider { get; set; }
 
         public MainBotForm()
         {
@@ -55,7 +54,7 @@ namespace BCore
             if (LoadedOrders.Any())
             {
                 await LoadOrdersToListView();
-                LoadStartAndEndTime(tb_hh.Text.Trim(), tb_mm.Text.Trim(), tb_ss.Text.Trim(), tb_ms.Text.Trim(), tb_duration.Text.Trim());
+                /*LoadStartAndEndTime(tb_hh.Text.Trim(), tb_mm.Text.Trim(), tb_ss.Text.Trim(), tb_ms.Text.Trim(), tb_duration.Text.Trim());
                 lbl_endTime.Text = $"End: {_EndTime:HH:mm:ss.fff}";
                 OrdersTasksList = new List<Task>();
                 foreach (var order in LoadedOrders)
@@ -66,7 +65,7 @@ namespace BCore
                         _EndTime,
                         int.Parse(tb_interval.Text.Trim()),
                         ApiToken), TaskCreationOptions.LongRunning));
-                }
+                }*/
             }
         }
 
@@ -88,7 +87,7 @@ namespace BCore
 
         private void SendOrderTask(HttpClient _http, BOrder order, DateTime endTime, int interval, string ApiToken)
         {
-            DateTime LastTrySendTime = DateTime.Now.AddMilliseconds(-interval);
+            /*DateTime LastTrySendTime = DateTime.Now.AddMilliseconds(-interval);
             string output = "";
             int sentCount = 0;
             do
@@ -101,38 +100,7 @@ namespace BCore
                     sentCount++;
                 }
             } while (TimeSpan.Compare(DateTime.Now.TimeOfDay, endTime.TimeOfDay) < 0);
-            AppendTextBox(output);
-        }
-
-        private static HttpRequestMessage InitOrderReqHeader(BOrder order, string ApiToken)
-        {
-            // https://api2.mobinsb.com/Web/V1/Order/Post
-            HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, "/Web/V1/Order/Post");
-            req.Headers.Add("Authorization", $"BasicAuthentication {ApiToken}");
-
-            var payload = new OrderPayload
-            {
-                IsSymbolCautionAgreement = false,
-                CautionAgreementSelected = false,
-                IsSymbolSepahAgreement = false,
-                SepahAgreementSelected = false,
-                orderCount = order.Count,
-                orderPrice = order.Price,
-                FinancialProviderId = 1,
-                minimumQuantity = 0,
-                maxShow = 0,
-                orderId = 0,
-                isin = order.SymboleCode,
-                orderSide = (order.OrderType == "SELL" ? "86" : "65"), // SELL(86) , BUY(65)
-                orderValidity = 74,
-                orderValiditydate = null,
-                shortSellIsEnabled = false,
-                shortSellIncentivePercent = 0
-            };
-
-            var str_payload = JsonSerializer.Serialize(payload);// JsonConvert.SerializeObject(payload);
-            req.Content = new StringContent(str_payload, System.Text.Encoding.UTF8, "application/json");
-            return req;
+            AppendTextBox(output);*/
         }
 
         public async Task LoadOrdersToListView()
@@ -233,13 +201,6 @@ namespace BCore
                 await db.SaveChangesAsync();
                 await LoadOrdersToListView();
             }
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            // var a = serviceProvider.GetRequiredService<IBotDatabaseRepository>();
-            // done
-            // tb_logs.Text = botDatabase.Hello();
         }
     }
 }
