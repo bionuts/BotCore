@@ -46,9 +46,9 @@ namespace BCore.Forms
                         Status = "",
                         OrderId = "0"
                     };
-                    MobinBroker m1 = new MobinBroker(token, order);
-                    await m1.SendOrder();
-                    tb_response.Text += $"ElapsedTime: {m1.SendingOrderElapsedTime}, Desc: {m1.SendingOrderMessageDesc}{Environment.NewLine}";
+                    // MobinBroker m1 = new MobinBroker(token, order);
+                    // await m1.SendOrder(1);
+                    // tb_response.Text += $"ElapsedTime: {m1.SendingOrderElapsedTime}, Desc: {m1.SendingOrderMessageDesc}{Environment.NewLine}";
                 }
                 catch (Exception ex)
                 {

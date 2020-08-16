@@ -12,7 +12,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace BCore.Lib
 {
@@ -21,7 +23,6 @@ namespace BCore.Lib
         private readonly ApplicationDbContext db;
         private HttpClient SendHttpClient;
         private HttpClient GeneralHttpClient;
-        private HttpRequestMessage SendOrderReqMsg;
         private Stopwatch stopwatch;
         private readonly JsonSerializerOptions serializeOptions;
         private readonly HttpClientHandler httpHandler;
@@ -64,7 +65,6 @@ namespace BCore.Lib
             SetHttpClientForSendingOrders();
             Token = token;
             Order = order;
-            PresetSendingOrderReqMsg();
         }
 
         public async Task<bool> InitCookies()
@@ -214,10 +214,10 @@ namespace BCore.Lib
             return (t1 + t2 + t3 + t4).Trim();
         }
 
-        public void PresetSendingOrderReqMsg()
+        public HttpRequestMessage GetSendingOrderRequestMessage()
         {
-            SendOrderReqMsg = new HttpRequestMessage(HttpMethod.Post, "/Web/V1/Order/Post"); // [https]://api2.mobinsb.com/Web/V1/Order/Post
-            SendOrderReqMsg.Headers.Add("Authorization", $"BasicAuthentication {Token}");
+            var req = new HttpRequestMessage(HttpMethod.Post, "/Web/V1/Order/Post"); // [https]://api2.mobinsb.com/Web/V1/Order/Post
+            req.Headers.Add("Authorization", $"BasicAuthentication {Token}");
             var payload = new OrderPayload
             {
                 IsSymbolCautionAgreement = false,
@@ -238,24 +238,38 @@ namespace BCore.Lib
                 shortSellIncentivePercent = 0
             };
             string str_payload = JsonSerializer.Serialize(payload);
-            SendOrderReqMsg.Content = new StringContent(str_payload, Encoding.UTF8, "application/json");
+            req.Content = new StringContent(str_payload, Encoding.UTF8, "application/json");
+            return req;
         }
 
-        public async Task SendOrder()
+        public void SendOrder(int tryCount, Dictionary<string, bool> dic, TextBox tb_result)
         {
-            // 57__{"Data":null,"MessageDesc":"وضعیت گروه اجازه این فعالیت را نمی دهد..","IsSuccessfull":false,"MessageCode":null,"Version":0}
-            // 58__{"Data":null,"MessageDesc":"محدودیت ارسال سفارش در ثانیه","IsSuccessfull":false,"MessageCode":"OMS_2080","Version":0}
+            int loop = 0;
+            string result;
+            DateTime sent;
+            HttpRequestMessage req = GetSendingOrderRequestMessage();
             stopwatch = Stopwatch.StartNew();
-            HttpResponseMessage httpResponse = await SendHttpClient.SendAsync(SendOrderReqMsg);
+            sent = DateTime.Now;
+            HttpResponseMessage httpResponse = SendHttpClient.SendAsync(req).Result;
             stopwatch.Stop();
-            SendingOrderElapsedTime = stopwatch.ElapsedMilliseconds;
             if (httpResponse.IsSuccessStatusCode)
             {
-                var content = await httpResponse.Content.ReadAsStringAsync();
+                loop++;
+                string content = httpResponse.Content.ReadAsStringAsync().Result;
                 OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
-                SendingOrderIsSuccessfull = orderRespond.IsSuccessfull;
-                SendingOrderMessageDesc = orderRespond.MessageDesc + "_" + orderRespond.MessageCode;
+                if (Order.SymboleCode == "IRO1GDIR0001" && loop > 2)
+                {
+                    dic[Order.SymboleCode] = true;
+                }
+                else
+                {
+                    dic[Order.SymboleCode] = orderRespond.IsSuccessfull;
+                }
+                result = $"\nT_{Thread.CurrentThread.ManagedThreadId}, Sym: {Order.SymboleName}, Sent: {sent:HH:mm:ss.fff}, ElapsedTime: {stopwatch.ElapsedMilliseconds}ms, Done: {orderRespond.IsSuccessfull}, ";
+                result += $"Hit: {tryCount}\nDesc: {orderRespond.MessageDesc}\n";
             }
+            else result = $"\nSym: {Order.SymboleName},Sent: {sent:HH:mm:ss.fff}, Error: {httpResponse.StatusCode}";
+            tb_result.Invoke((MethodInvoker)delegate { tb_result.Text += result.Replace("\n", Environment.NewLine); });
         }
 
         public async Task<GetOpenOrder> GetOpenOrders()

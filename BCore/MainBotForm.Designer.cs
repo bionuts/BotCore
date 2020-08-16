@@ -39,10 +39,8 @@
             this.orderType = new System.Windows.Forms.ColumnHeader();
             this.times = new System.Windows.Forms.ColumnHeader();
             this.hit = new System.Windows.Forms.ColumnHeader();
-            this.orderStatus = new System.Windows.Forms.ColumnHeader();
             this.tb_logs = new System.Windows.Forms.TextBox();
             this.btn_load = new System.Windows.Forms.Button();
-            this.lbl_status = new System.Windows.Forms.Label();
             this.tb_duration = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.tb_interval = new System.Windows.Forms.TextBox();
@@ -65,13 +63,12 @@
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
-            this.tb_subthread = new System.Windows.Forms.TextBox();
             this.MainConsoleMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // btn_start
             // 
-            this.btn_start.Location = new System.Drawing.Point(158, 270);
+            this.btn_start.Location = new System.Drawing.Point(157, 245);
             this.btn_start.Name = "btn_start";
             this.btn_start.Size = new System.Drawing.Size(140, 29);
             this.btn_start.TabIndex = 0;
@@ -91,15 +88,14 @@
             this.total,
             this.orderType,
             this.times,
-            this.hit,
-            this.orderStatus});
+            this.hit});
             this.lv_orders.FullRowSelect = true;
             this.lv_orders.GridLines = true;
             this.lv_orders.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lv_orders.HideSelection = false;
             this.lv_orders.Location = new System.Drawing.Point(12, 81);
             this.lv_orders.Name = "lv_orders";
-            this.lv_orders.Size = new System.Drawing.Size(1089, 183);
+            this.lv_orders.Size = new System.Drawing.Size(1090, 158);
             this.lv_orders.TabIndex = 2;
             this.lv_orders.UseCompatibleStateImageBehavior = false;
             this.lv_orders.View = System.Windows.Forms.View.Details;
@@ -108,14 +104,14 @@
             // 
             this.orderId.Name = "orderId";
             this.orderId.Text = "ID";
-            this.orderId.Width = 70;
+            this.orderId.Width = 65;
             // 
             // symName
             // 
             this.symName.Name = "symName";
             this.symName.Text = "Symbole";
             this.symName.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.symName.Width = 120;
+            this.symName.Width = 110;
             // 
             // count
             // 
@@ -127,13 +123,13 @@
             // 
             this.price.Name = "price";
             this.price.Text = "Price";
-            this.price.Width = 110;
+            this.price.Width = 95;
             // 
             // total
             // 
             this.total.Name = "total";
             this.total.Text = "Total";
-            this.total.Width = 160;
+            this.total.Width = 130;
             // 
             // orderType
             // 
@@ -153,40 +149,25 @@
             this.hit.Text = "Hits";
             this.hit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // orderStatus
-            // 
-            this.orderStatus.Name = "orderStatus";
-            this.orderStatus.Text = "Status";
-            this.orderStatus.Width = 320;
-            // 
             // tb_logs
             // 
             this.tb_logs.AcceptsReturn = true;
-            this.tb_logs.Location = new System.Drawing.Point(12, 325);
+            this.tb_logs.Location = new System.Drawing.Point(11, 280);
             this.tb_logs.Multiline = true;
             this.tb_logs.Name = "tb_logs";
             this.tb_logs.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.tb_logs.Size = new System.Drawing.Size(1089, 323);
+            this.tb_logs.Size = new System.Drawing.Size(1091, 353);
             this.tb_logs.TabIndex = 0;
             // 
             // btn_load
             // 
-            this.btn_load.Location = new System.Drawing.Point(12, 270);
+            this.btn_load.Location = new System.Drawing.Point(11, 245);
             this.btn_load.Name = "btn_load";
             this.btn_load.Size = new System.Drawing.Size(140, 29);
             this.btn_load.TabIndex = 4;
             this.btn_load.Text = "Load Orders";
             this.btn_load.UseVisualStyleBackColor = true;
             this.btn_load.Click += new System.EventHandler(this.btn_load_Click);
-            // 
-            // lbl_status
-            // 
-            this.lbl_status.AutoSize = true;
-            this.lbl_status.Location = new System.Drawing.Point(12, 302);
-            this.lbl_status.Name = "lbl_status";
-            this.lbl_status.Size = new System.Drawing.Size(43, 20);
-            this.lbl_status.TabIndex = 5;
-            this.lbl_status.Text = "Logs:";
             // 
             // tb_duration
             // 
@@ -320,7 +301,7 @@
             // 
             // btn_delete_orders
             // 
-            this.btn_delete_orders.Location = new System.Drawing.Point(961, 270);
+            this.btn_delete_orders.Location = new System.Drawing.Point(962, 245);
             this.btn_delete_orders.Name = "btn_delete_orders";
             this.btn_delete_orders.Size = new System.Drawing.Size(140, 29);
             this.btn_delete_orders.TabIndex = 10;
@@ -338,7 +319,7 @@
             this.toolStripMenuItem4});
             this.MainConsoleMenu.Location = new System.Drawing.Point(0, 0);
             this.MainConsoleMenu.Name = "MainConsoleMenu";
-            this.MainConsoleMenu.Size = new System.Drawing.Size(1776, 28);
+            this.MainConsoleMenu.Size = new System.Drawing.Size(1117, 28);
             this.MainConsoleMenu.TabIndex = 12;
             this.MainConsoleMenu.Text = "menuStrip1";
             // 
@@ -386,23 +367,12 @@
             this.toolStripMenuItem7.Text = "Login";
             this.toolStripMenuItem7.Click += new System.EventHandler(this.LoginMenuItemClick);
             // 
-            // tb_subthread
-            // 
-            this.tb_subthread.AcceptsReturn = true;
-            this.tb_subthread.Location = new System.Drawing.Point(1107, 81);
-            this.tb_subthread.Multiline = true;
-            this.tb_subthread.Name = "tb_subthread";
-            this.tb_subthread.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.tb_subthread.Size = new System.Drawing.Size(657, 567);
-            this.tb_subthread.TabIndex = 0;
-            // 
             // MainBotForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1776, 660);
-            this.Controls.Add(this.tb_subthread);
+            this.ClientSize = new System.Drawing.Size(1117, 645);
             this.Controls.Add(this.btn_delete_orders);
             this.Controls.Add(this.lbl_endTime);
             this.Controls.Add(this.tb_ss);
@@ -419,7 +389,6 @@
             this.Controls.Add(this.tb_interval);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.tb_duration);
-            this.Controls.Add(this.lbl_status);
             this.Controls.Add(this.btn_load);
             this.Controls.Add(this.btn_start);
             this.Controls.Add(this.MainConsoleMenu);
@@ -445,9 +414,7 @@
         private System.Windows.Forms.ColumnHeader count;
         private System.Windows.Forms.ColumnHeader total;
         private System.Windows.Forms.ColumnHeader orderType;
-        private System.Windows.Forms.ColumnHeader orderStatus;
         private System.Windows.Forms.Button btn_load;
-        private System.Windows.Forms.Label lbl_status;
         private System.Windows.Forms.TextBox tb_duration;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox tb_interval;
@@ -475,6 +442,5 @@
         private System.Windows.Forms.ColumnHeader price;
         private System.Windows.Forms.ColumnHeader hit;
         private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.TextBox tb_subthread;
     }
 }
