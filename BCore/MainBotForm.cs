@@ -92,11 +92,12 @@ namespace BCore
         {
             string sym = mobin.Order.SymboleCode;
             int size = (int)Math.Ceiling(endTime.Subtract(startTime).TotalMilliseconds / interval);
+            int hit = 0;
 
             Thread.Sleep((int)startTime.Subtract(DateTime.Now).TotalMilliseconds);
-            for (int i = 0; i < size && (!CeaseFireDic[sym]); i++)
+            for (; hit < size && (!CeaseFireDic[sym]); hit++)
             {
-                Task.Run(() => mobin.SendOrder(i, CeaseFireDic, tb_logs));
+                Task.Run(() => mobin.SendOrder(hit, CeaseFireDic, tb_logs));
                 Thread.Sleep(interval - 1);
             }
         }

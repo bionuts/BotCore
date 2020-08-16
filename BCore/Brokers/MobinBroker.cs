@@ -220,22 +220,22 @@ namespace BCore.Lib
             req.Headers.Add("Authorization", $"BasicAuthentication {Token}");
             var payload = new OrderPayload
             {
-                IsSymbolCautionAgreement = false,
                 CautionAgreementSelected = false,
+                FinancialProviderId = 1,
+                IsSymbolCautionAgreement = false,
                 IsSymbolSepahAgreement = false,
                 SepahAgreementSelected = false,
-                orderCount = Order.Count,
-                orderPrice = Order.Price,
-                FinancialProviderId = 1,
-                minimumQuantity = 0,
-                maxShow = 0,
-                orderId = 0,
                 isin = Order.SymboleCode,
+                maxShow = 0,
+                minimumQuantity = 0,
+                orderCount = Order.Count,
+                orderId = 0,
+                orderPrice = Order.Price,
                 orderSide = (Order.OrderType == "SELL" ? "86" : "65"), // SELL(86) , BUY(65)
                 orderValidity = 74,
                 orderValiditydate = null,
-                shortSellIsEnabled = false,
-                shortSellIncentivePercent = 0
+                shortSellIncentivePercent = 0,
+                shortSellIsEnabled = false
             };
             string str_payload = JsonSerializer.Serialize(payload);
             req.Content = new StringContent(str_payload, Encoding.UTF8, "application/json");
@@ -244,7 +244,6 @@ namespace BCore.Lib
 
         public void SendOrder(int tryCount, Dictionary<string, bool> dic, TextBox tb_result)
         {
-            int loop = 0;
             string result;
             DateTime sent;
             HttpRequestMessage req = GetSendingOrderRequestMessage();
@@ -254,21 +253,13 @@ namespace BCore.Lib
             stopwatch.Stop();
             if (httpResponse.IsSuccessStatusCode)
             {
-                loop++;
                 string content = httpResponse.Content.ReadAsStringAsync().Result;
                 OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
-                if (Order.SymboleCode == "IRO1GDIR0001" && loop > 2)
-                {
-                    dic[Order.SymboleCode] = true;
-                }
-                else
-                {
-                    dic[Order.SymboleCode] = orderRespond.IsSuccessfull;
-                }
+                dic[Order.SymboleCode] = orderRespond.IsSuccessfull;
                 result = $"\nT_{Thread.CurrentThread.ManagedThreadId}, Sym: {Order.SymboleName}, Sent: {sent:HH:mm:ss.fff}, ElapsedTime: {stopwatch.ElapsedMilliseconds}ms, Done: {orderRespond.IsSuccessfull}, ";
                 result += $"Hit: {tryCount}\nDesc: {orderRespond.MessageDesc}\n";
             }
-            else result = $"\nSym: {Order.SymboleName},Sent: {sent:HH:mm:ss.fff}, Error: {httpResponse.StatusCode}";
+            else result = $"\nT_{Thread.CurrentThread.ManagedThreadId}, Sym: {Order.SymboleName},Sent: {sent:HH:mm:ss.fff}, Error: {httpResponse.StatusCode}";
             tb_result.Invoke((MethodInvoker)delegate { tb_result.Text += result.Replace("\n", Environment.NewLine); });
         }
 
