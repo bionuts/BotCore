@@ -14,12 +14,10 @@ namespace BCore.Forms
     public partial class SendOrderForm : Form
     {
         private readonly ApplicationDbContext db;
-        private MobinBroker mobin;
         private string token;
 
         public SendOrderForm()
         {
-            mobin = new MobinBroker();
             db = new ApplicationDbContext();
             InitializeComponent();
         }
@@ -37,40 +35,20 @@ namespace BCore.Forms
             {
                 try
                 {
-                    mobin.Token = token;
-                    var order1 = new BOrder
+                    var order = new BOrder
                     {
-                        SymboleName = "ABADA",
-                        SymboleCode = "IRO1NBAB0001",
-                        OrderType = "BUY",
+                        SymboleName = cb_symboles.SelectedText,
+                        SymboleCode = cb_symboles.SelectedValue.ToString(),
+                        OrderType = ( button.Name == "BUY" ? "BUY" : "SELL"),
                         Count = int.Parse(tb_count.Text.Trim()),
-                        Price = int.Parse(tb_price.Text.Trim()),
+                        Price = decimal.Parse(tb_price.Text.Trim()),
                         CreatedDateTime = DateTime.Now,
                         Status = "",
                         OrderId = "0"
                     };
-                    mobin.Order = order1;
-                    mobin.PresetSendingOrderReqMsg();
-                    //var str = DateTime.Now.Millisecond.ToString("D3");
-                    mobin.SendOrder();
-                    //tb_response.Text += $"S_{str}, ElapsedTime: {mobin.SendingOrderElapsedTime}, Desc: {mobin.SendingOrderMessageDesc}{Environment.NewLine}";
-                    await Task.Delay(250);
-                    var order2 = new BOrder
-                    {
-                        SymboleName = "WebSA",
-                        SymboleCode = "IRO1BSDR0001",
-                        OrderType = "BUY",
-                        Count = int.Parse(tb_count.Text.Trim()),
-                        Price = int.Parse(tb_price.Text.Trim()),
-                        CreatedDateTime = DateTime.Now,
-                        Status = "",
-                        OrderId = "0"
-                    };
-                    mobin.Order = order2;
-                    mobin.PresetSendingOrderReqMsg();
-                    //str = DateTime.Now.Millisecond.ToString("D3");
-                    mobin.SendOrder();
-                    //tb_response.Text += $"S_{str}, ElapsedTime: {mobin.SendingOrderElapsedTime}, Desc: {mobin.SendingOrderMessageDesc}{Environment.NewLine}";
+                    MobinBroker m1 = new MobinBroker(token, order);
+                    await m1.SendOrder();
+                    tb_response.Text += $"ElapsedTime: {m1.SendingOrderElapsedTime}, Desc: {m1.SendingOrderMessageDesc}{Environment.NewLine}";
                 }
                 catch (Exception ex)
                 {
@@ -96,8 +74,8 @@ namespace BCore.Forms
 
         private async void btn_get_open_orders_Click(object sender, EventArgs e)
         {
-            var token = await db.BSettings.Where(s => s.Key == "apitoken").FirstOrDefaultAsync();
-            mobin.Token = token.Value;
+            MobinBroker mobin = new MobinBroker();
+            mobin.Token = token;
             GetOpenOrder openOrder = await mobin.GetOpenOrders();
             tb_response.Text = mobin.SendingOrderMessageDesc + Environment.NewLine;
             foreach (var o in openOrder.Data)

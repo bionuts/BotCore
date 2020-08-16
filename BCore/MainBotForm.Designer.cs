@@ -64,8 +64,8 @@
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
+            this.tb_subthread = new System.Windows.Forms.TextBox();
             this.MainConsoleMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -195,7 +195,7 @@
             this.tb_duration.Name = "tb_duration";
             this.tb_duration.Size = new System.Drawing.Size(47, 27);
             this.tb_duration.TabIndex = 1;
-            this.tb_duration.Text = "2";
+            this.tb_duration.Text = "3.2";
             this.tb_duration.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label1
@@ -214,7 +214,7 @@
             this.tb_interval.Name = "tb_interval";
             this.tb_interval.Size = new System.Drawing.Size(47, 27);
             this.tb_interval.TabIndex = 2;
-            this.tb_interval.Text = "305";
+            this.tb_interval.Text = "300";
             this.tb_interval.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label2
@@ -304,7 +304,7 @@
             this.tb_ms.Name = "tb_ms";
             this.tb_ms.Size = new System.Drawing.Size(42, 27);
             this.tb_ms.TabIndex = 6;
-            this.tb_ms.Text = "300";
+            this.tb_ms.Text = "000";
             this.tb_ms.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // lbl_endTime
@@ -335,11 +335,10 @@
             this.toolStripMenuItem1,
             this.toolStripMenuItem2,
             this.toolStripMenuItem3,
-            this.toolStripMenuItem4,
-            this.toolStripMenuItem5});
+            this.toolStripMenuItem4});
             this.MainConsoleMenu.Location = new System.Drawing.Point(0, 0);
             this.MainConsoleMenu.Name = "MainConsoleMenu";
-            this.MainConsoleMenu.Size = new System.Drawing.Size(1115, 28);
+            this.MainConsoleMenu.Size = new System.Drawing.Size(1776, 28);
             this.MainConsoleMenu.TabIndex = 12;
             this.MainConsoleMenu.Text = "menuStrip1";
             // 
@@ -387,18 +386,23 @@
             this.toolStripMenuItem7.Text = "Login";
             this.toolStripMenuItem7.Click += new System.EventHandler(this.LoginMenuItemClick);
             // 
-            // toolStripMenuItem5
+            // tb_subthread
             // 
-            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(76, 24);
-            this.toolStripMenuItem5.Text = "Settings";
+            this.tb_subthread.AcceptsReturn = true;
+            this.tb_subthread.Location = new System.Drawing.Point(1107, 81);
+            this.tb_subthread.Multiline = true;
+            this.tb_subthread.Name = "tb_subthread";
+            this.tb_subthread.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.tb_subthread.Size = new System.Drawing.Size(657, 567);
+            this.tb_subthread.TabIndex = 0;
             // 
             // MainBotForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1115, 660);
+            this.ClientSize = new System.Drawing.Size(1776, 660);
+            this.Controls.Add(this.tb_subthread);
             this.Controls.Add(this.btn_delete_orders);
             this.Controls.Add(this.lbl_endTime);
             this.Controls.Add(this.tb_ss);
@@ -468,9 +472,9 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem6;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem7;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
         private System.Windows.Forms.ColumnHeader price;
         private System.Windows.Forms.ColumnHeader hit;
         private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.TextBox tb_subthread;
     }
 }

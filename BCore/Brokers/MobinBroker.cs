@@ -254,7 +254,7 @@ namespace BCore.Lib
                 var content = await httpResponse.Content.ReadAsStringAsync();
                 OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
                 SendingOrderIsSuccessfull = orderRespond.IsSuccessfull;
-                SendingOrderMessageDesc = orderRespond.MessageDesc;
+                SendingOrderMessageDesc = orderRespond.MessageDesc + "_" + orderRespond.MessageCode;
             }
         }
 

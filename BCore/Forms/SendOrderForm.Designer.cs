@@ -183,6 +183,7 @@
             this.Controls.Add(this.lbl_total);
             this.Controls.Add(this.btn_sell);
             this.Name = "SendOrderForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Load += new System.EventHandler(this.SendOrderForm_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

@@ -29,7 +29,7 @@ namespace BCore
         private readonly ApplicationDbContext db;
         private List<BOrder> LoadedOrders;
         private string ApiToken;
-        private List<Task> orderTasks;
+        private Task[] orderTasks;
         private DateTime _StartTime;
         private DateTime _EndTime;
 
@@ -53,48 +53,61 @@ namespace BCore
                 await LoadOrdersToListView();
                 LoadStartAndEndTime(tb_hh.Text.Trim(), tb_mm.Text.Trim(), tb_ss.Text.Trim(), tb_ms.Text.Trim(), tb_duration.Text.Trim());
                 lbl_endTime.Text = $"End: {_EndTime:HH:mm:ss.fff}";
-                orderTasks = new List<Task>();
+
+                orderTasks = new Task[LoadedOrders.Count];
                 int step = int.Parse(tb_interval.Text.Trim()) / LoadedOrders.Count;
                 int dot = 0;
+                int idx = 0;
                 foreach (var order in LoadedOrders)
                 {
                     var st = _StartTime.AddMilliseconds(dot);
                     var en = _EndTime.AddMilliseconds(dot);
                     dot += step;
-                    orderTasks.Add(new Task(() => SendOrderTask(
-                        new MobinBroker(ApiToken, order),
-                        st, en,
-                        int.Parse(tb_interval.Text.Trim()))
-                    , TaskCreationOptions.LongRunning));
+                    orderTasks[idx++] = new Task(
+                        () => SendOrderTask(new MobinBroker(ApiToken, order), st, en, int.Parse(tb_interval.Text.Trim())));
                 }
             }
         }
 
         private void btn_start_Click(object sender, EventArgs e)
         {
-            foreach (var t in orderTasks)
-                t.Start();
+            ((Button)sender).Text = "Running...";
+            ((Button)sender).Enabled = false;
+            for (int i = 0; i < orderTasks.Length; i++)
+                orderTasks[i].Start();
         }
 
         private void SendOrderTask(MobinBroker mobin, DateTime startTime, DateTime endTime, int interval)
         {
-            string output = "S_" + startTime.Millisecond.ToString("D3") + " , ";
+            string output = "";
             bool ceasefire = false;
-            DateTime LastTrySendTime = DateTime.Now.AddMilliseconds(-interval);
             int sentCount = 0;
-            while (TimeSpan.Compare(DateTime.Now.TimeOfDay, startTime.TimeOfDay) < 0) ; // -1  if  t1 is shorter than t2. 
-            do
+            int size = (int)Math.Ceiling(endTime.Subtract(startTime).TotalMilliseconds / interval);
+            /* MobinBroker[] mtask = new MobinBroker[size];
+             for (int i = 0; i < size; i++)
+                 mtask[i] = mobin;*/
+            Thread.Sleep((int)startTime.Subtract(DateTime.Now).TotalMilliseconds);
+
+            for (int i = 0; i < size && (!ceasefire); i++)
             {
-                if (DateTime.Now.Subtract(LastTrySendTime).TotalMilliseconds >= interval)
-                {
-                    mobin.SendOrder();
-                    output += DateTime.Now.Millisecond.ToString("D3") + " , ";
-                    LastTrySendTime = DateTime.Now;
-                    sentCount++;
-                }
-            } while ((TimeSpan.Compare(DateTime.Now.TimeOfDay, endTime.TimeOfDay) < 0) && !ceasefire);
-            output = $"\ntryCount: {sentCount}, timeVector: {output} {mobin.Order.SymboleName}";
+                mobin.SendOrder();
+                output += $"{DateTime.Now.Millisecond:D3}, ";
+                Task.Run(() => fun(mobin.Order.SymboleCode));
+                Thread.Sleep(interval - 1);
+                sentCount++;
+            }
+            output = $"\nTryCount: {sentCount}, TimeVector: {output} {mobin.Order.SymboleName}";
             AppendTextBox(output);
+        }
+
+        public async void fun(string n)
+        {
+            string o = $"\nST_{Thread.CurrentThread.ManagedThreadId}_{n}_{DateTime.Now.Millisecond:D3}";
+            await Task.Delay(new Random().Next(100, 200));
+            if (n == "IRO1GDIR0001")
+            {
+                AppendTextBoxSubThread(o);
+            }
         }
 
         public async Task LoadOrdersToListView()
@@ -152,6 +165,16 @@ namespace BCore
                 return;
             }
             tb_logs.Text += value.Replace("\n", Environment.NewLine);
+        }
+
+        public void AppendTextBoxSubThread(string value)
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action<string>(AppendTextBoxSubThread), new object[] { value });
+                return;
+            }
+            tb_subthread.Text += value.Replace("\n", Environment.NewLine);
         }
 
         private void AccountMenuItemClick(object sender, EventArgs e)
