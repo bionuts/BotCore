@@ -37,7 +37,7 @@ namespace BCore.Forms
                 {
                     var order = new BOrder
                     {
-                        SymboleName = cb_symboles.SelectedText,
+                        SymboleName = cb_symboles.GetItemText(cb_symboles.SelectedItem),
                         SymboleCode = cb_symboles.SelectedValue.ToString(),
                         OrderType = ( button.Name == "BUY" ? "BUY" : "SELL"),
                         Count = int.Parse(tb_count.Text.Trim()),
@@ -46,9 +46,8 @@ namespace BCore.Forms
                         Status = "",
                         OrderId = "0"
                     };
-                    // MobinBroker m1 = new MobinBroker(token, order);
-                    // await m1.SendOrder(1);
-                    // tb_response.Text += $"ElapsedTime: {m1.SendingOrderElapsedTime}, Desc: {m1.SendingOrderMessageDesc}{Environment.NewLine}";
+                    MobinBroker m1 = new MobinBroker(token, order);
+                    tb_response.Text += (await m1.SendOrder()).Replace("\n", Environment.NewLine);
                 }
                 catch (Exception ex)
                 {
@@ -74,14 +73,9 @@ namespace BCore.Forms
 
         private async void btn_get_open_orders_Click(object sender, EventArgs e)
         {
-            MobinBroker mobin = new MobinBroker();
-            mobin.Token = token;
-            GetOpenOrder openOrder = await mobin.GetOpenOrders();
-            tb_response.Text = mobin.SendingOrderMessageDesc + Environment.NewLine;
-            foreach (var o in openOrder.Data)
-            {
-                tb_response.Text += o.symbol + Environment.NewLine;
-            }
+            MobinBroker m1 = new MobinBroker();
+            m1.Token = token;
+            tb_response.Text += (await m1.GetOpenOrders()).Replace("\n", Environment.NewLine);
         }
     }
 }

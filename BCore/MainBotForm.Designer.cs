@@ -63,6 +63,7 @@
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
+            this.btn_sort_result = new System.Windows.Forms.Button();
             this.MainConsoleMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -155,9 +156,10 @@
             this.tb_logs.Location = new System.Drawing.Point(11, 280);
             this.tb_logs.Multiline = true;
             this.tb_logs.Name = "tb_logs";
-            this.tb_logs.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.tb_logs.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.tb_logs.Size = new System.Drawing.Size(1091, 353);
             this.tb_logs.TabIndex = 0;
+            this.tb_logs.WordWrap = false;
             // 
             // btn_load
             // 
@@ -367,12 +369,23 @@
             this.toolStripMenuItem7.Text = "Login";
             this.toolStripMenuItem7.Click += new System.EventHandler(this.LoginMenuItemClick);
             // 
+            // btn_sort_result
+            // 
+            this.btn_sort_result.Location = new System.Drawing.Point(818, 245);
+            this.btn_sort_result.Name = "btn_sort_result";
+            this.btn_sort_result.Size = new System.Drawing.Size(138, 29);
+            this.btn_sort_result.TabIndex = 13;
+            this.btn_sort_result.Text = "Sort Result";
+            this.btn_sort_result.UseVisualStyleBackColor = true;
+            this.btn_sort_result.Click += new System.EventHandler(this.btn_sort_result_Click);
+            // 
             // MainBotForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1117, 645);
+            this.Controls.Add(this.btn_sort_result);
             this.Controls.Add(this.btn_delete_orders);
             this.Controls.Add(this.lbl_endTime);
             this.Controls.Add(this.tb_ss);
@@ -442,5 +455,6 @@
         private System.Windows.Forms.ColumnHeader price;
         private System.Windows.Forms.ColumnHeader hit;
         private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.Button btn_sort_result;
     }
 }

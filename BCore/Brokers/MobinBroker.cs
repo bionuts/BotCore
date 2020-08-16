@@ -39,7 +39,9 @@ namespace BCore.Lib
             httpHandler = new HttpClientHandler()
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli,
-                AllowAutoRedirect = false
+                AllowAutoRedirect = false,
+                UseProxy = false,
+                Proxy = null
             };
             serializeOptions = new JsonSerializerOptions
             {
@@ -216,7 +218,7 @@ namespace BCore.Lib
 
         public HttpRequestMessage GetSendingOrderRequestMessage()
         {
-            var req = new HttpRequestMessage(HttpMethod.Post, "/Web/V1/Order/Post"); // [https]://api2.mobinsb.com/Web/V1/Order/Post
+            var req = new HttpRequestMessage(HttpMethod.Post, "/Web/V1/Order/Post");
             req.Headers.Add("Authorization", $"BasicAuthentication {Token}");
             var payload = new OrderPayload
             {
@@ -242,28 +244,59 @@ namespace BCore.Lib
             return req;
         }
 
-        public void SendOrder(int tryCount, Dictionary<string, bool> dic, TextBox tb_result)
+        public async void SendOrder(int tryCount, ReturnedResultObject obj)
         {
             string result;
             DateTime sent;
             HttpRequestMessage req = GetSendingOrderRequestMessage();
+            try
+            {
+                stopwatch = Stopwatch.StartNew();
+                sent = DateTime.Now;
+                HttpResponseMessage httpResponse = await SendHttpClient.SendAsync(req);
+                stopwatch.Stop();
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    string content = await httpResponse.Content.ReadAsStringAsync();
+                    OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
+                    obj.CeaseFire = orderRespond.IsSuccessfull;
+                    result = $"[{sent:HH:mm:ss.fff}] , Sym: {Order.SymboleName,-10}, Elps: {stopwatch.ElapsedMilliseconds:D3}ms, Desc: {orderRespond.MessageDesc}, Done: {orderRespond.IsSuccessfull}, ";
+                    result += $"Hit: {tryCount}, T_{Thread.CurrentThread.ManagedThreadId}\n";
+                }
+                else
+                {
+                    result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {Order.SymboleName},Sent: {sent:HH:mm:ss.fff},T_{Thread.CurrentThread.ManagedThreadId},  Error: {httpResponse.StatusCode}\n";
+                }
+            }
+            catch (Exception ex)
+            {
+                result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {Order.SymboleName},Sent: {DateTime.Now:HH:mm:ss.fff}, Error: {ex.Message}\n";
+            }
+            obj.ResStr += result;
+        }
+
+        public async Task<String> SendOrder()
+        {
+            string result;
+            HttpRequestMessage req = GetSendingOrderRequestMessage();
             stopwatch = Stopwatch.StartNew();
-            sent = DateTime.Now;
-            HttpResponseMessage httpResponse = SendHttpClient.SendAsync(req).Result;
+            HttpResponseMessage httpResponse = await SendHttpClient.SendAsync(req);
             stopwatch.Stop();
             if (httpResponse.IsSuccessStatusCode)
             {
-                string content = httpResponse.Content.ReadAsStringAsync().Result;
+                string content = await httpResponse.Content.ReadAsStringAsync();
                 OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
-                dic[Order.SymboleCode] = orderRespond.IsSuccessfull;
-                result = $"\nT_{Thread.CurrentThread.ManagedThreadId}, Sym: {Order.SymboleName}, Sent: {sent:HH:mm:ss.fff}, ElapsedTime: {stopwatch.ElapsedMilliseconds}ms, Done: {orderRespond.IsSuccessfull}, ";
-                result += $"Hit: {tryCount}\nDesc: {orderRespond.MessageDesc}\n";
+                result = $"\nElapsedTime: {stopwatch.ElapsedMilliseconds}ms, Done: {orderRespond.IsSuccessfull}\n";
+                result += $"Desc: {orderRespond.MessageDesc}\n";
             }
-            else result = $"\nT_{Thread.CurrentThread.ManagedThreadId}, Sym: {Order.SymboleName},Sent: {sent:HH:mm:ss.fff}, Error: {httpResponse.StatusCode}";
-            tb_result.Invoke((MethodInvoker)delegate { tb_result.Text += result.Replace("\n", Environment.NewLine); });
+            else
+            {
+                result = $"Error: {httpResponse.StatusCode}";
+            }
+            return result;
         }
 
-        public async Task<GetOpenOrder> GetOpenOrders()
+        public async Task<string> GetOpenOrders()
         {
             GetOpenOrder openOrders = null;
             var req = new HttpRequestMessage(HttpMethod.Get, "https://api2.mobinsb.com/Web/V1/Order/GetOpenOrder/OpenOrder");
@@ -283,17 +316,22 @@ namespace BCore.Lib
             req.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36");
             req.Headers.Add("X-Requested-With", "XMLHttpRequest");
 
+            string result = "";
             Stopwatch stopwatch = Stopwatch.StartNew();
             HttpResponseMessage httpResponse = await GeneralHttpClient.SendAsync(req);
             if (httpResponse.IsSuccessStatusCode)
             {
                 stopwatch.Stop();
-                SendingOrderElapsedTime = stopwatch.ElapsedMilliseconds;
-                SendingOrderMessageDesc = "ElapsedTime: " + SendingOrderElapsedTime.ToString();
-                var res = await httpResponse.Content.ReadAsStringAsync();
-                openOrders = JsonSerializer.Deserialize<GetOpenOrder>(res);
+                string content = await httpResponse.Content.ReadAsStringAsync();
+                openOrders = JsonSerializer.Deserialize<GetOpenOrder>(content);
+                result = $"\nElapsedTime: {stopwatch.ElapsedMilliseconds}ms, Done: {openOrders.IsSuccessfull}\n";
+                result += $"Desc: {openOrders.MessageDesc}\n";
+                foreach (var o in openOrders.Data)
+                {
+                    result += $"Sym: {o.symbol}, Price: {o.orderprice}, Count: {o.qunatity}\n";
+                }
             }
-            return openOrders;
+            return result;
         }
 
         private void SetHttpClientForSendingOrders()

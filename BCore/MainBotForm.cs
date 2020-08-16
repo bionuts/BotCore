@@ -33,7 +33,7 @@ namespace BCore
         private Thread[] orderThread;
         private DateTime _StartTime;
         private DateTime _EndTime;
-        private static Dictionary<string, bool> CeaseFireDic;
+        static volatile object locker = new Object();
 
         public MainBotForm()
         {
@@ -58,9 +58,6 @@ namespace BCore
 
                 // orderTasks = new Task[LoadedOrders.Count];
                 orderThread = new Thread[LoadedOrders.Count];
-                CeaseFireDic = new Dictionary<string, bool>();
-                foreach (var order in LoadedOrders)
-                    CeaseFireDic.Add(order.SymboleCode, false);
                 int step = int.Parse(tb_interval.Text.Trim()) / LoadedOrders.Count;
                 int dot = 0;
                 int idx = 0;
@@ -90,15 +87,22 @@ namespace BCore
 
         private void SendOrderTask(MobinBroker mobin, DateTime startTime, DateTime endTime, int interval)
         {
+            ReturnedResultObject obj = new ReturnedResultObject
+            {
+                ResStr = "",
+                CeaseFire = false
+            };
             string sym = mobin.Order.SymboleCode;
             int size = (int)Math.Ceiling(endTime.Subtract(startTime).TotalMilliseconds / interval);
-            int hit = 0;
-
             Thread.Sleep((int)startTime.Subtract(DateTime.Now).TotalMilliseconds);
-            for (; hit < size && (!CeaseFireDic[sym]); hit++)
+            for (int i = 0; (i < size) && (!obj.CeaseFire); i++)
             {
-                Task.Run(() => mobin.SendOrder(hit, CeaseFireDic, tb_logs));
-                Thread.Sleep(interval - 1);
+                Task.Run(() => mobin.SendOrder(i, obj));
+                Thread.Sleep(interval);
+            }
+            lock (locker)
+            {
+                tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text += obj.ResStr.Replace("\n", Environment.NewLine); });
             }
         }
 
@@ -229,6 +233,18 @@ namespace BCore
                 await db.SaveChangesAsync();
                 await LoadOrdersToListView();
             }
+        }
+
+        private void btn_sort_result_Click(object sender, EventArgs e)
+        {
+            List<string> myList = new List<string>();
+            var arr = tb_logs.Text.Trim().Split(Environment.NewLine);
+            foreach (var s in arr)
+                myList.Add(s);
+            myList = myList.OrderBy(p => p.Substring(1, p.IndexOf("]"))).ToList();
+            tb_logs.Text = "";
+            foreach (var l in myList)
+                tb_logs.Text += l + Environment.NewLine;
         }
     }
 }
