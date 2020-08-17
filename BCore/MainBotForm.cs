@@ -31,6 +31,7 @@ namespace BCore
         private string ApiToken;
         private Task[] orderTasks;
         private Thread[] orderThread;
+        private Thread OrdersThread;
         private DateTime _StartTime;
         private DateTime _EndTime;
         static volatile object locker = new Object();
@@ -71,7 +72,13 @@ namespace BCore
                     idx++;
                     dot += step;
                 }
+                OrdersThread = new Thread(() => SendAllOrders(LoadedOrders, int.Parse(tb_interval.Text.Trim()), _StartTime, _EndTime));
             }
+        }
+
+        private void SendAllOrders(List<BOrder> orders, int mainInterval, DateTime start, DateTime end)
+        {
+            int step = (mainInterval + orders.Count - 1) / orders.Count;
         }
 
         private async void btn_start_Click(object sender, EventArgs e)
