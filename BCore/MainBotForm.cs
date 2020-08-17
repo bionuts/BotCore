@@ -20,6 +20,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
 
 namespace BCore
@@ -57,7 +58,7 @@ namespace BCore
                 LoadStartAndEndTime(tb_hh.Text.Trim(), tb_mm.Text.Trim(), tb_ss.Text.Trim(), tb_ms.Text.Trim(), tb_duration.Text.Trim());
                 lbl_endTime.Text = $"End: {_EndTime:HH:mm:ss.fff}";
 
-                // orderTasks = new Task[LoadedOrders.Count];
+                /*orderTasks = new Task[LoadedOrders.Count];
                 orderThread = new Thread[LoadedOrders.Count];
                 int step = int.Parse(tb_interval.Text.Trim()) / LoadedOrders.Count;
                 int dot = 0;
@@ -71,25 +72,58 @@ namespace BCore
                     orderThread[idx] = new Thread(() => SendOrderTask(new MobinBroker(ApiToken, order), stime, etime, intval));
                     idx++;
                     dot += step;
-                }
-                OrdersThread = new Thread(() => SendAllOrders(LoadedOrders, int.Parse(tb_interval.Text.Trim()), _StartTime, _EndTime));
+                }*/
+                OrdersThread = new Thread(() => SendAllOrders(LoadedOrders, int.Parse(tb_interval.Text.Trim()), _StartTime, _EndTime))
+                {
+                    Priority = ThreadPriority.Highest
+                };
             }
         }
 
         private void SendAllOrders(List<BOrder> orders, int mainInterval, DateTime start, DateTime end)
         {
+            ReturnedResultObject obj = new ReturnedResultObject
+            {
+                ResStr = "",
+                CeaseFire = false
+            };
             int step = (mainInterval + orders.Count - 1) / orders.Count;
+            int forloop = (int)((end.Subtract(start).TotalMilliseconds + step - 1) / step);
+            int whichOne = 0;
+            MobinBroker mobin = new MobinBroker();
+            mobin.Token = ApiToken;
+            Thread.Sleep((int)start.Subtract(DateTime.Now).TotalMilliseconds - 20);
+            for (int i = 0; i < forloop; i++)
+            {
+                mobin.Order = orders[whichOne++];
+                // Task.Run(() => mobin.SendOrder(obj));
+                mobin.SendOrder(obj);
+                if (whichOne == orders.Count) whichOne = 0;
+                Thread.Sleep(step);
+            }
+
+            tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text = obj.ResStr.Replace("\n", Environment.NewLine); });
+        }
+
+        private string CalculateDiff(int[] dif)
+        {
+            string str = "";
+            for (int j = 0; j < dif.Length - 1; j++)
+            {
+                if (dif[j] < dif[j + 1])
+                    str += $"{dif[j + 1] - dif[j]} , ";
+                else
+                    str += $"{1000 - dif[j] + dif[j + 1]} , ";
+            }
+            return str;
         }
 
         private async void btn_start_Click(object sender, EventArgs e)
         {
             ((Button)sender).Text = "Running...";
             ((Button)sender).Enabled = false;
-            /*for (int i = 0; i < orderTasks.Length; i++)
-                orderTasks[i].Start();*/
-            for (int i = 0; i < orderThread.Length; i++)
-                orderThread[i].Start();
-            await EnableBtn();
+            OrdersThread.Start();
+            await EnableBtnOneThread();
         }
 
         private void SendOrderTask(MobinBroker mobin, DateTime startTime, DateTime endTime, int interval)
@@ -111,6 +145,19 @@ namespace BCore
             {
                 tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text += obj.ResStr.Replace("\n", Environment.NewLine); });
             }
+        }
+
+        private async Task EnableBtnOneThread()
+        {
+            bool done = true;
+            while (done)
+            {
+                if (OrdersThread.ThreadState == System.Threading.ThreadState.Stopped)
+                    done = false;
+                else
+                    await Task.Delay(500);
+            }
+            btn_start.Invoke((MethodInvoker)delegate { btn_start.Enabled = true; btn_start.Text = "Start"; });
         }
 
         public async Task EnableBtn()

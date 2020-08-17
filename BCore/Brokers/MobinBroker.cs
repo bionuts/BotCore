@@ -275,23 +275,63 @@ namespace BCore.Lib
             obj.ResStr += result;
         }
 
-        public async Task<String> SendOrder()
+        public async void SendOrder(ReturnedResultObject obj)
         {
             string result;
+            DateTime sent;
             HttpRequestMessage req = GetSendingOrderRequestMessage();
-            stopwatch = Stopwatch.StartNew();
-            HttpResponseMessage httpResponse = await SendHttpClient.SendAsync(req);
-            stopwatch.Stop();
-            if (httpResponse.IsSuccessStatusCode)
+            try
             {
-                string content = await httpResponse.Content.ReadAsStringAsync();
-                OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
-                result = $"\nElapsedTime: {stopwatch.ElapsedMilliseconds}ms, Done: {orderRespond.IsSuccessfull}\n";
-                result += $"Desc: {orderRespond.MessageDesc}\n";
+                stopwatch = Stopwatch.StartNew();
+                sent = DateTime.Now;
+                HttpResponseMessage httpResponse = await SendHttpClient.SendAsync(req);
+                stopwatch.Stop();
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    string content = await httpResponse.Content.ReadAsStringAsync();
+                    OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
+                    obj.CeaseFire = orderRespond.IsSuccessfull;
+                    result = $"[{sent:HH:mm:ss.fff}] , ID:{Order.Id}, Sym: {Order.SymboleName,-10}, Elps: {stopwatch.ElapsedMilliseconds:D3}ms, Desc: {orderRespond.MessageDesc}, Done: {orderRespond.IsSuccessfull}, ";
+                    result += $"T_{Thread.CurrentThread.ManagedThreadId}\n";
+                }
+                else
+                {
+                    result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {Order.SymboleName},Sent: {sent:HH:mm:ss.fff},T_{Thread.CurrentThread.ManagedThreadId},  Error: {httpResponse.StatusCode}\n";
+                }
             }
-            else
+            catch (Exception ex)
             {
-                result = $"Error: {httpResponse.StatusCode}";
+                result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {Order.SymboleName},Sent: {DateTime.Now:HH:mm:ss.fff}, Error: {ex.Message}\n";
+            }
+            obj.ResStr += result;
+        }
+
+        public async Task<string> SendOrder()
+        {
+            string result;
+            DateTime sent;
+            HttpRequestMessage req = GetSendingOrderRequestMessage();
+            try
+            {
+                stopwatch = Stopwatch.StartNew();
+                sent = DateTime.Now;
+                HttpResponseMessage httpResponse = await SendHttpClient.SendAsync(req);
+                stopwatch.Stop();
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    string content = await httpResponse.Content.ReadAsStringAsync();
+                    OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
+                    result = $"[{sent:HH:mm:ss.fff}] , ID:{Order.Id}, Sym: {Order.SymboleName,-10}, Elps: {stopwatch.ElapsedMilliseconds:D3}ms, Desc: {orderRespond.MessageDesc}, Done: {orderRespond.IsSuccessfull}, ";
+                    result += $"T_{Thread.CurrentThread.ManagedThreadId}\n";
+                }
+                else
+                {
+                    result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {Order.SymboleName},Sent: {sent:HH:mm:ss.fff},T_{Thread.CurrentThread.ManagedThreadId},  Error: {httpResponse.StatusCode}\n";
+                }
+            }
+            catch (Exception ex)
+            {
+                result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {Order.SymboleName},Sent: {DateTime.Now:HH:mm:ss.fff}, Error: {ex.Message}\n";
             }
             return result;
         }
