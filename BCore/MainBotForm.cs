@@ -30,16 +30,30 @@ namespace BCore
         private readonly ApplicationDbContext db;
         private List<BOrder> LoadedOrders;
         private string ApiToken;
-        private Task[] orderTasks;
+        private Task[] orderTasks_;
         private Thread[] orderThread;
         private Thread OrdersThread;
+        // private Task OrdersTask;
         private DateTime _StartTime;
         private DateTime _EndTime;
+
+        private HttpRequestMessage[] arr_req;
+        private Thread[] arr_thread;
+        private Task[] OrderTasks;
+        private readonly HttpClient sendhttp;
         static volatile object locker = new Object();
+        private string resultOfThreads = "";
+        private readonly JsonSerializerOptions serializeOptions;
+        private int StepWait;
 
         public MainBotForm()
         {
             db = new ApplicationDbContext();
+            sendhttp = MobinBroker.SetHttpClientForSendingOrdersStatic();
+            serializeOptions = new JsonSerializerOptions
+            {
+                IgnoreNullValues = true,
+            };
             InitializeComponent();
         }
 
@@ -57,7 +71,7 @@ namespace BCore
                 await LoadOrdersToListView();
                 LoadStartAndEndTime(tb_hh.Text.Trim(), tb_mm.Text.Trim(), tb_ss.Text.Trim(), tb_ms.Text.Trim(), tb_duration.Text.Trim());
                 lbl_endTime.Text = $"End: {_EndTime:HH:mm:ss.fff}";
-
+                InitHttpRequestMessageAndThreadArray(LoadedOrders, ApiToken, int.Parse(tb_interval.Text.Trim()), _StartTime, _EndTime);
                 /*orderTasks = new Task[LoadedOrders.Count];
                 orderThread = new Thread[LoadedOrders.Count];
                 int step = int.Parse(tb_interval.Text.Trim()) / LoadedOrders.Count;
@@ -73,14 +87,15 @@ namespace BCore
                     idx++;
                     dot += step;
                 }*/
-                OrdersThread = new Thread(() => SendAllOrders(LoadedOrders, int.Parse(tb_interval.Text.Trim()), _StartTime, _EndTime))
+                // OrdersTask = new Task(() => SendAllOrders(LoadedOrders, int.Parse(tb_interval.Text.Trim()), _StartTime, _EndTime));
+                /*OrdersThread = new Thread(() => SendAllOrders(LoadedOrders, int.Parse(tb_interval.Text.Trim()), _StartTime, _EndTime))
                 {
                     Priority = ThreadPriority.Highest
-                };
+                };*/
             }
         }
 
-        private void SendAllOrders(List<BOrder> orders, int mainInterval, DateTime start, DateTime end)
+        private async Task SendAllOrders(List<BOrder> orders, int mainInterval, DateTime start, DateTime end)
         {
             ReturnedResultObject obj = new ReturnedResultObject
             {
@@ -90,19 +105,86 @@ namespace BCore
             int step = (mainInterval + orders.Count - 1) / orders.Count;
             int forloop = (int)((end.Subtract(start).TotalMilliseconds + step - 1) / step);
             int whichOne = 0;
-            MobinBroker mobin = new MobinBroker();
-            mobin.Token = ApiToken;
-            Thread.Sleep((int)start.Subtract(DateTime.Now).TotalMilliseconds - 20);
+            MobinBroker mobin = new MobinBroker
+            {
+                Token = ApiToken
+            };
+            // Thread.Sleep((int)start.Subtract(DateTime.Now).TotalMilliseconds - 20);
+            await Task.Delay((int)start.Subtract(DateTime.Now).TotalMilliseconds - 20);
             for (int i = 0; i < forloop; i++)
             {
-                mobin.Order = orders[whichOne++];
-                // Task.Run(() => mobin.SendOrder(obj));
-                mobin.SendOrder(obj);
+                // Task.Run(() => mobin.SendOrder(orders[whichOne++], obj));
                 if (whichOne == orders.Count) whichOne = 0;
-                Thread.Sleep(step);
+                await Task.Delay(step);
             }
 
-            tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text = obj.ResStr.Replace("\n", Environment.NewLine); });
+            tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text = MobinBroker.resultOfThreads.Replace("\n", Environment.NewLine); });
+        }
+
+        private async Task<string> SendOrderRequests()
+        {
+            // arr_thread[0].Start();
+            await Task.Delay((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds - 20);
+            // foreach (var t in arr_thread)
+            for (int i = 0; i < OrderTasks.Length; i++)
+            {
+                OrderTasks[i].Start();
+                await Task.Delay(StepWait);
+            }
+            await Task.Delay(1000);
+            return resultOfThreads.Replace("\n", Environment.NewLine);
+        }
+
+        private void InitHttpRequestMessageAndThreadArray(List<BOrder> orders, string token, int mainInterval, DateTime start, DateTime end)
+        {
+            StepWait = (mainInterval + orders.Count - 1) / orders.Count;
+            int reqSize = (int)((end.Subtract(start).TotalMilliseconds + StepWait - 1) / StepWait);
+            arr_req = new HttpRequestMessage[reqSize];
+            arr_thread = new Thread[reqSize];
+            OrderTasks = new Task[reqSize];
+            int whichOne = 0;
+            for (int i = 0; i < reqSize; i++)
+            {
+                if (whichOne == orders.Count) whichOne = 0;
+                arr_req[i] = MobinBroker.GetSendingOrderRequestMessageStatic(orders[whichOne], token);
+                arr_thread[i] = new Thread(() => SendReq(arr_req[i], orders[whichOne].Id, orders[whichOne].SymboleName));
+                OrderTasks[i] = new Task(() => SendReq(arr_req[i], orders[whichOne].Id, orders[whichOne].SymboleName));
+                whichOne++;
+            }
+        }
+
+        private void SendReq(HttpRequestMessage req, int id, string sym)
+        {
+            string result;
+            DateTime sent;
+            Stopwatch _stopwatch = new Stopwatch();
+            try
+            {
+                sent = DateTime.Now;
+                _stopwatch.Start();
+                HttpResponseMessage httpResponse = sendhttp.SendAsync(req).Result;
+                _stopwatch.Stop();
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    string content = httpResponse.Content.ReadAsStringAsync().Result;
+                    OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
+                    // obj.CeaseFire = orderRespond.IsSuccessfull;
+                    result = $"T{Thread.CurrentThread.ManagedThreadId:D3} [{sent:HH:mm:ss.fff}][{_stopwatch.ElapsedMilliseconds:D3}ms] ID:{id} , {sym} , " +
+                        $"[{orderRespond.IsSuccessfull}] Desc: {orderRespond.MessageDesc}\n";
+                }
+                else
+                {
+                    result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {sym},Sent: {sent:HH:mm:ss.fff}, Error: {httpResponse.StatusCode}\n";
+                }
+            }
+            catch (Exception ex)
+            {
+                result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {sym},Sent: {DateTime.Now:HH:mm:ss.fff}, Error: {ex.Message}\n";
+            }
+            lock (locker)
+            {
+                resultOfThreads += result;
+            }
         }
 
         private string CalculateDiff(int[] dif)
@@ -120,10 +202,13 @@ namespace BCore
 
         private async void btn_start_Click(object sender, EventArgs e)
         {
-            ((Button)sender).Text = "Running...";
             ((Button)sender).Enabled = false;
-            OrdersThread.Start();
-            await EnableBtnOneThread();
+            ((Button)sender).Text = "Running...";
+            tb_logs.Text = await SendOrderRequests();  //SendAllOrders(LoadedOrders, int.Parse(tb_interval.Text.Trim()), _StartTime, _EndTime);
+            ((Button)sender).Text = "Start";
+            ((Button)sender).Enabled = true;
+            //OrdersThread.Start();
+            //await EnableBtnOneThread();
         }
 
         private void SendOrderTask(MobinBroker mobin, DateTime startTime, DateTime endTime, int interval)
@@ -295,7 +380,7 @@ namespace BCore
             var arr = tb_logs.Text.Trim().Split(Environment.NewLine);
             foreach (var s in arr)
                 myList.Add(s);
-            myList = myList.OrderBy(p => p.Substring(1, p.IndexOf("]"))).ToList();
+            myList = myList.OrderBy(p => p.Substring(5, p.IndexOf("]"))).ToList();
             tb_logs.Text = "";
             foreach (var l in myList)
                 tb_logs.Text += l + Environment.NewLine;

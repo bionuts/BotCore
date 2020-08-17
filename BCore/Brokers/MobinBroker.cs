@@ -26,6 +26,8 @@ namespace BCore.Lib
         private Stopwatch stopwatch;
         private readonly JsonSerializerOptions serializeOptions;
         private readonly HttpClientHandler httpHandler;
+        static volatile object locker = new Object();
+        public static string resultOfThreads = "";
 
         public string Token { get; set; }
         public BOrder Order { get; set; }
@@ -57,7 +59,9 @@ namespace BCore.Lib
             httpHandler = new HttpClientHandler()
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli,
-                AllowAutoRedirect = false
+                AllowAutoRedirect = false,
+                UseProxy = false,
+                Proxy = null
             };
             serializeOptions = new JsonSerializerOptions
             {
@@ -244,6 +248,34 @@ namespace BCore.Lib
             return req;
         }
 
+        public static HttpRequestMessage GetSendingOrderRequestMessageStatic(BOrder order, string token)
+        {
+            var req = new HttpRequestMessage(HttpMethod.Post, "/Web/V1/Order/Post");
+            req.Headers.Add("Authorization", $"BasicAuthentication {token}");
+            var payload = new OrderPayload
+            {
+                CautionAgreementSelected = false,
+                FinancialProviderId = 1,
+                IsSymbolCautionAgreement = false,
+                IsSymbolSepahAgreement = false,
+                SepahAgreementSelected = false,
+                isin = order.SymboleCode,
+                maxShow = 0,
+                minimumQuantity = 0,
+                orderCount = order.Count,
+                orderId = 0,
+                orderPrice = order.Price,
+                orderSide = (order.OrderType == "SELL" ? "86" : "65"), // SELL(86) , BUY(65)
+                orderValidity = 74,
+                orderValiditydate = null,
+                shortSellIncentivePercent = 0,
+                shortSellIsEnabled = false
+            };
+            string str_payload = JsonSerializer.Serialize(payload);
+            req.Content = new StringContent(str_payload, Encoding.UTF8, "application/json");
+            return req;
+        }
+
         public async void SendOrder(int tryCount, ReturnedResultObject obj)
         {
             string result;
@@ -251,8 +283,8 @@ namespace BCore.Lib
             HttpRequestMessage req = GetSendingOrderRequestMessage();
             try
             {
-                stopwatch = Stopwatch.StartNew();
                 sent = DateTime.Now;
+                stopwatch = Stopwatch.StartNew();
                 HttpResponseMessage httpResponse = await SendHttpClient.SendAsync(req);
                 stopwatch.Stop();
                 if (httpResponse.IsSuccessStatusCode)
@@ -260,8 +292,9 @@ namespace BCore.Lib
                     string content = await httpResponse.Content.ReadAsStringAsync();
                     OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
                     obj.CeaseFire = orderRespond.IsSuccessfull;
-                    result = $"[{sent:HH:mm:ss.fff}] , Sym: {Order.SymboleName,-10}, Elps: {stopwatch.ElapsedMilliseconds:D3}ms, Desc: {orderRespond.MessageDesc}, Done: {orderRespond.IsSuccessfull}, ";
-                    result += $"Hit: {tryCount}, T_{Thread.CurrentThread.ManagedThreadId}\n";
+                    result = $"[{sent:HH:mm:ss.fff}] , ID:{Order.Id}, Sym: {Order.SymboleName,-10}, Elps: {stopwatch.ElapsedMilliseconds:D3}ms, " +
+                    $"End:[{DateTime.Now:HH:mm:ss.fff}] , Desc: {orderRespond.MessageDesc}, Done: {orderRespond.IsSuccessfull}, " +
+                    $"T_{Thread.CurrentThread.ManagedThreadId}\n";
                 }
                 else
                 {
@@ -272,38 +305,45 @@ namespace BCore.Lib
             {
                 result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {Order.SymboleName},Sent: {DateTime.Now:HH:mm:ss.fff}, Error: {ex.Message}\n";
             }
-            obj.ResStr += result;
+            lock (locker)
+            {
+                obj.ResStr += result;
+            }
         }
 
-        public async void SendOrder(ReturnedResultObject obj)
+        public void SendOrder(BOrder order, ReturnedResultObject obj)
         {
             string result;
             DateTime sent;
-            HttpRequestMessage req = GetSendingOrderRequestMessage();
+            Stopwatch _stopwatch = new Stopwatch();
+            HttpRequestMessage req = GetSendingOrderRequestMessageStatic(order, Token);
             try
             {
-                stopwatch = Stopwatch.StartNew();
                 sent = DateTime.Now;
-                HttpResponseMessage httpResponse = await SendHttpClient.SendAsync(req);
-                stopwatch.Stop();
+                _stopwatch.Start();
+                HttpResponseMessage httpResponse = SendHttpClient.SendAsync(req).Result;
+                _stopwatch.Stop();
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    string content = await httpResponse.Content.ReadAsStringAsync();
+                    string content = httpResponse.Content.ReadAsStringAsync().Result;
                     OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
                     obj.CeaseFire = orderRespond.IsSuccessfull;
-                    result = $"[{sent:HH:mm:ss.fff}] , ID:{Order.Id}, Sym: {Order.SymboleName,-10}, Elps: {stopwatch.ElapsedMilliseconds:D3}ms, Desc: {orderRespond.MessageDesc}, Done: {orderRespond.IsSuccessfull}, ";
-                    result += $"T_{Thread.CurrentThread.ManagedThreadId}\n";
+                    result = $"T{Thread.CurrentThread.ManagedThreadId:D3} [{sent:HH:mm:ss.fff}][{_stopwatch.ElapsedMilliseconds:D3}ms] ID:{order.Id},{order.SymboleName} , " +
+                        $"[{orderRespond.IsSuccessfull}] Desc: {orderRespond.MessageDesc}\n";
                 }
                 else
                 {
-                    result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {Order.SymboleName},Sent: {sent:HH:mm:ss.fff},T_{Thread.CurrentThread.ManagedThreadId},  Error: {httpResponse.StatusCode}\n";
+                    result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {order.SymboleName},Sent: {sent:HH:mm:ss.fff},T_{Thread.CurrentThread.ManagedThreadId},  Error: {httpResponse.StatusCode}\n";
                 }
             }
             catch (Exception ex)
             {
-                result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {Order.SymboleName},Sent: {DateTime.Now:HH:mm:ss.fff}, Error: {ex.Message}\n";
+                result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {order.SymboleName},Sent: {DateTime.Now:HH:mm:ss.fff}, Error: {ex.Message}\n";
             }
-            obj.ResStr += result;
+            lock (locker)
+            {
+                resultOfThreads += result;
+            }
         }
 
         public async Task<string> SendOrder()
@@ -313,16 +353,17 @@ namespace BCore.Lib
             HttpRequestMessage req = GetSendingOrderRequestMessage();
             try
             {
-                stopwatch = Stopwatch.StartNew();
                 sent = DateTime.Now;
+                stopwatch = Stopwatch.StartNew();
                 HttpResponseMessage httpResponse = await SendHttpClient.SendAsync(req);
                 stopwatch.Stop();
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     string content = await httpResponse.Content.ReadAsStringAsync();
                     OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
-                    result = $"[{sent:HH:mm:ss.fff}] , ID:{Order.Id}, Sym: {Order.SymboleName,-10}, Elps: {stopwatch.ElapsedMilliseconds:D3}ms, Desc: {orderRespond.MessageDesc}, Done: {orderRespond.IsSuccessfull}, ";
-                    result += $"T_{Thread.CurrentThread.ManagedThreadId}\n";
+                    result = $"[{sent:HH:mm:ss.fff}] , ID:{Order.Id}, Sym: {Order.SymboleName,-10}, Elps: {stopwatch.ElapsedMilliseconds:D3}ms, " +
+                    $"End:[{DateTime.Now:HH:mm:ss.fff}] , Desc: {orderRespond.MessageDesc}, Done: {orderRespond.IsSuccessfull}, " +
+                    $"T_{Thread.CurrentThread.ManagedThreadId}\n";
                 }
                 else
                 {
@@ -394,6 +435,36 @@ namespace BCore.Lib
             SendHttpClient.DefaultRequestHeaders.Add("Sec-Fetch-Site", "same-site");
             SendHttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36");
             SendHttpClient.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
+        }
+
+        public static HttpClient SetHttpClientForSendingOrdersStatic()
+        {
+            HttpClientHandler httpHandler = new HttpClientHandler()
+            {
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli,
+                AllowAutoRedirect = false,
+                UseProxy = false,
+                Proxy = null
+            };
+            HttpClient http = new HttpClient(httpHandler)
+            {
+                BaseAddress = new Uri("https://api2.mobinsb.com")
+            };
+            http.DefaultRequestHeaders.Add("Accept", "*/*");
+            http.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
+            http.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9,la;q=0.8,fa;q=0.7,ar;q=0.6,fr;q=0.5");
+            http.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
+            http.DefaultRequestHeaders.Add("Connection", "keep-alive");
+            http.DefaultRequestHeaders.Add("Host", "api2.mobinsb.com");
+            http.DefaultRequestHeaders.Add("Origin", "https://silver.mobinsb.com");
+            http.DefaultRequestHeaders.Add("Pragma", "no-cache");
+            http.DefaultRequestHeaders.Add("Referer", "https://silver.mobinsb.com/Home/Default/page-1");
+            http.DefaultRequestHeaders.Add("Sec-Fetch-Dest", "empty");
+            http.DefaultRequestHeaders.Add("Sec-Fetch-Mode", "cors");
+            http.DefaultRequestHeaders.Add("Sec-Fetch-Site", "same-site");
+            http.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36");
+            http.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
+            return http;
         }
 
         private async Task SaveCookiesToDataBase(List<CookieItem> cookies)
