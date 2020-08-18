@@ -248,10 +248,10 @@ namespace BCore.Lib
             return req;
         }
 
-        public static HttpRequestMessage GetSendingOrderRequestMessageStatic(BOrder order, string token)
+        public static HttpRequestMessage GetSendingOrderRequestMessageStatic(BOrder order)
         {
             var req = new HttpRequestMessage(HttpMethod.Post, "/Web/V1/Order/Post");
-            req.Headers.Add("Authorization", $"BasicAuthentication {token}");
+            // req.Headers.Add("Authorization", $"BasicAuthentication {token}");
             var payload = new OrderPayload
             {
                 CautionAgreementSelected = false,
@@ -316,7 +316,7 @@ namespace BCore.Lib
             string result;
             DateTime sent;
             Stopwatch _stopwatch = new Stopwatch();
-            HttpRequestMessage req = GetSendingOrderRequestMessageStatic(order, Token);
+            HttpRequestMessage req = GetSendingOrderRequestMessageStatic(order);
             try
             {
                 sent = DateTime.Now;
@@ -437,7 +437,7 @@ namespace BCore.Lib
             SendHttpClient.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
         }
 
-        public static HttpClient SetHttpClientForSendingOrdersStatic()
+        public static HttpClient SetHttpClientForSendingOrdersStatic(string token)
         {
             HttpClientHandler httpHandler = new HttpClientHandler()
             {
@@ -453,6 +453,7 @@ namespace BCore.Lib
             http.DefaultRequestHeaders.Add("Accept", "*/*");
             http.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
             http.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9,la;q=0.8,fa;q=0.7,ar;q=0.6,fr;q=0.5");
+            http.DefaultRequestHeaders.Add("Authorization", $"BasicAuthentication {token}");
             http.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
             http.DefaultRequestHeaders.Add("Connection", "keep-alive");
             http.DefaultRequestHeaders.Add("Host", "api2.mobinsb.com");

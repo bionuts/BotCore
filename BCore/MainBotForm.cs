@@ -38,9 +38,10 @@ namespace BCore
         private DateTime _EndTime;
 
         private HttpRequestMessage[] arr_req;
+        private ThreadParamObject[] arr_params;
         private Thread[] arr_thread;
         private Task[] OrderTasks;
-        private readonly HttpClient sendhttp;
+        private HttpClient sendhttp;
         static volatile object locker = new Object();
         private string resultOfThreads = "";
         private readonly JsonSerializerOptions serializeOptions;
@@ -49,7 +50,6 @@ namespace BCore
         public MainBotForm()
         {
             db = new ApplicationDbContext();
-            sendhttp = MobinBroker.SetHttpClientForSendingOrdersStatic();
             serializeOptions = new JsonSerializerOptions
             {
                 IgnoreNullValues = true,
@@ -66,12 +66,13 @@ namespace BCore
         {
             LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).OrderBy(d => d.CreatedDateTime).ToListAsync();
             ApiToken = (await db.BSettings.Where(c => c.Key == "apitoken").FirstOrDefaultAsync()).Value;
+            sendhttp = MobinBroker.SetHttpClientForSendingOrdersStatic(ApiToken);
             if (LoadedOrders.Any())
             {
                 await LoadOrdersToListView();
                 LoadStartAndEndTime(tb_hh.Text.Trim(), tb_mm.Text.Trim(), tb_ss.Text.Trim(), tb_ms.Text.Trim(), tb_duration.Text.Trim());
                 lbl_endTime.Text = $"End: {_EndTime:HH:mm:ss.fff}";
-                InitHttpRequestMessageAndThreadArray(LoadedOrders, ApiToken, int.Parse(tb_interval.Text.Trim()), _StartTime, _EndTime);
+                InitHttpRequestMessageAndThreadArray(LoadedOrders, int.Parse(tb_interval.Text.Trim()), _StartTime, _EndTime);
                 /*orderTasks = new Task[LoadedOrders.Count];
                 orderThread = new Thread[LoadedOrders.Count];
                 int step = int.Parse(tb_interval.Text.Trim()) / LoadedOrders.Count;
@@ -121,40 +122,54 @@ namespace BCore
             tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text = MobinBroker.resultOfThreads.Replace("\n", Environment.NewLine); });
         }
 
-        private async Task<string> SendOrderRequests()
+        private void SendOrderRequests()
         {
-            // arr_thread[0].Start();
-            await Task.Delay((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds - 20);
-            // foreach (var t in arr_thread)
-            for (int i = 0; i < OrderTasks.Length; i++)
+            try
             {
-                OrderTasks[i].Start();
-                await Task.Delay(StepWait);
+                int size = arr_params.Length;
+                while (TimeSpan.Compare(DateTime.Now.TimeOfDay, _StartTime.TimeOfDay) < 0) ;
+                //Console.WriteLine($"Start: {_StartTime:HH:mm:ss.fff}");
+                for (int i = 0; i < size; i++)
+                {
+                    arr_thread[i].Start(arr_params[i]);
+                    _StartTime = _StartTime.AddMilliseconds(StepWait);
+                    while (TimeSpan.Compare(DateTime.Now.TimeOfDay, _StartTime.TimeOfDay) < 0) ;
+                    //Console.WriteLine(_StartTime.ToString("HH:mm:ss.fff"));
+                }
+                Thread.Sleep(1000);
+                tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text = resultOfThreads.Replace("\n", Environment.NewLine); });
             }
-            await Task.Delay(1000);
-            return resultOfThreads.Replace("\n", Environment.NewLine);
+            catch (Exception ex)
+            {
+                tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text = ex.Message; });
+            }
         }
 
-        private void InitHttpRequestMessageAndThreadArray(List<BOrder> orders, string token, int mainInterval, DateTime start, DateTime end)
+        private void InitHttpRequestMessageAndThreadArray(List<BOrder> orders, int mainInterval, DateTime start, DateTime end)
         {
             StepWait = (mainInterval + orders.Count - 1) / orders.Count;
             int reqSize = (int)((end.Subtract(start).TotalMilliseconds + StepWait - 1) / StepWait);
             arr_req = new HttpRequestMessage[reqSize];
+            arr_params = new ThreadParamObject[reqSize];
             arr_thread = new Thread[reqSize];
-            OrderTasks = new Task[reqSize];
             int whichOne = 0;
             for (int i = 0; i < reqSize; i++)
             {
                 if (whichOne == orders.Count) whichOne = 0;
-                arr_req[i] = MobinBroker.GetSendingOrderRequestMessageStatic(orders[whichOne], token);
-                arr_thread[i] = new Thread(() => SendReq(arr_req[i], orders[whichOne].Id, orders[whichOne].SymboleName));
-                OrderTasks[i] = new Task(() => SendReq(arr_req[i], orders[whichOne].Id, orders[whichOne].SymboleName));
+                arr_params[i] = new ThreadParamObject
+                {
+                    ID = orders[whichOne].Id,
+                    SYM = orders[whichOne].SymboleName,
+                    REQ = MobinBroker.GetSendingOrderRequestMessageStatic(orders[whichOne])
+                };
+                arr_thread[i] = new Thread(new ParameterizedThreadStart(SendReq));
                 whichOne++;
             }
         }
 
-        private void SendReq(HttpRequestMessage req, int id, string sym)
+        public void SendReq(object p)
         {
+            ThreadParamObject paramObject = (ThreadParamObject)p;
             string result;
             DateTime sent;
             Stopwatch _stopwatch = new Stopwatch();
@@ -162,24 +177,24 @@ namespace BCore
             {
                 sent = DateTime.Now;
                 _stopwatch.Start();
-                HttpResponseMessage httpResponse = sendhttp.SendAsync(req).Result;
+                HttpResponseMessage httpResponse = sendhttp.SendAsync(paramObject.REQ).Result;
                 _stopwatch.Stop();
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     string content = httpResponse.Content.ReadAsStringAsync().Result;
                     OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
                     // obj.CeaseFire = orderRespond.IsSuccessfull;
-                    result = $"T{Thread.CurrentThread.ManagedThreadId:D3} [{sent:HH:mm:ss.fff}][{_stopwatch.ElapsedMilliseconds:D3}ms] ID:{id} , {sym} , " +
+                    result = $"T{Thread.CurrentThread.ManagedThreadId:D3} [{sent:HH:mm:ss.fff}][{_stopwatch.ElapsedMilliseconds:D3}ms] ID:{paramObject.ID} , {paramObject.SYM} , " +
                         $"[{orderRespond.IsSuccessfull}] Desc: {orderRespond.MessageDesc}\n";
                 }
                 else
                 {
-                    result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {sym},Sent: {sent:HH:mm:ss.fff}, Error: {httpResponse.StatusCode}\n";
+                    result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {paramObject.SYM},Sent: {sent:HH:mm:ss.fff}, Error: {httpResponse.StatusCode}\n";
                 }
             }
             catch (Exception ex)
             {
-                result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {sym},Sent: {DateTime.Now:HH:mm:ss.fff}, Error: {ex.Message}\n";
+                result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {paramObject.SYM},Sent: {DateTime.Now:HH:mm:ss.fff}, Error: {ex.Message}\n";
             }
             lock (locker)
             {
@@ -200,11 +215,11 @@ namespace BCore
             return str;
         }
 
-        private async void btn_start_Click(object sender, EventArgs e)
+        private void btn_start_Click(object sender, EventArgs e)
         {
             ((Button)sender).Enabled = false;
             ((Button)sender).Text = "Running...";
-            tb_logs.Text = await SendOrderRequests();  //SendAllOrders(LoadedOrders, int.Parse(tb_interval.Text.Trim()), _StartTime, _EndTime);
+            Task task = Task.Factory.StartNew(() => SendOrderRequests(), TaskCreationOptions.LongRunning);
             ((Button)sender).Text = "Start";
             ((Button)sender).Enabled = true;
             //OrdersThread.Start();
