@@ -10,5 +10,6 @@ namespace BCore.DataModel
         public int ID { get; set; }
         public string SYM { get; set; }
         public HttpRequestMessage REQ { get; set; }
+        public int WhichOne { get; set; }
     }
 }
