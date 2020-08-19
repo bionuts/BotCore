@@ -36,7 +36,7 @@ namespace BCore
 
         private ThreadParamObject[] arr_params;
         private HttpClient sendhttp;
-        static volatile object locker = new Object();
+        static readonly object locker = new object();
         private string resultOfThreads = "";
         private readonly JsonSerializerOptions serializeOptions;
         private int StepWait;
@@ -76,27 +76,16 @@ namespace BCore
         {
             try
             {
-                int idx;
-                int ceaseSize = ceaseFire.Length;
-                int diffWait = 0;
-                int Fcounter = 0;
                 int size = arr_params.Length;
                 Thread.Sleep((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
                 Console.WriteLine($"Start: {DateTime.Now:HH:mm:ss.fff}");
                 for (int i = 0; i < size; i++)
                 {
                     if (ceaseFire[arr_params[i].WhichOne])
-                    {
-                        for (idx = 0; idx < ceaseSize && !ceaseFire[idx]; idx++)
-                            if (!ceaseFire[idx])
-                                Fcounter++;
-                        diffWait = (intervalDuration + Fcounter - 1) / Fcounter;
-                        Thread.Sleep(diffWait - StepWait);
-                        StepWait = diffWait;
-                    }
+                        continue;
                     else
                     {
-                        Task.Factory.StartNew(() => SendReq(arr_params[i], ceaseFire));
+                        Task.Factory.StartNew(() => SendReq(arr_params[i]));
                         Thread.Sleep(StepWait);
                         Console.WriteLine($"Out: {DateTime.Now:HH:mm:ss.fff}");
                     }
@@ -109,7 +98,7 @@ namespace BCore
             }
         }
 
-        public void SendReq(ThreadParamObject paramObject, bool[] ceaseFire)
+        public void SendReq(ThreadParamObject paramObject)
         {
             string result;
             DateTime sent;
@@ -117,7 +106,7 @@ namespace BCore
             try
             {
                 sent = DateTime.Now;
-                Console.WriteLine($"Thread => {sent:HH:mm:ss.fff}");
+                Console.WriteLine($"Thread => {paramObject.ID} {sent:HH:mm:ss.fff}");
                 _stopwatch.Start();
                 HttpResponseMessage httpResponse = sendhttp.SendAsync(paramObject.REQ).Result;
                 _stopwatch.Stop();
@@ -125,8 +114,9 @@ namespace BCore
                 {
                     string content = httpResponse.Content.ReadAsStringAsync().Result;
                     OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
-                    ceaseFire[paramObject.WhichOne] = orderRespond.IsSuccessfull;
-                    result = $"[{sent:HH:mm:ss.fff}] [{_stopwatch.ElapsedMilliseconds:D3}ms] [ID:{paramObject.ID}] => {paramObject.SYM} " +
+                    if (orderRespond.IsSuccessfull)
+                        ceaseFire[paramObject.WhichOne] = true;
+                    result = $"[{sent:HH:mm:ss.fff}] [{_stopwatch.ElapsedMilliseconds:D3}ms] [ID:{paramObject.ID}] => {paramObject.SYM:-10} " +
                         $"[{orderRespond.IsSuccessfull}] Desc: {orderRespond.MessageDesc}\n";
                 }
                 else
