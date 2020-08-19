@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainBotForm));
             this.btn_start = new System.Windows.Forms.Button();
             this.lv_orders = new System.Windows.Forms.ListView();
@@ -64,6 +65,8 @@
             this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
             this.lbl_server_time = new System.Windows.Forms.Label();
+            this.timer_cando = new System.Windows.Forms.Timer(this.components);
+            this.lbl_done = new System.Windows.Forms.Label();
             this.MainConsoleMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -381,12 +384,32 @@
             this.lbl_server_time.Text = "Server Time: 00:00:00";
             this.lbl_server_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // timer_cando
+            // 
+            this.timer_cando.Enabled = true;
+            this.timer_cando.Interval = 30000;
+            this.timer_cando.Tick += new System.EventHandler(this.timer_cando_Tick);
+            // 
+            // lbl_done
+            // 
+            this.lbl_done.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbl_done.AutoSize = true;
+            this.lbl_done.BackColor = System.Drawing.Color.Red;
+            this.lbl_done.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lbl_done.ForeColor = System.Drawing.Color.White;
+            this.lbl_done.Location = new System.Drawing.Point(472, 249);
+            this.lbl_done.Name = "lbl_done";
+            this.lbl_done.Size = new System.Drawing.Size(101, 20);
+            this.lbl_done.TabIndex = 15;
+            this.lbl_done.Text = "disconnected";
+            // 
             // MainBotForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1117, 645);
+            this.Controls.Add(this.lbl_done);
             this.Controls.Add(this.lbl_server_time);
             this.Controls.Add(this.btn_delete_orders);
             this.Controls.Add(this.lbl_endTime);
@@ -458,5 +481,7 @@
         private System.Windows.Forms.ColumnHeader hit;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.Label lbl_server_time;
+        private System.Windows.Forms.Timer timer_cando;
+        private System.Windows.Forms.Label lbl_done;
     }
 }

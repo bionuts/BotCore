@@ -34,9 +34,11 @@ namespace BCore
         private DateTime _EndTime;
         private DateTime ServerTime;
         private int intervalDuration;
+        private bool can;
 
         private ThreadParamObject[] arr_params;
         private HttpClient sendhttp;
+        private HttpClient GenHttp;
         static readonly object locker = new object();
         private string resultOfThreads = "";
         private readonly JsonSerializerOptions serializeOptions;
@@ -50,26 +52,41 @@ namespace BCore
             {
                 IgnoreNullValues = true,
             };
+            GenHttp = new HttpClient();
             InitializeComponent();
         }
 
         private async void MainBotForm_Load(object sender, EventArgs e)
         {
             await LoadOrdersToListView();
+            can = await Utilities.CanRunTheApp(GenHttp);
+            if (can)
+            {
+                lbl_done.Text = "connected";
+                lbl_done.BackColor = Color.Green;
+            }
+            else
+            {
+                lbl_done.Text = "disconnected";
+                lbl_done.BackColor = Color.Red;
+            }
         }
 
         private async void btn_load_Click(object sender, EventArgs e)
         {
-            LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).OrderBy(d => d.CreatedDateTime).ToListAsync();
-            ApiToken = (await db.BSettings.Where(c => c.Key == "apitoken").FirstOrDefaultAsync()).Value;
-            sendhttp = MobinBroker.SetHttpClientForSendingOrdersStatic(ApiToken);
-            if (LoadedOrders.Any())
+            if (can)
             {
-                await LoadOrdersToListView();
-                LoadStartAndEndTime(tb_hh.Text.Trim(), tb_mm.Text.Trim(), tb_ss.Text.Trim(), tb_ms.Text.Trim(), tb_duration.Text.Trim());
-                lbl_endTime.Text = $"End: {_EndTime:HH:mm:ss.fff}";
-                intervalDuration = int.Parse(tb_interval.Text.Trim());
-                InitHttpRequestMessageAndThreadArray(LoadedOrders, intervalDuration, _StartTime, _EndTime);
+                LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).OrderBy(d => d.CreatedDateTime).ToListAsync();
+                ApiToken = (await db.BSettings.Where(c => c.Key == "apitoken").FirstOrDefaultAsync()).Value;
+                sendhttp = MobinBroker.SetHttpClientForSendingOrdersStatic(ApiToken);
+                if (LoadedOrders.Any())
+                {
+                    await LoadOrdersToListView();
+                    LoadStartAndEndTime(tb_hh.Text.Trim(), tb_mm.Text.Trim(), tb_ss.Text.Trim(), tb_ms.Text.Trim(), tb_duration.Text.Trim());
+                    lbl_endTime.Text = $"End: {_EndTime:HH:mm:ss.fff}";
+                    intervalDuration = int.Parse(tb_interval.Text.Trim());
+                    InitHttpRequestMessageAndThreadArray(LoadedOrders, intervalDuration, _StartTime, _EndTime);
+                }
             }
         }
 
@@ -155,11 +172,14 @@ namespace BCore
 
         private async void btn_start_Click(object sender, EventArgs e)
         {
-            ((Button)sender).Enabled = false;
-            ((Button)sender).Text = "Running...";
-            await Task.Factory.StartNew(() => SendOrderRequests());
-            ((Button)sender).Text = "Start";
-            ((Button)sender).Enabled = true;
+            if (can)
+            {
+                ((Button)sender).Enabled = false;
+                ((Button)sender).Text = "Running...";
+                await Task.Factory.StartNew(() => SendOrderRequests());
+                ((Button)sender).Text = "Start";
+                ((Button)sender).Enabled = true;
+            }
         }
 
         public async Task LoadOrdersToListView()
@@ -220,33 +240,47 @@ namespace BCore
 
         private void AccountMenuItemClick(object sender, EventArgs e)
         {
-            Account accountForm = new Account();
-            accountForm.ShowDialog();
+            if (can)
+            {
+                Account accountForm = new Account();
+                accountForm.ShowDialog();
+            }
         }
 
         private void LoginMenuItemClick(object sender, EventArgs e)
         {
-            Login loginForm = new Login();
-            loginForm.ShowDialog();
+            if (can)
+            {
+                Login loginForm = new Login();
+                loginForm.ShowDialog();
+            }
         }
 
         private void SymboleMenuItemClick(object sender, EventArgs e)
         {
-            SymboleForm symForm = new SymboleForm();
-            symForm.ShowDialog();
+            if (can)
+            {
+                SymboleForm symForm = new SymboleForm();
+                symForm.ShowDialog();
+            }
         }
 
         private void OrderMenuItemClick(object sender, EventArgs e)
         {
-            OrderForm orderForm = new OrderForm();
-            orderForm.ShowDialog();
+            if (can)
+            {
+                OrderForm orderForm = new OrderForm();
+                orderForm.ShowDialog();
+            }
         }
 
         private void TestSendOrderOpenOrderMenuItemClick(object sender, EventArgs e)
         {
-            SendOrderForm sendOrderForm = new SendOrderForm();
-            // SendOrderForm sendOrderForm = BotServiceProvider.GetRequiredService<SendOrderForm>();
-            sendOrderForm.ShowDialog();
+            if (can)
+            {
+                SendOrderForm sendOrderForm = new SendOrderForm();
+                sendOrderForm.ShowDialog();
+            }
         }
 
         private async void btn_delete_orders_Click(object sender, EventArgs e)
@@ -278,6 +312,25 @@ namespace BCore
             foreach (var line in lineList)
                 tmp += line + Environment.NewLine;
             return tmp;
+        }
+
+        private void timer_cando_Tick(object sender, EventArgs e)
+        {
+            bool tmp = Utilities.CanRunTheApp2(GenHttp);
+            lock (locker)
+            {
+                can = tmp;
+            }
+            if (can)
+            {
+                lbl_done.Text = "connected";
+                lbl_done.BackColor = Color.Green;
+            }
+            else
+            {
+                lbl_done.Text = "disconnected";
+                lbl_done.BackColor = Color.Red;
+            }
         }
     }
 }
