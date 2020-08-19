@@ -32,6 +32,7 @@ namespace BCore
         private string ApiToken;
         private DateTime _StartTime;
         private DateTime _EndTime;
+        private DateTime ServerTime;
         private int intervalDuration;
 
         private ThreadParamObject[] arr_params;
@@ -78,19 +79,17 @@ namespace BCore
             {
                 int size = arr_params.Length;
                 Thread.Sleep((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
-                Console.WriteLine($"Start: {DateTime.Now:HH:mm:ss.fff}");
                 for (int i = 0; i < size; i++)
                 {
                     if (ceaseFire[arr_params[i].WhichOne])
                         continue;
                     else
                     {
-                        Task.Factory.StartNew(() => SendReq(arr_params[i]));
+                        Task.Factory.StartNew(() => SendReq(arr_params[i])); // study here for beter lunch of thread from pool
                         Thread.Sleep(StepWait);
-                        Console.WriteLine($"Out: {DateTime.Now:HH:mm:ss.fff}");
                     }
                 }
-                tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text = resultOfThreads.Replace("\n", Environment.NewLine); });
+                tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text = SortResult(resultOfThreads); });
             }
             catch (Exception ex)
             {
@@ -106,7 +105,6 @@ namespace BCore
             try
             {
                 sent = DateTime.Now;
-                Console.WriteLine($"Thread => {paramObject.ID} {sent:HH:mm:ss.fff}");
                 _stopwatch.Start();
                 HttpResponseMessage httpResponse = sendhttp.SendAsync(paramObject.REQ).Result;
                 _stopwatch.Stop();
@@ -117,7 +115,7 @@ namespace BCore
                     if (orderRespond.IsSuccessfull)
                         ceaseFire[paramObject.WhichOne] = true;
                     result = $"[{sent:HH:mm:ss.fff}] [{_stopwatch.ElapsedMilliseconds:D3}ms] [ID:{paramObject.ID}] => {paramObject.SYM:-10} " +
-                        $"[{orderRespond.IsSuccessfull}] Desc: {orderRespond.MessageDesc}\n";
+                        $",ThreadID: {Thread.CurrentThread.ManagedThreadId:D3} [{orderRespond.IsSuccessfull}] Desc: {orderRespond.MessageDesc}\n";
                 }
                 else
                 {
@@ -269,16 +267,17 @@ namespace BCore
             }
         }
 
-        private void btn_sort_result_Click(object sender, EventArgs e)
+        private string SortResult(string result)
         {
-            List<string> myList = new List<string>();
-            var arr = tb_logs.Text.Trim().Split(Environment.NewLine);
-            foreach (var s in arr)
-                myList.Add(s);
-            myList = myList.OrderBy(p => p.Substring(1, p.IndexOf("]"))).ToList();
-            tb_logs.Text = "";
-            foreach (var l in myList)
-                tb_logs.Text += l + Environment.NewLine;
+            string tmp = "";
+            List<string> lineList = new List<string>();
+            var lines = result.Split("\n");
+            foreach (var line in lines)
+                lineList.Add(line);
+            lineList = lineList.OrderBy(p => p.Substring(1, p.IndexOf("]"))).ToList();
+            foreach (var line in lineList)
+                tmp += line + Environment.NewLine;
+            return tmp;
         }
     }
 }

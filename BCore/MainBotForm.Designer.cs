@@ -63,7 +63,7 @@
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
-            this.btn_sort_result = new System.Windows.Forms.Button();
+            this.lbl_server_time = new System.Windows.Forms.Label();
             this.MainConsoleMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -297,9 +297,9 @@
             this.lbl_endTime.ForeColor = System.Drawing.Color.DarkGreen;
             this.lbl_endTime.Location = new System.Drawing.Point(587, 49);
             this.lbl_endTime.Name = "lbl_endTime";
-            this.lbl_endTime.Size = new System.Drawing.Size(15, 20);
+            this.lbl_endTime.Size = new System.Drawing.Size(49, 20);
             this.lbl_endTime.TabIndex = 8;
-            this.lbl_endTime.Text = "-";
+            this.lbl_endTime.Text = "End: -";
             // 
             // btn_delete_orders
             // 
@@ -369,15 +369,17 @@
             this.toolStripMenuItem7.Text = "Login";
             this.toolStripMenuItem7.Click += new System.EventHandler(this.LoginMenuItemClick);
             // 
-            // btn_sort_result
+            // lbl_server_time
             // 
-            this.btn_sort_result.Location = new System.Drawing.Point(818, 245);
-            this.btn_sort_result.Name = "btn_sort_result";
-            this.btn_sort_result.Size = new System.Drawing.Size(138, 29);
-            this.btn_sort_result.TabIndex = 13;
-            this.btn_sort_result.Text = "Sort Result";
-            this.btn_sort_result.UseVisualStyleBackColor = true;
-            this.btn_sort_result.Click += new System.EventHandler(this.btn_sort_result_Click);
+            this.lbl_server_time.AutoSize = true;
+            this.lbl_server_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lbl_server_time.ForeColor = System.Drawing.Color.Red;
+            this.lbl_server_time.Location = new System.Drawing.Point(303, 249);
+            this.lbl_server_time.Name = "lbl_server_time";
+            this.lbl_server_time.Size = new System.Drawing.Size(163, 20);
+            this.lbl_server_time.TabIndex = 14;
+            this.lbl_server_time.Text = "Server Time: 00:00:00";
+            this.lbl_server_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // MainBotForm
             // 
@@ -385,7 +387,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1117, 645);
-            this.Controls.Add(this.btn_sort_result);
+            this.Controls.Add(this.lbl_server_time);
             this.Controls.Add(this.btn_delete_orders);
             this.Controls.Add(this.lbl_endTime);
             this.Controls.Add(this.tb_ss);
@@ -455,6 +457,6 @@
         private System.Windows.Forms.ColumnHeader price;
         private System.Windows.Forms.ColumnHeader hit;
         private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.Button btn_sort_result;
+        private System.Windows.Forms.Label lbl_server_time;
     }
 }
