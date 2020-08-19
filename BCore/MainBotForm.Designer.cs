@@ -67,6 +67,10 @@
             this.lbl_server_time = new System.Windows.Forms.Label();
             this.timer_cando = new System.Windows.Forms.Timer(this.components);
             this.lbl_done = new System.Windows.Forms.Label();
+            this.timer_real_time = new System.Windows.Forms.Timer(this.components);
+            this.lbl_system_time = new System.Windows.Forms.Label();
+            this.tb_ws_logs = new System.Windows.Forms.TextBox();
+            this.btn_ws_start = new System.Windows.Forms.Button();
             this.MainConsoleMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -156,11 +160,11 @@
             // tb_logs
             // 
             this.tb_logs.AcceptsReturn = true;
-            this.tb_logs.Location = new System.Drawing.Point(11, 280);
+            this.tb_logs.Location = new System.Drawing.Point(12, 280);
             this.tb_logs.Multiline = true;
             this.tb_logs.Name = "tb_logs";
             this.tb_logs.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tb_logs.Size = new System.Drawing.Size(1091, 353);
+            this.tb_logs.Size = new System.Drawing.Size(685, 353);
             this.tb_logs.TabIndex = 0;
             this.tb_logs.WordWrap = false;
             // 
@@ -377,31 +381,67 @@
             this.lbl_server_time.AutoSize = true;
             this.lbl_server_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_server_time.ForeColor = System.Drawing.Color.Red;
-            this.lbl_server_time.Location = new System.Drawing.Point(303, 249);
+            this.lbl_server_time.Location = new System.Drawing.Point(1031, 58);
             this.lbl_server_time.Name = "lbl_server_time";
-            this.lbl_server_time.Size = new System.Drawing.Size(163, 20);
+            this.lbl_server_time.Size = new System.Drawing.Size(71, 20);
             this.lbl_server_time.TabIndex = 14;
-            this.lbl_server_time.Text = "Server Time: 00:00:00";
+            this.lbl_server_time.Text = "00:00:00";
             this.lbl_server_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // timer_cando
             // 
             this.timer_cando.Enabled = true;
-            this.timer_cando.Interval = 30000;
+            this.timer_cando.Interval = 300000;
             this.timer_cando.Tick += new System.EventHandler(this.timer_cando_Tick);
             // 
             // lbl_done
             // 
-            this.lbl_done.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lbl_done.AutoSize = true;
-            this.lbl_done.BackColor = System.Drawing.Color.Red;
-            this.lbl_done.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lbl_done.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.lbl_done.ForeColor = System.Drawing.Color.White;
-            this.lbl_done.Location = new System.Drawing.Point(472, 249);
+            this.lbl_done.Location = new System.Drawing.Point(302, 248);
             this.lbl_done.Name = "lbl_done";
-            this.lbl_done.Size = new System.Drawing.Size(101, 20);
+            this.lbl_done.Size = new System.Drawing.Size(0, 23);
             this.lbl_done.TabIndex = 15;
-            this.lbl_done.Text = "disconnected";
+            // 
+            // timer_real_time
+            // 
+            this.timer_real_time.Enabled = true;
+            this.timer_real_time.Interval = 1000;
+            this.timer_real_time.Tick += new System.EventHandler(this.timer_real_time_Tick);
+            // 
+            // lbl_system_time
+            // 
+            this.lbl_system_time.AutoSize = true;
+            this.lbl_system_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lbl_system_time.ForeColor = System.Drawing.Color.CornflowerBlue;
+            this.lbl_system_time.Location = new System.Drawing.Point(954, 58);
+            this.lbl_system_time.Name = "lbl_system_time";
+            this.lbl_system_time.Size = new System.Drawing.Size(71, 20);
+            this.lbl_system_time.TabIndex = 14;
+            this.lbl_system_time.Text = "00:00:00";
+            this.lbl_system_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // tb_ws_logs
+            // 
+            this.tb_ws_logs.AcceptsReturn = true;
+            this.tb_ws_logs.Location = new System.Drawing.Point(703, 280);
+            this.tb_ws_logs.Multiline = true;
+            this.tb_ws_logs.Name = "tb_ws_logs";
+            this.tb_ws_logs.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.tb_ws_logs.Size = new System.Drawing.Size(399, 353);
+            this.tb_ws_logs.TabIndex = 0;
+            this.tb_ws_logs.WordWrap = false;
+            // 
+            // btn_ws_start
+            // 
+            this.btn_ws_start.Location = new System.Drawing.Point(703, 246);
+            this.btn_ws_start.Name = "btn_ws_start";
+            this.btn_ws_start.Size = new System.Drawing.Size(126, 29);
+            this.btn_ws_start.TabIndex = 16;
+            this.btn_ws_start.Text = "WS Receive";
+            this.btn_ws_start.UseVisualStyleBackColor = true;
+            this.btn_ws_start.Click += new System.EventHandler(this.btn_ws_start_Click);
             // 
             // MainBotForm
             // 
@@ -409,6 +449,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1117, 645);
+            this.Controls.Add(this.btn_ws_start);
+            this.Controls.Add(this.tb_ws_logs);
+            this.Controls.Add(this.lbl_system_time);
             this.Controls.Add(this.lbl_done);
             this.Controls.Add(this.lbl_server_time);
             this.Controls.Add(this.btn_delete_orders);
@@ -483,5 +526,9 @@
         private System.Windows.Forms.Label lbl_server_time;
         private System.Windows.Forms.Timer timer_cando;
         private System.Windows.Forms.Label lbl_done;
+        private System.Windows.Forms.Timer timer_real_time;
+        private System.Windows.Forms.Label lbl_system_time;
+        private System.Windows.Forms.TextBox tb_ws_logs;
+        private System.Windows.Forms.Button btn_ws_start;
     }
 }

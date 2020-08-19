@@ -16,6 +16,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -32,9 +33,13 @@ namespace BCore
         private string ApiToken;
         private DateTime _StartTime;
         private DateTime _EndTime;
-        private DateTime ServerTime;
         private int intervalDuration;
-        private bool can;
+        private volatile bool can;
+
+        private DateTime ServerTime;
+        private ClientWebSocket ClientWS;
+        Uri wsUri = new Uri("wss://push2v7.etadbir.com/lightstreamer");
+        readonly ArraySegment<byte> bytesReceived;
 
         private ThreadParamObject[] arr_params;
         private HttpClient sendhttp;
@@ -53,6 +58,24 @@ namespace BCore
                 IgnoreNullValues = true,
             };
             GenHttp = new HttpClient();
+
+            ClientWS = new ClientWebSocket();            
+            ClientWS.Options.SetRequestHeader("Host", "push2v7.etadbir.com");
+            ClientWS.Options.SetRequestHeader("Connection", "Upgrade");
+            ClientWS.Options.SetRequestHeader("Pragma", "no-cache");
+            ClientWS.Options.SetRequestHeader("Cache-Control", "no-cache");
+            ClientWS.Options.SetRequestHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36");
+            ClientWS.Options.SetRequestHeader("Upgrade", "websocket");
+            ClientWS.Options.SetRequestHeader("Origin", "https://silver.mobinsb.com");
+            ClientWS.Options.SetRequestHeader("Sec-WebSocket-Version", "13");
+            ClientWS.Options.SetRequestHeader("Accept-Encoding", "gzip, deflate, br");
+            ClientWS.Options.SetRequestHeader("Accept-Language", "en-US,en;q=0.9,la;q=0.8,fa;q=0.7,ar;q=0.6,fr;q=0.5");
+            ClientWS.Options.SetRequestHeader("Sec-WebSocket-Key", Convert.ToBase64String(Encoding.UTF8.GetBytes("WebSocket rocks!")));
+            ClientWS.Options.SetRequestHeader("Sec-WebSocket-Extensions", "permessage-deflate"); // ; client_max_window_bits"
+            ClientWS.Options.SetRequestHeader("Sec-WebSocket-Protocol", "js.lightstreamer.com");
+            bytesReceived = new ArraySegment<byte>(new byte[1024]);
+
+
             InitializeComponent();
         }
 
@@ -62,12 +85,12 @@ namespace BCore
             can = await Utilities.CanRunTheApp(GenHttp);
             if (can)
             {
-                lbl_done.Text = "connected";
+                lbl_done.Text = "[connected]";
                 lbl_done.BackColor = Color.Green;
             }
             else
             {
-                lbl_done.Text = "disconnected";
+                lbl_done.Text = "[disconnected]";
                 lbl_done.BackColor = Color.Red;
             }
         }
@@ -317,19 +340,44 @@ namespace BCore
         private void timer_cando_Tick(object sender, EventArgs e)
         {
             bool tmp = Utilities.CanRunTheApp2(GenHttp);
-            lock (locker)
-            {
-                can = tmp;
-            }
+            can = tmp;
             if (can)
             {
-                lbl_done.Text = "connected";
+                lbl_done.Text = "[connected]";
                 lbl_done.BackColor = Color.Green;
             }
             else
             {
-                lbl_done.Text = "disconnected";
+                lbl_done.Text = "[disconnected]";
                 lbl_done.BackColor = Color.Red;
+            }
+        }
+
+        private async void timer_real_time_Tick(object sender, EventArgs e)
+        {
+            lbl_system_time.Text = DateTime.Now.ToString("HH:mm:ss");
+            if (ClientWS.State == WebSocketState.Open)
+            {
+                var result = await ClientWS.ReceiveAsync(bytesReceived, CancellationToken.None);
+                tb_ws_logs.Text += Encoding.UTF8.GetString(bytesReceived.Array, 0, result.Count) + Environment.NewLine;
+            }
+            else
+            {
+                // tb_ws_logs.Text += ClientWS.CloseStatusDescription + Environment.NewLine;
+            }
+        }
+
+        private async void btn_ws_start_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                await ClientWS.ConnectAsync(wsUri, CancellationToken.None);
+                if (ClientWS.State == WebSocketState.Open)
+                    tb_ws_logs.Text += "Connected";
+            }
+            catch (Exception ex)
+            {
+                tb_ws_logs.Text += ex.Message + Environment.NewLine;
             }
         }
     }
