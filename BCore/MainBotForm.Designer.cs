@@ -71,6 +71,7 @@
             this.lbl_system_time = new System.Windows.Forms.Label();
             this.tb_ws_logs = new System.Windows.Forms.TextBox();
             this.btn_ws_start = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.MainConsoleMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -443,12 +444,23 @@
             this.btn_ws_start.UseVisualStyleBackColor = true;
             this.btn_ws_start.Click += new System.EventHandler(this.btn_ws_start_Click);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(576, 245);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(94, 29);
+            this.button1.TabIndex = 17;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // MainBotForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1117, 645);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.btn_ws_start);
             this.Controls.Add(this.tb_ws_logs);
             this.Controls.Add(this.lbl_system_time);
@@ -530,5 +542,6 @@
         private System.Windows.Forms.Label lbl_system_time;
         private System.Windows.Forms.TextBox tb_ws_logs;
         private System.Windows.Forms.Button btn_ws_start;
+        private System.Windows.Forms.Button button1;
     }
 }

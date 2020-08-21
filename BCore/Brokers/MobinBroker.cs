@@ -549,5 +549,51 @@ namespace BCore.Lib
             }
             return cookies;
         }
+
+        public async Task<string> CreateSessionForWebSocket()
+        {
+            var req = new HttpRequestMessage(HttpMethod.Post, "https://push2v7.etadbir.com/lightstreamer/create_session.js");
+            req.Headers.Add("Accept", "*/*");
+            req.Headers.Add("Accept-Encoding", "gzip, deflate, br");
+            req.Headers.Add("Accept-Language", "en-US,en;q=0.9,la;q=0.8,fa;q=0.7,ar;q=0.6,fr;q=0.5");
+            req.Headers.Add("Cache-Control", "no-cache");
+            req.Headers.Add("Connection", "keep-alive");
+            req.Headers.Add("Pragma", "no-cache");
+            req.Headers.Add("Host", "push2v7.etadbir.com");
+            req.Headers.Add("Origin", "https://silver.mobinsb.com");
+            req.Headers.Add("Referer", "https://silver.mobinsb.com/Home/Default/page-1");
+            req.Headers.Add("Sec-Fetch-Dest", "empty");
+            req.Headers.Add("Sec-Fetch-Mode", "cors");
+            req.Headers.Add("Sec-Fetch-Site", "cross-site");
+            req.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36");
+
+            int phase = 100 * (int)Math.Round(new Random().NextDouble() * 100);
+            FormUrlEncodedContent formData = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("LS_op2", "create"),
+                new KeyValuePair<string, string>("LS_phase", phase.ToString()),  // 100 * f.randomG(100) ==> randomG(a): math.round(math.random()*(a || 1E3 )) 1E3 = 1000
+                new KeyValuePair<string, string>("LS_cause","new.api"),
+                new KeyValuePair<string, string>("LS_polling","true"),
+                new KeyValuePair<string, string>("LS_polling_millis","0"),
+                new KeyValuePair<string, string>("LS_idle_millis","0"),
+                new KeyValuePair<string, string>("LS_cid","pcYgxn8m8 feOojyA1T681f3g2.pz479mDv"),
+                new KeyValuePair<string, string>("LS_adapter_set","STOCKLISTDEMO_REMOTE"),
+                new KeyValuePair<string, string>("LS_user","777&msb01473118"),
+                new KeyValuePair<string, string>("LS_password","777"),
+                new KeyValuePair<string, string>("LS_container","lsc")
+            });
+            req.Content = formData;
+            HttpResponseMessage res = await GeneralHttpClient.SendAsync(req);
+            if (res.IsSuccessStatusCode)
+            {
+                // setPhase(2501);start('S93912e248d8e9080M98eT1235238', null, 0, 50000, 'Lightstreamer HTTP Server', '86.57.3.186');loop(0);
+                string output = await res.Content.ReadAsStringAsync();
+                int start = output.IndexOf(";start('");
+                int end = output.IndexOf("',", start);
+                string LS_session = output.Substring(start + 8, end - (start + 8));
+                return $"{phase},{LS_session}";
+            }
+            return "";
+        }
     }
 }
