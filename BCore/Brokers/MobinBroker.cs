@@ -23,12 +23,15 @@ namespace BCore.Lib
         private readonly ApplicationDbContext db;
         private HttpClient SendHttpClient;
         private HttpClient GeneralHttpClient;
+        public MobinWebSocket MobinWebSocket;
         private Stopwatch stopwatch;
         private readonly JsonSerializerOptions serializeOptions;
         private readonly HttpClientHandler httpHandler;
         static volatile object locker = new Object();
         public static string resultOfThreads = "";
 
+        public string LS_Session { get; set; }
+        public int LS_Phase { get; set; }
         public string Token { get; set; }
         public BOrder Order { get; set; }
         public long SendingOrderElapsedTime { get; private set; }
@@ -38,12 +41,13 @@ namespace BCore.Lib
         public MobinBroker()
         {
             db = new ApplicationDbContext();
+            MobinWebSocket = new MobinWebSocket();
             httpHandler = new HttpClientHandler()
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli,
                 AllowAutoRedirect = false,
-                UseProxy = false,
-                Proxy = null
+                Proxy = null,
+                UseProxy = false
             };
             serializeOptions = new JsonSerializerOptions
             {
@@ -550,7 +554,7 @@ namespace BCore.Lib
             return cookies;
         }
 
-        public async Task<string> CreateSessionForWebSocket()
+        public async Task<bool> CreateSessionForWebSocket()
         {
             var req = new HttpRequestMessage(HttpMethod.Post, "https://push2v7.etadbir.com/lightstreamer/create_session.js");
             req.Headers.Add("Accept", "*/*");
@@ -567,11 +571,11 @@ namespace BCore.Lib
             req.Headers.Add("Sec-Fetch-Site", "cross-site");
             req.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36");
 
-            int phase = 100 * (int)Math.Round(new Random().NextDouble() * 100);
-            FormUrlEncodedContent formData = new FormUrlEncodedContent(new[]
+            LS_Phase = 100 * (int)Math.Round(new Random().NextDouble() * 100);
+            req.Content = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("LS_op2", "create"),
-                new KeyValuePair<string, string>("LS_phase", phase.ToString()),  // 100 * f.randomG(100) ==> randomG(a): math.round(math.random()*(a || 1E3 )) 1E3 = 1000
+                new KeyValuePair<string, string>("LS_phase", LS_Phase.ToString()),  // 100 * f.randomG(100) ==> randomG(a): math.round(math.random()*(a || 1E3 )) 1E3 = 1000
                 new KeyValuePair<string, string>("LS_cause","new.api"),
                 new KeyValuePair<string, string>("LS_polling","true"),
                 new KeyValuePair<string, string>("LS_polling_millis","0"),
@@ -582,18 +586,64 @@ namespace BCore.Lib
                 new KeyValuePair<string, string>("LS_password","777"),
                 new KeyValuePair<string, string>("LS_container","lsc")
             });
-            req.Content = formData;
-            HttpResponseMessage res = await GeneralHttpClient.SendAsync(req);
-            if (res.IsSuccessStatusCode)
+
+            try
             {
-                // setPhase(2501);start('S93912e248d8e9080M98eT1235238', null, 0, 50000, 'Lightstreamer HTTP Server', '86.57.3.186');loop(0);
-                string output = await res.Content.ReadAsStringAsync();
-                int start = output.IndexOf(";start('");
-                int end = output.IndexOf("',", start);
-                string LS_session = output.Substring(start + 8, end - (start + 8));
-                return $"{phase},{LS_session}";
+                HttpResponseMessage res = await GeneralHttpClient.SendAsync(req);
+                if (res.IsSuccessStatusCode)
+                {
+                    // setPhase(2501);start('S93912e248d8e9080M98eT1235238', null, 0, 50000, 'Lightstreamer HTTP Server', '86.57.3.186');loop(0);
+                    string output = await res.Content.ReadAsStringAsync();
+                    int start = output.IndexOf(";start('");
+                    int end = output.IndexOf("',", start);
+                    LS_Session = output.Substring(start + 8, end - (start + 8));
+                    return true;
+                }
+                return false;
             }
-            return "";
+            catch (Exception ex)
+            {
+                // log data by ILogger
+                return false;
+            }
+        }
+
+        public string StayTuneHttpClient()
+        {
+            var req = new HttpRequestMessage(HttpMethod.Get, "https://api2.mobinsb.com/Web/V1/Order/GetOpenOrder/OpenOrder");
+            req.Headers.Add("Accept", "*/*");
+            req.Headers.Add("Accept-Encoding", "gzip, deflate, br");
+            req.Headers.Add("Accept-Language", "en-US,en;q=0.9,la;q=0.8,fa;q=0.7,ar;q=0.6,fr;q=0.5");
+            req.Headers.Add("Authorization", $"BasicAuthentication {Token}");
+            req.Headers.Add("Cache-Control", "no-cache");
+            req.Headers.Add("Connection", "keep-alive");
+            req.Headers.Add("Host", "api2.mobinsb.com");
+            req.Headers.Add("Origin", "https://silver.mobinsb.com");
+            req.Headers.Add("Pragma", "no-cache");
+            req.Headers.Add("Referer", "https://silver.mobinsb.com/Home/Default/page-1");
+            req.Headers.Add("Sec-Fetch-Dest", "empty");
+            req.Headers.Add("Sec-Fetch-Mode", "cors");
+            req.Headers.Add("Sec-Fetch-Site", "same-site");
+            req.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36");
+            req.Headers.Add("X-Requested-With", "XMLHttpRequest");
+            try
+            {
+                string result = "";
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                HttpResponseMessage httpResponse = GeneralHttpClient.SendAsync(req).Result;
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    stopwatch.Stop();
+                    string content = httpResponse.Content.ReadAsStringAsync().Result;
+                    GetOpenOrder openOrders = JsonSerializer.Deserialize<GetOpenOrder>(content);
+                    result = $"Elps: {stopwatch.ElapsedMilliseconds}ms, Orders: {openOrders.Data.Length}, [{openOrders.IsSuccessfull}]";
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
         }
     }
 }

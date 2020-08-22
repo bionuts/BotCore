@@ -70,8 +70,8 @@
             this.timer_real_time = new System.Windows.Forms.Timer(this.components);
             this.lbl_system_time = new System.Windows.Forms.Label();
             this.tb_ws_logs = new System.Windows.Forms.TextBox();
-            this.btn_ws_start = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.tb_stay_tune = new System.Windows.Forms.TextBox();
+            this.timer_stay_tune = new System.Windows.Forms.Timer(this.components);
             this.MainConsoleMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -165,7 +165,7 @@
             this.tb_logs.Multiline = true;
             this.tb_logs.Name = "tb_logs";
             this.tb_logs.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tb_logs.Size = new System.Drawing.Size(685, 353);
+            this.tb_logs.Size = new System.Drawing.Size(1090, 353);
             this.tb_logs.TabIndex = 0;
             this.tb_logs.WordWrap = false;
             // 
@@ -329,7 +329,7 @@
             this.toolStripMenuItem4});
             this.MainConsoleMenu.Location = new System.Drawing.Point(0, 0);
             this.MainConsoleMenu.Name = "MainConsoleMenu";
-            this.MainConsoleMenu.Size = new System.Drawing.Size(1117, 28);
+            this.MainConsoleMenu.Size = new System.Drawing.Size(1662, 28);
             this.MainConsoleMenu.TabIndex = 12;
             this.MainConsoleMenu.Text = "menuStrip1";
             // 
@@ -426,42 +426,38 @@
             // tb_ws_logs
             // 
             this.tb_ws_logs.AcceptsReturn = true;
-            this.tb_ws_logs.Location = new System.Drawing.Point(703, 280);
+            this.tb_ws_logs.Location = new System.Drawing.Point(1108, 81);
             this.tb_ws_logs.Multiline = true;
             this.tb_ws_logs.Name = "tb_ws_logs";
             this.tb_ws_logs.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tb_ws_logs.Size = new System.Drawing.Size(399, 353);
+            this.tb_ws_logs.Size = new System.Drawing.Size(283, 552);
             this.tb_ws_logs.TabIndex = 0;
             this.tb_ws_logs.WordWrap = false;
             // 
-            // btn_ws_start
+            // tb_stay_tune
             // 
-            this.btn_ws_start.Location = new System.Drawing.Point(703, 246);
-            this.btn_ws_start.Name = "btn_ws_start";
-            this.btn_ws_start.Size = new System.Drawing.Size(126, 29);
-            this.btn_ws_start.TabIndex = 16;
-            this.btn_ws_start.Text = "WS Receive";
-            this.btn_ws_start.UseVisualStyleBackColor = true;
-            this.btn_ws_start.Click += new System.EventHandler(this.btn_ws_start_Click);
+            this.tb_stay_tune.AcceptsReturn = true;
+            this.tb_stay_tune.Location = new System.Drawing.Point(1397, 81);
+            this.tb_stay_tune.Multiline = true;
+            this.tb_stay_tune.Name = "tb_stay_tune";
+            this.tb_stay_tune.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.tb_stay_tune.Size = new System.Drawing.Size(253, 552);
+            this.tb_stay_tune.TabIndex = 0;
+            this.tb_stay_tune.WordWrap = false;
             // 
-            // button1
+            // timer_stay_tune
             // 
-            this.button1.Location = new System.Drawing.Point(576, 245);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(94, 29);
-            this.button1.TabIndex = 17;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.timer_stay_tune.Enabled = true;
+            this.timer_stay_tune.Interval = 10000;
+            this.timer_stay_tune.Tick += new System.EventHandler(this.timer_stay_tune_Tick);
             // 
             // MainBotForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1117, 645);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.btn_ws_start);
+            this.ClientSize = new System.Drawing.Size(1662, 645);
+            this.Controls.Add(this.tb_stay_tune);
             this.Controls.Add(this.tb_ws_logs);
             this.Controls.Add(this.lbl_system_time);
             this.Controls.Add(this.lbl_done);
@@ -541,7 +537,7 @@
         private System.Windows.Forms.Timer timer_real_time;
         private System.Windows.Forms.Label lbl_system_time;
         private System.Windows.Forms.TextBox tb_ws_logs;
-        private System.Windows.Forms.Button btn_ws_start;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TextBox tb_stay_tune;
+        private System.Windows.Forms.Timer timer_stay_tune;
     }
 }
