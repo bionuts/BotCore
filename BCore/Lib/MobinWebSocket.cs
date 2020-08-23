@@ -14,14 +14,15 @@ namespace BCore.Lib
         Uri wsUri = new Uri("wss://push2v7.etadbir.com/lightstreamer");
         readonly ArraySegment<byte> WS_BUFFER;
         ArraySegment<byte> WS_SND_BUFFER;
-
-        static string pattern = @"d\(1,1,2,'([0-1][0-9]|[2][0-3]):([0-5][0-9]):[0-5][0-9]'\);"; // d(1,1,2,'01:21:00')
-        static string InnerPattern = @"([0-1][0-9]|[2][0-3]):([0-5][0-9]):[0-5][0-9]"; // 01:21:00
-        Regex timeRegex = new Regex(pattern);
-        Regex InnerTimeRegex = new Regex(InnerPattern);
-        Match timeMatch;
-        Match InnerTimeMatch;
         string wsRes = "";
+
+        public bool IS_OPEN
+        {
+            get
+            {
+                return ClientWS.State == WebSocketState.Open;
+            }
+        }
 
         public MobinWebSocket()
         {
@@ -78,40 +79,23 @@ namespace BCore.Lib
             }
         }
 
-        private async void ReceiveData()
+        public async Task<string> ReceiveDataFromWebSocket()
         {
-            while (ClientWS.State == WebSocketState.Open)
+            try
             {
-                try
+                wsRes = "";
+                var result = await ClientWS.ReceiveAsync(WS_BUFFER, CancellationToken.None);
+                wsRes += Encoding.UTF8.GetString(WS_BUFFER.Array, 0, result.Count);
+                while (!result.EndOfMessage)
                 {
-                    wsRes = "";
-                    var result = await ClientWS.ReceiveAsync(WS_BUFFER, CancellationToken.None);
                     wsRes += Encoding.UTF8.GetString(WS_BUFFER.Array, 0, result.Count);
-                    while (!result.EndOfMessage)
-                    {
-                        wsRes += Encoding.UTF8.GetString(WS_BUFFER.Array, 0, result.Count);
-                    }
-
-                    timeMatch = timeRegex.Match(wsRes);
-                    if (timeMatch.Success)
-                    {
-                        InnerTimeMatch = InnerTimeRegex.Match(timeMatch.Value);
-                        string[] timeValues = InnerTimeMatch.Value.Split(":");
-                        ServerTime = new DateTime(
-                            DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day,
-                            int.Parse(timeValues[0]), int.Parse(timeValues[1]), int.Parse(timeValues[2]), ServerTime.Millisecond);
-                    }
-
-                    tb_ws_logs.AppendText(wsRes + Environment.NewLine);
-                    tb_ws_logs.ScrollToCaret();
                 }
-                catch (Exception ex)
-                {
-                    tb_ws_logs.AppendText(ex.Message + Environment.NewLine);
-                    tb_ws_logs.ScrollToCaret();
-                }
+                return wsRes;
             }
-
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
         }
     }
 }

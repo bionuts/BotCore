@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -117,6 +118,28 @@ namespace BCore.Lib
             {
                 return false;
             }
+        }
+
+        public static bool GetTimeFromString(string input, out string output)
+        {
+            output = "";
+            // d(1,1,2,'01:21:00')
+            // d(1,1,'keyclock','typeclock','08:10:01');
+            string pattern = @"(d\(1,1,2,'([0-1][0-9]|[2][0-3]):([0-5][0-9]):[0-5][0-9]'\);)|(d\(1,1,'keyclock','typeclock','([0-1][0-9]|[2][0-3]):([0-5][0-9]):[0-5][0-9]'\);)";
+            string InnerPattern = @"([0-1][0-9]|[2][0-3]):([0-5][0-9]):[0-5][0-9]";
+            Regex timeRegex = new Regex(pattern);
+            Regex InnerTimeRegex = new Regex(InnerPattern);
+            Match timeMatch;
+            Match InnerTimeMatch;
+
+            timeMatch = timeRegex.Match(input);
+            if (timeMatch.Success)
+            {
+                InnerTimeMatch = InnerTimeRegex.Match(timeMatch.Value);
+                output = InnerTimeMatch.Value;
+                return true;
+            }
+            return false;
         }
     }
 }

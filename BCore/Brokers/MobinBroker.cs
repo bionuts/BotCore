@@ -21,15 +21,16 @@ namespace BCore.Lib
     class MobinBroker
     {
         private readonly ApplicationDbContext db;
-        private HttpClient SendHttpClient;
-        private HttpClient GeneralHttpClient;
+        private static readonly HttpClient SendHttpClient = SetHttpClientForSendingOrders();
+        private readonly HttpClient GeneralHttpClient;
         public MobinWebSocket MobinWebSocket;
         private Stopwatch stopwatch;
         private readonly JsonSerializerOptions serializeOptions;
         private readonly HttpClientHandler httpHandler;
-        static volatile object locker = new Object();
-        public static string resultOfThreads = "";
+        static volatile object locker = new object();
 
+        public static string ResultOfThreads { get; set; } = "";
+        public bool[] CeaseFire { get; set; }
         public string LS_Session { get; set; }
         public int LS_Phase { get; set; }
         public string Token { get; set; }
@@ -54,7 +55,6 @@ namespace BCore.Lib
                 IgnoreNullValues = true,
             };
             GeneralHttpClient = new HttpClient(httpHandler);
-            SetHttpClientForSendingOrders();
         }
 
         public MobinBroker(string token, BOrder order)
@@ -72,7 +72,6 @@ namespace BCore.Lib
                 IgnoreNullValues = true,
             };
             GeneralHttpClient = new HttpClient(httpHandler);
-            SetHttpClientForSendingOrders();
             Token = token;
             Order = order;
         }
@@ -152,13 +151,13 @@ namespace BCore.Lib
                 loginRequest.Headers.Add("Cookie", temp.Substring(0, temp.LastIndexOf(";")));
             }
 
-            FormUrlEncodedContent formData = new FormUrlEncodedContent(new[]
+            loginRequest.Content = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("username", username),
                 new KeyValuePair<string, string>("password", password),
                 new KeyValuePair<string, string>("capcha",captcha)
             });
-            loginRequest.Content = formData;
+
             HttpResponseMessage loginResponse = await GeneralHttpClient.SendAsync(loginRequest);
             if (loginResponse.StatusCode == HttpStatusCode.Redirect)
             {
@@ -252,10 +251,10 @@ namespace BCore.Lib
             return req;
         }
 
-        public static HttpRequestMessage GetSendingOrderRequestMessageStatic(BOrder order)
+        public HttpRequestMessage GetSendingOrderRequestMessage(BOrder order)
         {
             var req = new HttpRequestMessage(HttpMethod.Post, "/Web/V1/Order/Post");
-            // req.Headers.Add("Authorization", $"BasicAuthentication {token}");
+            req.Headers.Add("Authorization", $"BasicAuthentication {Token}");
             var payload = new OrderPayload
             {
                 CautionAgreementSelected = false,
@@ -278,6 +277,42 @@ namespace BCore.Lib
             string str_payload = JsonSerializer.Serialize(payload);
             req.Content = new StringContent(str_payload, Encoding.UTF8, "application/json");
             return req;
+        }
+
+        public void SendReqThread(ThreadParamObject paramObject)
+        {
+            string result;
+            DateTime sent;
+            Stopwatch _stopwatch = new Stopwatch();
+            try
+            {
+                sent = DateTime.Now;
+                result = paramObject.ID.ToString() + Environment.NewLine;
+                _stopwatch.Start();
+                HttpResponseMessage httpResponse = SendHttpClient.SendAsync(paramObject.REQ).Result;
+                _stopwatch.Stop();
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    string content = httpResponse.Content.ReadAsStringAsync().Result;
+                    OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
+                    if (orderRespond.IsSuccessfull)
+                        CeaseFire[paramObject.WhichOne] = true;
+                    result = $"[{sent:HH:mm:ss.fff}] [{_stopwatch.ElapsedMilliseconds:D3}ms] [ID:{paramObject.ID}] => {paramObject.SYM:-10} " +
+                        $",ThreadID: {Thread.CurrentThread.ManagedThreadId:D3} [{orderRespond.IsSuccessfull}] Desc: {orderRespond.MessageDesc}\n";
+                }
+                else
+                {
+                    result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {paramObject.SYM},Sent: {sent:HH:mm:ss.fff}, Error: {httpResponse.StatusCode}\n";
+                }
+            }
+            catch (Exception ex)
+            {
+                result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {paramObject.SYM},Sent: {DateTime.Now:HH:mm:ss.fff}, Error: {ex.Message}\n";
+            }
+            lock (locker)
+            {
+                ResultOfThreads += result;
+            }
         }
 
         public async void SendOrder(int tryCount, ReturnedResultObject obj)
@@ -320,7 +355,7 @@ namespace BCore.Lib
             string result;
             DateTime sent;
             Stopwatch _stopwatch = new Stopwatch();
-            HttpRequestMessage req = GetSendingOrderRequestMessageStatic(order);
+            HttpRequestMessage req = GetSendingOrderRequestMessage(order);
             try
             {
                 sent = DateTime.Now;
@@ -346,7 +381,7 @@ namespace BCore.Lib
             }
             lock (locker)
             {
-                resultOfThreads += result;
+                ResultOfThreads += result;
             }
         }
 
@@ -419,29 +454,7 @@ namespace BCore.Lib
             return result;
         }
 
-        private void SetHttpClientForSendingOrders()
-        {
-            SendHttpClient = new HttpClient(httpHandler)
-            {
-                BaseAddress = new Uri("https://api2.mobinsb.com")
-            };
-            SendHttpClient.DefaultRequestHeaders.Add("Accept", "*/*");
-            SendHttpClient.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
-            SendHttpClient.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9,la;q=0.8,fa;q=0.7,ar;q=0.6,fr;q=0.5");
-            SendHttpClient.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
-            SendHttpClient.DefaultRequestHeaders.Add("Connection", "keep-alive");
-            SendHttpClient.DefaultRequestHeaders.Add("Host", "api2.mobinsb.com");
-            SendHttpClient.DefaultRequestHeaders.Add("Origin", "https://silver.mobinsb.com");
-            SendHttpClient.DefaultRequestHeaders.Add("Pragma", "no-cache");
-            SendHttpClient.DefaultRequestHeaders.Add("Referer", "https://silver.mobinsb.com/Home/Default/page-1");
-            SendHttpClient.DefaultRequestHeaders.Add("Sec-Fetch-Dest", "empty");
-            SendHttpClient.DefaultRequestHeaders.Add("Sec-Fetch-Mode", "cors");
-            SendHttpClient.DefaultRequestHeaders.Add("Sec-Fetch-Site", "same-site");
-            SendHttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36");
-            SendHttpClient.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
-        }
-
-        public static HttpClient SetHttpClientForSendingOrdersStatic(string token)
+        private static HttpClient SetHttpClientForSendingOrders(string token = "")
         {
             HttpClientHandler httpHandler = new HttpClientHandler()
             {
@@ -450,6 +463,7 @@ namespace BCore.Lib
                 UseProxy = false,
                 Proxy = null
             };
+
             HttpClient http = new HttpClient(httpHandler)
             {
                 BaseAddress = new Uri("https://api2.mobinsb.com")
@@ -457,7 +471,7 @@ namespace BCore.Lib
             http.DefaultRequestHeaders.Add("Accept", "*/*");
             http.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
             http.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9,la;q=0.8,fa;q=0.7,ar;q=0.6,fr;q=0.5");
-            http.DefaultRequestHeaders.Add("Authorization", $"BasicAuthentication {token}");
+            if (!string.IsNullOrEmpty(token)) http.DefaultRequestHeaders.Add("Authorization", $"BasicAuthentication {token}");
             http.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
             http.DefaultRequestHeaders.Add("Connection", "keep-alive");
             http.DefaultRequestHeaders.Add("Host", "api2.mobinsb.com");
@@ -601,7 +615,7 @@ namespace BCore.Lib
                 }
                 return false;
             }
-            catch (Exception ex)
+            catch // (Exception ex)
             {
                 // log data by ILogger
                 return false;
@@ -611,32 +625,18 @@ namespace BCore.Lib
         public string StayTuneHttpClient()
         {
             var req = new HttpRequestMessage(HttpMethod.Get, "https://api2.mobinsb.com/Web/V1/Order/GetOpenOrder/OpenOrder");
-            req.Headers.Add("Accept", "*/*");
-            req.Headers.Add("Accept-Encoding", "gzip, deflate, br");
-            req.Headers.Add("Accept-Language", "en-US,en;q=0.9,la;q=0.8,fa;q=0.7,ar;q=0.6,fr;q=0.5");
             req.Headers.Add("Authorization", $"BasicAuthentication {Token}");
-            req.Headers.Add("Cache-Control", "no-cache");
-            req.Headers.Add("Connection", "keep-alive");
-            req.Headers.Add("Host", "api2.mobinsb.com");
-            req.Headers.Add("Origin", "https://silver.mobinsb.com");
-            req.Headers.Add("Pragma", "no-cache");
-            req.Headers.Add("Referer", "https://silver.mobinsb.com/Home/Default/page-1");
-            req.Headers.Add("Sec-Fetch-Dest", "empty");
-            req.Headers.Add("Sec-Fetch-Mode", "cors");
-            req.Headers.Add("Sec-Fetch-Site", "same-site");
-            req.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36");
-            req.Headers.Add("X-Requested-With", "XMLHttpRequest");
             try
             {
                 string result = "";
                 Stopwatch stopwatch = Stopwatch.StartNew();
-                HttpResponseMessage httpResponse = GeneralHttpClient.SendAsync(req).Result;
+                HttpResponseMessage httpResponse = SendHttpClient.SendAsync(req).Result;
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     stopwatch.Stop();
                     string content = httpResponse.Content.ReadAsStringAsync().Result;
                     GetOpenOrder openOrders = JsonSerializer.Deserialize<GetOpenOrder>(content);
-                    result = $"Elps: {stopwatch.ElapsedMilliseconds}ms, Orders: {openOrders.Data.Length}, [{openOrders.IsSuccessfull}]";
+                    result = $"[{stopwatch.ElapsedMilliseconds:D3}ms], Orders: {openOrders.Data.Length}, [{openOrders.IsSuccessfull}]";
                 }
                 return result;
             }

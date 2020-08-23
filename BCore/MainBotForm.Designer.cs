@@ -72,6 +72,7 @@
             this.tb_ws_logs = new System.Windows.Forms.TextBox();
             this.tb_stay_tune = new System.Windows.Forms.TextBox();
             this.timer_stay_tune = new System.Windows.Forms.Timer(this.components);
+            this.lbl_time_diff = new System.Windows.Forms.Label();
             this.MainConsoleMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -104,7 +105,7 @@
             this.lv_orders.HideSelection = false;
             this.lv_orders.Location = new System.Drawing.Point(12, 81);
             this.lv_orders.Name = "lv_orders";
-            this.lv_orders.Size = new System.Drawing.Size(1090, 158);
+            this.lv_orders.Size = new System.Drawing.Size(934, 158);
             this.lv_orders.TabIndex = 2;
             this.lv_orders.UseCompatibleStateImageBehavior = false;
             this.lv_orders.View = System.Windows.Forms.View.Details;
@@ -165,7 +166,7 @@
             this.tb_logs.Multiline = true;
             this.tb_logs.Name = "tb_logs";
             this.tb_logs.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tb_logs.Size = new System.Drawing.Size(1090, 353);
+            this.tb_logs.Size = new System.Drawing.Size(934, 353);
             this.tb_logs.TabIndex = 0;
             this.tb_logs.WordWrap = false;
             // 
@@ -186,7 +187,7 @@
             this.tb_duration.Name = "tb_duration";
             this.tb_duration.Size = new System.Drawing.Size(47, 27);
             this.tb_duration.TabIndex = 1;
-            this.tb_duration.Text = "3.2";
+            this.tb_duration.Text = "2";
             this.tb_duration.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label1
@@ -311,7 +312,7 @@
             // 
             // btn_delete_orders
             // 
-            this.btn_delete_orders.Location = new System.Drawing.Point(962, 245);
+            this.btn_delete_orders.Location = new System.Drawing.Point(806, 246);
             this.btn_delete_orders.Name = "btn_delete_orders";
             this.btn_delete_orders.Size = new System.Drawing.Size(140, 29);
             this.btn_delete_orders.TabIndex = 10;
@@ -329,7 +330,7 @@
             this.toolStripMenuItem4});
             this.MainConsoleMenu.Location = new System.Drawing.Point(0, 0);
             this.MainConsoleMenu.Name = "MainConsoleMenu";
-            this.MainConsoleMenu.Size = new System.Drawing.Size(1662, 28);
+            this.MainConsoleMenu.Size = new System.Drawing.Size(1321, 28);
             this.MainConsoleMenu.TabIndex = 12;
             this.MainConsoleMenu.Text = "menuStrip1";
             // 
@@ -426,37 +427,47 @@
             // tb_ws_logs
             // 
             this.tb_ws_logs.AcceptsReturn = true;
-            this.tb_ws_logs.Location = new System.Drawing.Point(1108, 81);
+            this.tb_ws_logs.Location = new System.Drawing.Point(952, 323);
             this.tb_ws_logs.Multiline = true;
             this.tb_ws_logs.Name = "tb_ws_logs";
             this.tb_ws_logs.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tb_ws_logs.Size = new System.Drawing.Size(283, 552);
+            this.tb_ws_logs.Size = new System.Drawing.Size(355, 310);
             this.tb_ws_logs.TabIndex = 0;
             this.tb_ws_logs.WordWrap = false;
             // 
             // tb_stay_tune
             // 
             this.tb_stay_tune.AcceptsReturn = true;
-            this.tb_stay_tune.Location = new System.Drawing.Point(1397, 81);
+            this.tb_stay_tune.Location = new System.Drawing.Point(954, 81);
             this.tb_stay_tune.Multiline = true;
             this.tb_stay_tune.Name = "tb_stay_tune";
             this.tb_stay_tune.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tb_stay_tune.Size = new System.Drawing.Size(253, 552);
+            this.tb_stay_tune.Size = new System.Drawing.Size(353, 236);
             this.tb_stay_tune.TabIndex = 0;
             this.tb_stay_tune.WordWrap = false;
             // 
             // timer_stay_tune
             // 
             this.timer_stay_tune.Enabled = true;
-            this.timer_stay_tune.Interval = 10000;
+            this.timer_stay_tune.Interval = 8000;
             this.timer_stay_tune.Tick += new System.EventHandler(this.timer_stay_tune_Tick);
+            // 
+            // lbl_time_diff
+            // 
+            this.lbl_time_diff.AutoSize = true;
+            this.lbl_time_diff.Location = new System.Drawing.Point(1109, 58);
+            this.lbl_time_diff.Name = "lbl_time_diff";
+            this.lbl_time_diff.Size = new System.Drawing.Size(17, 20);
+            this.lbl_time_diff.TabIndex = 16;
+            this.lbl_time_diff.Text = "0";
             // 
             // MainBotForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1662, 645);
+            this.ClientSize = new System.Drawing.Size(1321, 645);
+            this.Controls.Add(this.lbl_time_diff);
             this.Controls.Add(this.tb_stay_tune);
             this.Controls.Add(this.tb_ws_logs);
             this.Controls.Add(this.lbl_system_time);
@@ -539,5 +550,6 @@
         private System.Windows.Forms.TextBox tb_ws_logs;
         private System.Windows.Forms.TextBox tb_stay_tune;
         private System.Windows.Forms.Timer timer_stay_tune;
+        private System.Windows.Forms.Label lbl_time_diff;
     }
 }
