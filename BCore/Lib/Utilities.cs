@@ -50,15 +50,8 @@ namespace BCore.Lib
                             return true;
                         }
                     }
-                    else
-                    {
-                        return false;
-                    }
                 }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
             catch
             {

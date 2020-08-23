@@ -622,6 +622,7 @@ namespace BCore.Lib
             }
         }
 
+        DateTime tuneTime;
         public string StayTuneHttpClient()
         {
             var req = new HttpRequestMessage(HttpMethod.Get, "https://api2.mobinsb.com/Web/V1/Order/GetOpenOrder/OpenOrder");
@@ -634,9 +635,19 @@ namespace BCore.Lib
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     stopwatch.Stop();
+                    var mobinDate = httpResponse.Headers.Date;
+                    if (mobinDate.HasValue)
+                    {
+                        // DateTime tmobin = DateTime.ParseExact(GMT, "ddd, dd MMM yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+                        tuneTime =
+                            new DateTime(
+                                mobinDate.Value.Year, mobinDate.Value.Month, mobinDate.Value.Day,
+                            mobinDate.Value.Hour, mobinDate.Value.Minute, mobinDate.Value.Second);
+                        tuneTime = tuneTime.ToLocalTime();
+                    }
                     string content = httpResponse.Content.ReadAsStringAsync().Result;
                     GetOpenOrder openOrders = JsonSerializer.Deserialize<GetOpenOrder>(content);
-                    result = $"[{stopwatch.ElapsedMilliseconds:D3}ms], Orders: {openOrders.Data.Length}, [{openOrders.IsSuccessfull}]";
+                    result = $"[{stopwatch.ElapsedMilliseconds:D3}ms]/2 => [{tuneTime.AddMilliseconds(stopwatch.ElapsedMilliseconds / 2):HH:mm:ss}] Orders: {openOrders.Data.Length}, [{openOrders.IsSuccessfull}]";
                 }
                 return result;
             }

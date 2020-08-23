@@ -105,7 +105,7 @@
             this.lv_orders.HideSelection = false;
             this.lv_orders.Location = new System.Drawing.Point(12, 81);
             this.lv_orders.Name = "lv_orders";
-            this.lv_orders.Size = new System.Drawing.Size(934, 158);
+            this.lv_orders.Size = new System.Drawing.Size(775, 158);
             this.lv_orders.TabIndex = 2;
             this.lv_orders.UseCompatibleStateImageBehavior = false;
             this.lv_orders.View = System.Windows.Forms.View.Details;
@@ -166,7 +166,7 @@
             this.tb_logs.Multiline = true;
             this.tb_logs.Name = "tb_logs";
             this.tb_logs.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tb_logs.Size = new System.Drawing.Size(934, 353);
+            this.tb_logs.Size = new System.Drawing.Size(775, 256);
             this.tb_logs.TabIndex = 0;
             this.tb_logs.WordWrap = false;
             // 
@@ -312,7 +312,7 @@
             // 
             // btn_delete_orders
             // 
-            this.btn_delete_orders.Location = new System.Drawing.Point(806, 246);
+            this.btn_delete_orders.Location = new System.Drawing.Point(647, 245);
             this.btn_delete_orders.Name = "btn_delete_orders";
             this.btn_delete_orders.Size = new System.Drawing.Size(140, 29);
             this.btn_delete_orders.TabIndex = 10;
@@ -330,7 +330,7 @@
             this.toolStripMenuItem4});
             this.MainConsoleMenu.Location = new System.Drawing.Point(0, 0);
             this.MainConsoleMenu.Name = "MainConsoleMenu";
-            this.MainConsoleMenu.Size = new System.Drawing.Size(1321, 28);
+            this.MainConsoleMenu.Size = new System.Drawing.Size(1159, 28);
             this.MainConsoleMenu.TabIndex = 12;
             this.MainConsoleMenu.Text = "menuStrip1";
             // 
@@ -383,7 +383,7 @@
             this.lbl_server_time.AutoSize = true;
             this.lbl_server_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_server_time.ForeColor = System.Drawing.Color.Red;
-            this.lbl_server_time.Location = new System.Drawing.Point(1031, 58);
+            this.lbl_server_time.Location = new System.Drawing.Point(870, 58);
             this.lbl_server_time.Name = "lbl_server_time";
             this.lbl_server_time.Size = new System.Drawing.Size(71, 20);
             this.lbl_server_time.TabIndex = 14;
@@ -417,7 +417,7 @@
             this.lbl_system_time.AutoSize = true;
             this.lbl_system_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_system_time.ForeColor = System.Drawing.Color.CornflowerBlue;
-            this.lbl_system_time.Location = new System.Drawing.Point(954, 58);
+            this.lbl_system_time.Location = new System.Drawing.Point(793, 58);
             this.lbl_system_time.Name = "lbl_system_time";
             this.lbl_system_time.Size = new System.Drawing.Size(71, 20);
             this.lbl_system_time.TabIndex = 14;
@@ -427,22 +427,22 @@
             // tb_ws_logs
             // 
             this.tb_ws_logs.AcceptsReturn = true;
-            this.tb_ws_logs.Location = new System.Drawing.Point(952, 323);
+            this.tb_ws_logs.Location = new System.Drawing.Point(793, 245);
             this.tb_ws_logs.Multiline = true;
             this.tb_ws_logs.Name = "tb_ws_logs";
             this.tb_ws_logs.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tb_ws_logs.Size = new System.Drawing.Size(355, 310);
+            this.tb_ws_logs.Size = new System.Drawing.Size(355, 291);
             this.tb_ws_logs.TabIndex = 0;
             this.tb_ws_logs.WordWrap = false;
             // 
             // tb_stay_tune
             // 
             this.tb_stay_tune.AcceptsReturn = true;
-            this.tb_stay_tune.Location = new System.Drawing.Point(954, 81);
+            this.tb_stay_tune.Location = new System.Drawing.Point(793, 81);
             this.tb_stay_tune.Multiline = true;
             this.tb_stay_tune.Name = "tb_stay_tune";
             this.tb_stay_tune.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tb_stay_tune.Size = new System.Drawing.Size(353, 236);
+            this.tb_stay_tune.Size = new System.Drawing.Size(353, 158);
             this.tb_stay_tune.TabIndex = 0;
             this.tb_stay_tune.WordWrap = false;
             // 
@@ -455,7 +455,7 @@
             // lbl_time_diff
             // 
             this.lbl_time_diff.AutoSize = true;
-            this.lbl_time_diff.Location = new System.Drawing.Point(1109, 58);
+            this.lbl_time_diff.Location = new System.Drawing.Point(948, 58);
             this.lbl_time_diff.Name = "lbl_time_diff";
             this.lbl_time_diff.Size = new System.Drawing.Size(17, 20);
             this.lbl_time_diff.TabIndex = 16;
@@ -466,7 +466,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1321, 645);
+            this.ClientSize = new System.Drawing.Size(1159, 546);
             this.Controls.Add(this.lbl_time_diff);
             this.Controls.Add(this.tb_stay_tune);
             this.Controls.Add(this.tb_ws_logs);
@@ -496,7 +496,7 @@
             this.MaximizeBox = false;
             this.Name = "MainBotForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "WineoBot";
+            this.Text = "Sniper Bot";
             this.Load += new System.EventHandler(this.MainBotForm_Load);
             this.MainConsoleMenu.ResumeLayout(false);
             this.MainConsoleMenu.PerformLayout();

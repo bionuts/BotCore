@@ -320,7 +320,7 @@ namespace BCore
                 {
                     string[] timeValues = tmp.Split(":");
                     ServerTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day,
-                    int.Parse(timeValues[0]), int.Parse(timeValues[1]), int.Parse(timeValues[2]), ServerTime.Millisecond);
+                    DateTime.Now.Hour, int.Parse(timeValues[1]), int.Parse(timeValues[2]), ServerTime.Millisecond);
                 }
                 tb_ws_logs.AppendText(line + Environment.NewLine);
                 tb_ws_logs.ScrollToCaret();
