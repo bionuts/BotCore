@@ -39,7 +39,7 @@ namespace BCore
 
         private DateTime PcTime;
         private DateTime WsTime;
-        private DateTime OpenOrderTime;
+        private DateTime OrdersTime;
         private DateTime OptionTime;
         private DateTime LoginTime;
         static volatile object locker = new object();
@@ -65,7 +65,7 @@ namespace BCore
             {
                 lbl_done.Text = "[connected]";
                 lbl_done.BackColor = Color.Green;
-                PcTime = WsTime = OpenOrderTime = OptionTime = LoginTime = DateTime.Now;
+                PcTime = WsTime = OrdersTime = OptionTime = LoginTime = DateTime.Now;
                 if (await MobinAgent.CreateSessionForWebSocket() && await MobinAgent.MobinWebSocket.StartWebSocket(MobinAgent.LS_Phase, MobinAgent.LS_Session))
                     StartReceiveDataFromWS();
             }
@@ -119,7 +119,6 @@ namespace BCore
         {
             try
             {
-                // Console.WriteLine($"MainThread: T{Thread.CurrentThread.ManagedThreadId:D3}");
                 int size = arr_params.Length;
                 Thread.Sleep((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
                 for (int i = 0; i < size; i++)
@@ -128,10 +127,10 @@ namespace BCore
                         continue;
                     else
                     {
-                        Task.Factory.StartNew(() => MobinAgent.SendReqThread(arr_params[i])); // study here for beter lunch of thread from pool
+                        // study here for beter lunch of thread from pool
+                        Task.Factory.StartNew(() => MobinAgent.SendReqThread(arr_params[i], ref OrdersTime, ref OptionTime, ref LoginTime));
                         Thread.Sleep(StepWait);
                     }
-                    // Console.WriteLine($"Out: {DateTime.Now:HH:mm:ss.fff}");
                 }
                 tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text = SortResult(MobinBroker.ResultOfThreads); });
             }
@@ -307,14 +306,18 @@ namespace BCore
 
         private void timer_real_time_Tick(object sender, EventArgs e)
         {
-            WsTime = WsTime.AddSeconds(1);
             PcTime = DateTime.Now;
 
-            lbl_pc_time.Text = PcTime.ToString("hh:mm:ss");
-            lbl_ws_time.Text = WsTime.ToString("hh:mm:ss");
+            WsTime = WsTime.AddSeconds(1);
+            OrdersTime = OrdersTime.AddSeconds(1);
+            OptionTime = OptionTime.AddSeconds(1);
+            LoginTime = LoginTime.AddSeconds(1);
 
-
-            lbl_time_diff.Text = $"{(int)PcTime.Subtract(WsTime).TotalMilliseconds} ms";
+            lbl_pc_time.Text = $"PC: {PcTime:hh:mm:ss}";
+            lbl_ws_time.Text = $"WS: {WsTime:hh:mm:ss} [{PcTime.Subtract(WsTime).TotalMilliseconds}]";
+            lbl_openorders_time.Text = $"Orders: {OrdersTime:hh:mm:ss} [{PcTime.Subtract(OrdersTime).TotalMilliseconds}]";
+            lbl_option_time.Text = $"Option: {OptionTime:hh:mm:ss} [{PcTime.Subtract(OptionTime).TotalMilliseconds}]";
+            lbl_login.Text = $"Login: {LoginTime:hh:mm:ss} [{PcTime.Subtract(LoginTime).TotalMilliseconds}]";
         }
 
         private async void StartReceiveDataFromWS()
@@ -347,17 +350,17 @@ namespace BCore
 
         private void timer_stay_tune_Tick(object sender, EventArgs e)
         {
-            SetWSLog(MobinAgent.StayTuneHttpClient() + Environment.NewLine);
+            SetWSLog(MobinAgent.StayTuneHttpClient(ref OrdersTime) + Environment.NewLine);
         }
 
         private void timer_option_Tick(object sender, EventArgs e)
         {
-            SetWSLog(MobinAgent.GetTimeBasedOnOptionHeader() + Environment.NewLine);
+            SetWSLog(MobinAgent.GetTimeBasedOnOptionHeader(ref OptionTime) + Environment.NewLine);
         }
 
         private void timer_login_Tick(object sender, EventArgs e)
         {
-            SetWSLog(MobinAgent.GetTimeBasedOnLoginHeader() + Environment.NewLine);
+            SetWSLog(MobinAgent.GetTimeBasedOnLoginHeader(ref LoginTime) + Environment.NewLine);
         }
     }
 }

@@ -279,14 +279,16 @@ namespace BCore.Lib
             return req;
         }
 
-        public void SendReqThread(ThreadParamObject paramObject)
+        public void SendReqThread(ThreadParamObject paramObject, ref DateTime order_time, ref DateTime option_time, ref DateTime login_time)
         {
+            string calibre_time;
             string result;
             DateTime sent;
             Stopwatch _stopwatch = new Stopwatch();
             try
             {
                 sent = DateTime.Now;
+                calibre_time = $"[OpenOrderTime:{order_time:HH:mm:ss.fff}][OptionTime:{option_time:HH:mm:ss.fff}][LoginTime:{login_time:HH:mm:ss.fff}]";
                 _stopwatch.Start();
                 HttpResponseMessage httpResponse = SendHttpClient.SendAsync(paramObject.REQ).Result;
                 _stopwatch.Stop();
@@ -296,7 +298,7 @@ namespace BCore.Lib
                     OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
                     if (orderRespond.IsSuccessfull)
                         CeaseFire[paramObject.WhichOne] = true;
-                    result = $"[{sent:HH:mm:ss.fff}] [{_stopwatch.ElapsedMilliseconds:D3}ms] [ID:{paramObject.ID}] => {paramObject.SYM:-10} " +
+                    result = $"[{sent:HH:mm:ss.fff}] [{_stopwatch.ElapsedMilliseconds:D3}ms], {calibre_time} , [ID:{paramObject.ID}] => {paramObject.SYM:-10} " +
                         $",ThreadID: {Thread.CurrentThread.ManagedThreadId:D3} [{orderRespond.IsSuccessfull}] Desc: {orderRespond.MessageDesc}\n";
                 }
                 else
@@ -621,17 +623,17 @@ namespace BCore.Lib
             }
         }
 
-        public string StayTuneHttpClient()
+        public string StayTuneHttpClient(ref DateTime order_time)
         {
             try
             {
                 DateTime sent;
-                DateTime recv;
+                // DateTime recv;
                 Stopwatch stopwatch;
 
                 var req = new HttpRequestMessage(HttpMethod.Get, "https://api2.mobinsb.com/Web/V1/Order/GetOpenOrder/OpenOrder");
                 req.Headers.Add("Authorization", $"BasicAuthentication {Token}");
-                
+
                 sent = DateTime.Now;
                 stopwatch = Stopwatch.StartNew();
                 HttpResponseMessage httpResponse = SendHttpClient.SendAsync(req).Result;
@@ -639,17 +641,17 @@ namespace BCore.Lib
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     var mobinDate = httpResponse.Headers.Date;
-                    recv = new DateTime(
+                    order_time = new DateTime(
                             mobinDate.Value.Year,
                             mobinDate.Value.Month,
                             mobinDate.Value.Day,
                             mobinDate.Value.Hour,
                             mobinDate.Value.Minute,
-                            mobinDate.Value.Second);
-                    recv = recv.ToLocalTime();
+                            mobinDate.Value.Second).ToLocalTime();
+                    // order_time = recv.ToLocalTime();
                     string content = httpResponse.Content.ReadAsStringAsync().Result;
                     GetOpenOrder openOrders = JsonSerializer.Deserialize<GetOpenOrder>(content);
-                    return $"[{stopwatch.ElapsedMilliseconds:D3}ms][Recv: {recv:HH:mm:ss}][Sent: {sent:HH:mm:ss.fff}] => Orders: {openOrders.Data.Length}, [{openOrders.IsSuccessfull}]";
+                    return $"[{stopwatch.ElapsedMilliseconds:D3}ms][Recv: {order_time:HH:mm:ss}][Sent: {sent:HH:mm:ss.fff}] => Orders: {openOrders.Data.Length}, [{openOrders.IsSuccessfull}]";
                 }
                 return "";
             }
@@ -659,13 +661,13 @@ namespace BCore.Lib
             }
         }
 
-        public string GetTimeBasedOnOptionHeader()
+        public string GetTimeBasedOnOptionHeader(ref DateTime option_time)
         {
             try
             {
                 // "ddd, dd MMM yyyy HH:mm:ss"
                 DateTime sent;
-                DateTime recv;
+                // DateTime recv;
                 Stopwatch stopwatch;
 
                 HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Options, "https://api2.mobinsb.com/Web/V1/Order/Post");
@@ -678,15 +680,15 @@ namespace BCore.Lib
                 if (httpResponse.StatusCode == HttpStatusCode.NoContent)
                 {
                     var mobinDate = httpResponse.Headers.Date;
-                    recv = new DateTime(
+                    option_time = new DateTime(
                             mobinDate.Value.Year,
                             mobinDate.Value.Month,
                             mobinDate.Value.Day,
                             mobinDate.Value.Hour,
                             mobinDate.Value.Minute,
-                            mobinDate.Value.Second);
-                    recv = recv.ToLocalTime();
-                    return $"[{stopwatch.ElapsedMilliseconds:D3}ms][Recv: {recv:HH:mm:ss}][Sent: {sent:HH:mm:ss.fff}] => Options";
+                            mobinDate.Value.Second).ToLocalTime();
+                    // recv = recv.ToLocalTime();
+                    return $"[{stopwatch.ElapsedMilliseconds:D3}ms][Recv: {option_time:HH:mm:ss}][Sent: {sent:HH:mm:ss.fff}] => Options";
                 }
                 return "";
             }
@@ -696,13 +698,13 @@ namespace BCore.Lib
             }
         }
 
-        public string GetTimeBasedOnLoginHeader()
+        public string GetTimeBasedOnLoginHeader(ref DateTime login_time)
         {
             try
             {
                 // "ddd, dd MMM yyyy HH:mm:ss"
                 DateTime sent;
-                DateTime recv;
+                // DateTime recv;
                 Stopwatch stopwatch;
 
                 var req = new HttpRequestMessage(HttpMethod.Get, "https://silver.mobinsb.com/login");
@@ -716,15 +718,15 @@ namespace BCore.Lib
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     var mobinDate = httpResponse.Headers.Date;
-                    recv = new DateTime(
+                    login_time = new DateTime(
                             mobinDate.Value.Year,
                             mobinDate.Value.Month,
                             mobinDate.Value.Day,
                             mobinDate.Value.Hour,
                             mobinDate.Value.Minute,
-                            mobinDate.Value.Second);
-                    recv = recv.ToLocalTime();
-                    return $"[{stopwatch.ElapsedMilliseconds:D3}ms][Recv: {recv:HH:mm:ss}][Sent: {sent:HH:mm:ss.fff}] => Login";
+                            mobinDate.Value.Second).ToLocalTime();
+                    // recv = recv.ToLocalTime();
+                    return $"[{stopwatch.ElapsedMilliseconds:D3}ms][Recv: {login_time:HH:mm:ss}][Sent: {sent:HH:mm:ss.fff}] => Login";
                 }
                 return "";
             }
