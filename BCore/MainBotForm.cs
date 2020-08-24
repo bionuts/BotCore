@@ -37,8 +37,12 @@ namespace BCore
         private int Interval;
         private volatile bool can;
 
-        private DateTime ServerTime;
-        private DateTime SystemTime;
+        private DateTime PcTime;
+        private DateTime WsTime;
+        private DateTime OpenOrderTime;
+        private DateTime OptionTime;
+        private DateTime LoginTime;
+        static volatile object locker = new object();
 
         private ThreadParamObject[] arr_params;
         private readonly HttpClient GenHttp;
@@ -61,7 +65,7 @@ namespace BCore
             {
                 lbl_done.Text = "[connected]";
                 lbl_done.BackColor = Color.Green;
-                SystemTime = ServerTime = DateTime.Now;
+                PcTime = WsTime = OpenOrderTime = OptionTime = LoginTime = DateTime.Now;
                 if (await MobinAgent.CreateSessionForWebSocket() && await MobinAgent.MobinWebSocket.StartWebSocket(MobinAgent.LS_Phase, MobinAgent.LS_Session))
                     StartReceiveDataFromWS();
             }
@@ -303,11 +307,14 @@ namespace BCore
 
         private void timer_real_time_Tick(object sender, EventArgs e)
         {
-            ServerTime = ServerTime.AddSeconds(1);
-            SystemTime = DateTime.Now;
-            lbl_system_time.Text = SystemTime.ToString("hh:mm:ss");
-            lbl_server_time.Text = ServerTime.ToString("hh:mm:ss");
-            lbl_time_diff.Text = $"{(int)SystemTime.Subtract(ServerTime).TotalMilliseconds} ms";
+            WsTime = WsTime.AddSeconds(1);
+            PcTime = DateTime.Now;
+
+            lbl_pc_time.Text = PcTime.ToString("hh:mm:ss");
+            lbl_ws_time.Text = WsTime.ToString("hh:mm:ss");
+
+
+            lbl_time_diff.Text = $"{(int)PcTime.Subtract(WsTime).TotalMilliseconds} ms";
         }
 
         private async void StartReceiveDataFromWS()
@@ -319,23 +326,38 @@ namespace BCore
                 if (Utilities.GetTimeFromString(line, out string tmp))
                 {
                     string[] timeValues = tmp.Split(":");
-                    ServerTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day,
-                    DateTime.Now.Hour, int.Parse(timeValues[1]), int.Parse(timeValues[2]), ServerTime.Millisecond);
+                    WsTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day,
+                    DateTime.Now.Hour, int.Parse(timeValues[1]), int.Parse(timeValues[2]), WsTime.Millisecond);
+                    SetWSLog(line + Environment.NewLine);
+                    tb_ws_logs.ScrollToCaret();
                 }
-                tb_ws_logs.AppendText(line + Environment.NewLine);
-                tb_ws_logs.ScrollToCaret();
             }
             tb_ws_logs.AppendText("Socket has been Closed!!!" + Environment.NewLine);
             tb_ws_logs.ScrollToCaret();
         }
 
+        private void SetWSLog(string str)
+        {
+            lock (locker)
+            {
+                tb_ws_logs.AppendText(str);
+                // tb_ws_logs.ScrollToCaret();
+            }
+        }
+
         private void timer_stay_tune_Tick(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(MobinAgent.Token))
-            {
-                tb_stay_tune.AppendText(MobinAgent.StayTuneHttpClient() + Environment.NewLine);
-                tb_stay_tune.ScrollToCaret();
-            }
+            SetWSLog(MobinAgent.StayTuneHttpClient() + Environment.NewLine);
+        }
+
+        private void timer_option_Tick(object sender, EventArgs e)
+        {
+            SetWSLog(MobinAgent.GetTimeBasedOnOptionHeader() + Environment.NewLine);
+        }
+
+        private void timer_login_Tick(object sender, EventArgs e)
+        {
+            SetWSLog(MobinAgent.GetTimeBasedOnLoginHeader() + Environment.NewLine);
         }
     }
 }

@@ -64,23 +64,27 @@
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
-            this.lbl_server_time = new System.Windows.Forms.Label();
+            this.lbl_ws_time = new System.Windows.Forms.Label();
             this.timer_cando = new System.Windows.Forms.Timer(this.components);
             this.lbl_done = new System.Windows.Forms.Label();
             this.timer_real_time = new System.Windows.Forms.Timer(this.components);
-            this.lbl_system_time = new System.Windows.Forms.Label();
+            this.lbl_pc_time = new System.Windows.Forms.Label();
             this.tb_ws_logs = new System.Windows.Forms.TextBox();
-            this.tb_stay_tune = new System.Windows.Forms.TextBox();
             this.timer_stay_tune = new System.Windows.Forms.Timer(this.components);
             this.lbl_time_diff = new System.Windows.Forms.Label();
+            this.lbl_login = new System.Windows.Forms.Label();
+            this.lbl_option_time = new System.Windows.Forms.Label();
+            this.lbl_openorders_time = new System.Windows.Forms.Label();
+            this.timer_option = new System.Windows.Forms.Timer(this.components);
+            this.timer_login = new System.Windows.Forms.Timer(this.components);
             this.MainConsoleMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // btn_start
             // 
-            this.btn_start.Location = new System.Drawing.Point(157, 245);
+            this.btn_start.Location = new System.Drawing.Point(115, 304);
             this.btn_start.Name = "btn_start";
-            this.btn_start.Size = new System.Drawing.Size(140, 29);
+            this.btn_start.Size = new System.Drawing.Size(97, 29);
             this.btn_start.TabIndex = 0;
             this.btn_start.Text = "Start";
             this.btn_start.UseVisualStyleBackColor = true;
@@ -105,7 +109,7 @@
             this.lv_orders.HideSelection = false;
             this.lv_orders.Location = new System.Drawing.Point(12, 81);
             this.lv_orders.Name = "lv_orders";
-            this.lv_orders.Size = new System.Drawing.Size(775, 158);
+            this.lv_orders.Size = new System.Drawing.Size(577, 217);
             this.lv_orders.TabIndex = 2;
             this.lv_orders.UseCompatibleStateImageBehavior = false;
             this.lv_orders.View = System.Windows.Forms.View.Details;
@@ -162,21 +166,21 @@
             // tb_logs
             // 
             this.tb_logs.AcceptsReturn = true;
-            this.tb_logs.Location = new System.Drawing.Point(12, 280);
+            this.tb_logs.Location = new System.Drawing.Point(12, 339);
             this.tb_logs.Multiline = true;
             this.tb_logs.Name = "tb_logs";
             this.tb_logs.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tb_logs.Size = new System.Drawing.Size(775, 256);
+            this.tb_logs.Size = new System.Drawing.Size(578, 311);
             this.tb_logs.TabIndex = 0;
             this.tb_logs.WordWrap = false;
             // 
             // btn_load
             // 
-            this.btn_load.Location = new System.Drawing.Point(11, 245);
+            this.btn_load.Location = new System.Drawing.Point(12, 304);
             this.btn_load.Name = "btn_load";
-            this.btn_load.Size = new System.Drawing.Size(140, 29);
+            this.btn_load.Size = new System.Drawing.Size(97, 29);
             this.btn_load.TabIndex = 4;
-            this.btn_load.Text = "Load Orders";
+            this.btn_load.Text = "Load";
             this.btn_load.UseVisualStyleBackColor = true;
             this.btn_load.Click += new System.EventHandler(this.btn_load_Click);
             // 
@@ -312,11 +316,11 @@
             // 
             // btn_delete_orders
             // 
-            this.btn_delete_orders.Location = new System.Drawing.Point(647, 245);
+            this.btn_delete_orders.Location = new System.Drawing.Point(488, 304);
             this.btn_delete_orders.Name = "btn_delete_orders";
-            this.btn_delete_orders.Size = new System.Drawing.Size(140, 29);
+            this.btn_delete_orders.Size = new System.Drawing.Size(101, 29);
             this.btn_delete_orders.TabIndex = 10;
-            this.btn_delete_orders.Text = "Delete Orders";
+            this.btn_delete_orders.Text = "Delete";
             this.btn_delete_orders.UseVisualStyleBackColor = true;
             this.btn_delete_orders.Click += new System.EventHandler(this.btn_delete_orders_Click);
             // 
@@ -330,7 +334,7 @@
             this.toolStripMenuItem4});
             this.MainConsoleMenu.Location = new System.Drawing.Point(0, 0);
             this.MainConsoleMenu.Name = "MainConsoleMenu";
-            this.MainConsoleMenu.Size = new System.Drawing.Size(1159, 28);
+            this.MainConsoleMenu.Size = new System.Drawing.Size(1415, 28);
             this.MainConsoleMenu.TabIndex = 12;
             this.MainConsoleMenu.Text = "menuStrip1";
             // 
@@ -378,17 +382,17 @@
             this.toolStripMenuItem7.Text = "Login";
             this.toolStripMenuItem7.Click += new System.EventHandler(this.LoginMenuItemClick);
             // 
-            // lbl_server_time
+            // lbl_ws_time
             // 
-            this.lbl_server_time.AutoSize = true;
-            this.lbl_server_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.lbl_server_time.ForeColor = System.Drawing.Color.Red;
-            this.lbl_server_time.Location = new System.Drawing.Point(870, 58);
-            this.lbl_server_time.Name = "lbl_server_time";
-            this.lbl_server_time.Size = new System.Drawing.Size(71, 20);
-            this.lbl_server_time.TabIndex = 14;
-            this.lbl_server_time.Text = "00:00:00";
-            this.lbl_server_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lbl_ws_time.AutoSize = true;
+            this.lbl_ws_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lbl_ws_time.ForeColor = System.Drawing.Color.Red;
+            this.lbl_ws_time.Location = new System.Drawing.Point(1258, 103);
+            this.lbl_ws_time.Name = "lbl_ws_time";
+            this.lbl_ws_time.Size = new System.Drawing.Size(102, 20);
+            this.lbl_ws_time.TabIndex = 14;
+            this.lbl_ws_time.Text = "WS: 00:00:00";
+            this.lbl_ws_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // timer_cando
             // 
@@ -401,10 +405,11 @@
             this.lbl_done.AutoSize = true;
             this.lbl_done.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.lbl_done.ForeColor = System.Drawing.Color.White;
-            this.lbl_done.Location = new System.Drawing.Point(302, 248);
+            this.lbl_done.Location = new System.Drawing.Point(218, 306);
             this.lbl_done.Name = "lbl_done";
-            this.lbl_done.Size = new System.Drawing.Size(0, 23);
+            this.lbl_done.Size = new System.Drawing.Size(24, 23);
             this.lbl_done.TabIndex = 15;
+            this.lbl_done.Text = "--";
             // 
             // timer_real_time
             // 
@@ -412,39 +417,28 @@
             this.timer_real_time.Interval = 1000;
             this.timer_real_time.Tick += new System.EventHandler(this.timer_real_time_Tick);
             // 
-            // lbl_system_time
+            // lbl_pc_time
             // 
-            this.lbl_system_time.AutoSize = true;
-            this.lbl_system_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.lbl_system_time.ForeColor = System.Drawing.Color.CornflowerBlue;
-            this.lbl_system_time.Location = new System.Drawing.Point(793, 58);
-            this.lbl_system_time.Name = "lbl_system_time";
-            this.lbl_system_time.Size = new System.Drawing.Size(71, 20);
-            this.lbl_system_time.TabIndex = 14;
-            this.lbl_system_time.Text = "00:00:00";
-            this.lbl_system_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lbl_pc_time.AutoSize = true;
+            this.lbl_pc_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lbl_pc_time.ForeColor = System.Drawing.Color.CornflowerBlue;
+            this.lbl_pc_time.Location = new System.Drawing.Point(1263, 80);
+            this.lbl_pc_time.Name = "lbl_pc_time";
+            this.lbl_pc_time.Size = new System.Drawing.Size(97, 20);
+            this.lbl_pc_time.TabIndex = 14;
+            this.lbl_pc_time.Text = "PC: 00:00:00";
+            this.lbl_pc_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tb_ws_logs
             // 
             this.tb_ws_logs.AcceptsReturn = true;
-            this.tb_ws_logs.Location = new System.Drawing.Point(793, 245);
+            this.tb_ws_logs.Location = new System.Drawing.Point(595, 81);
             this.tb_ws_logs.Multiline = true;
             this.tb_ws_logs.Name = "tb_ws_logs";
             this.tb_ws_logs.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tb_ws_logs.Size = new System.Drawing.Size(355, 291);
+            this.tb_ws_logs.Size = new System.Drawing.Size(577, 569);
             this.tb_ws_logs.TabIndex = 0;
             this.tb_ws_logs.WordWrap = false;
-            // 
-            // tb_stay_tune
-            // 
-            this.tb_stay_tune.AcceptsReturn = true;
-            this.tb_stay_tune.Location = new System.Drawing.Point(793, 81);
-            this.tb_stay_tune.Multiline = true;
-            this.tb_stay_tune.Name = "tb_stay_tune";
-            this.tb_stay_tune.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tb_stay_tune.Size = new System.Drawing.Size(353, 158);
-            this.tb_stay_tune.TabIndex = 0;
-            this.tb_stay_tune.WordWrap = false;
             // 
             // timer_stay_tune
             // 
@@ -455,24 +449,74 @@
             // lbl_time_diff
             // 
             this.lbl_time_diff.AutoSize = true;
-            this.lbl_time_diff.Location = new System.Drawing.Point(948, 58);
+            this.lbl_time_diff.Location = new System.Drawing.Point(899, 46);
             this.lbl_time_diff.Name = "lbl_time_diff";
             this.lbl_time_diff.Size = new System.Drawing.Size(17, 20);
             this.lbl_time_diff.TabIndex = 16;
             this.lbl_time_diff.Text = "0";
+            // 
+            // lbl_login
+            // 
+            this.lbl_login.AutoSize = true;
+            this.lbl_login.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lbl_login.ForeColor = System.Drawing.Color.Red;
+            this.lbl_login.Location = new System.Drawing.Point(1242, 172);
+            this.lbl_login.Name = "lbl_login";
+            this.lbl_login.Size = new System.Drawing.Size(118, 20);
+            this.lbl_login.TabIndex = 14;
+            this.lbl_login.Text = "Login: 00:00:00";
+            this.lbl_login.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // lbl_option_time
+            // 
+            this.lbl_option_time.AutoSize = true;
+            this.lbl_option_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lbl_option_time.ForeColor = System.Drawing.Color.Red;
+            this.lbl_option_time.Location = new System.Drawing.Point(1233, 149);
+            this.lbl_option_time.Name = "lbl_option_time";
+            this.lbl_option_time.Size = new System.Drawing.Size(127, 20);
+            this.lbl_option_time.TabIndex = 14;
+            this.lbl_option_time.Text = "Option: 00:00:00";
+            this.lbl_option_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // lbl_openorders_time
+            // 
+            this.lbl_openorders_time.AutoSize = true;
+            this.lbl_openorders_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lbl_openorders_time.ForeColor = System.Drawing.Color.Red;
+            this.lbl_openorders_time.Location = new System.Drawing.Point(1199, 126);
+            this.lbl_openorders_time.Name = "lbl_openorders_time";
+            this.lbl_openorders_time.Size = new System.Drawing.Size(161, 20);
+            this.lbl_openorders_time.TabIndex = 14;
+            this.lbl_openorders_time.Text = "Open Order: 00:00:00";
+            this.lbl_openorders_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // timer_option
+            // 
+            this.timer_option.Enabled = true;
+            this.timer_option.Interval = 5000;
+            this.timer_option.Tick += new System.EventHandler(this.timer_option_Tick);
+            // 
+            // timer_login
+            // 
+            this.timer_login.Enabled = true;
+            this.timer_login.Interval = 4000;
+            this.timer_login.Tick += new System.EventHandler(this.timer_login_Tick);
             // 
             // MainBotForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1159, 546);
+            this.ClientSize = new System.Drawing.Size(1415, 662);
+            this.Controls.Add(this.lbl_login);
+            this.Controls.Add(this.lbl_option_time);
             this.Controls.Add(this.lbl_time_diff);
-            this.Controls.Add(this.tb_stay_tune);
+            this.Controls.Add(this.lbl_openorders_time);
             this.Controls.Add(this.tb_ws_logs);
-            this.Controls.Add(this.lbl_system_time);
+            this.Controls.Add(this.lbl_pc_time);
             this.Controls.Add(this.lbl_done);
-            this.Controls.Add(this.lbl_server_time);
+            this.Controls.Add(this.lbl_ws_time);
             this.Controls.Add(this.btn_delete_orders);
             this.Controls.Add(this.lbl_endTime);
             this.Controls.Add(this.tb_ss);
@@ -542,14 +586,18 @@
         private System.Windows.Forms.ColumnHeader price;
         private System.Windows.Forms.ColumnHeader hit;
         private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.Label lbl_server_time;
+        private System.Windows.Forms.Label lbl_ws_time;
         private System.Windows.Forms.Timer timer_cando;
         private System.Windows.Forms.Label lbl_done;
         private System.Windows.Forms.Timer timer_real_time;
-        private System.Windows.Forms.Label lbl_system_time;
+        private System.Windows.Forms.Label lbl_pc_time;
         private System.Windows.Forms.TextBox tb_ws_logs;
-        private System.Windows.Forms.TextBox tb_stay_tune;
         private System.Windows.Forms.Timer timer_stay_tune;
         private System.Windows.Forms.Label lbl_time_diff;
+        private System.Windows.Forms.Label lbl_login;
+        private System.Windows.Forms.Label lbl_option_time;
+        private System.Windows.Forms.Label lbl_openorders_time;
+        private System.Windows.Forms.Timer timer_option;
+        private System.Windows.Forms.Timer timer_login;
     }
 }

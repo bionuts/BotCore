@@ -287,7 +287,6 @@ namespace BCore.Lib
             try
             {
                 sent = DateTime.Now;
-                result = paramObject.ID.ToString() + Environment.NewLine;
                 _stopwatch.Start();
                 HttpResponseMessage httpResponse = SendHttpClient.SendAsync(paramObject.REQ).Result;
                 _stopwatch.Stop();
@@ -622,34 +621,112 @@ namespace BCore.Lib
             }
         }
 
-        DateTime tuneTime;
         public string StayTuneHttpClient()
         {
-            var req = new HttpRequestMessage(HttpMethod.Get, "https://api2.mobinsb.com/Web/V1/Order/GetOpenOrder/OpenOrder");
-            req.Headers.Add("Authorization", $"BasicAuthentication {Token}");
             try
             {
-                string result = "";
-                Stopwatch stopwatch = Stopwatch.StartNew();
+                DateTime sent;
+                DateTime recv;
+                Stopwatch stopwatch;
+
+                var req = new HttpRequestMessage(HttpMethod.Get, "https://api2.mobinsb.com/Web/V1/Order/GetOpenOrder/OpenOrder");
+                req.Headers.Add("Authorization", $"BasicAuthentication {Token}");
+                
+                sent = DateTime.Now;
+                stopwatch = Stopwatch.StartNew();
                 HttpResponseMessage httpResponse = SendHttpClient.SendAsync(req).Result;
+                stopwatch.Stop();
                 if (httpResponse.IsSuccessStatusCode)
                 {
-                    stopwatch.Stop();
                     var mobinDate = httpResponse.Headers.Date;
-                    if (mobinDate.HasValue)
-                    {
-                        // DateTime tmobin = DateTime.ParseExact(GMT, "ddd, dd MMM yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-                        tuneTime =
-                            new DateTime(
-                                mobinDate.Value.Year, mobinDate.Value.Month, mobinDate.Value.Day,
-                            mobinDate.Value.Hour, mobinDate.Value.Minute, mobinDate.Value.Second);
-                        tuneTime = tuneTime.ToLocalTime();
-                    }
+                    recv = new DateTime(
+                            mobinDate.Value.Year,
+                            mobinDate.Value.Month,
+                            mobinDate.Value.Day,
+                            mobinDate.Value.Hour,
+                            mobinDate.Value.Minute,
+                            mobinDate.Value.Second);
+                    recv = recv.ToLocalTime();
                     string content = httpResponse.Content.ReadAsStringAsync().Result;
                     GetOpenOrder openOrders = JsonSerializer.Deserialize<GetOpenOrder>(content);
-                    result = $"[{stopwatch.ElapsedMilliseconds:D3}ms]/2 => [{tuneTime.AddMilliseconds(stopwatch.ElapsedMilliseconds / 2):HH:mm:ss}] Orders: {openOrders.Data.Length}, [{openOrders.IsSuccessfull}]";
+                    return $"[{stopwatch.ElapsedMilliseconds:D3}ms][Recv: {recv:HH:mm:ss}][Sent: {sent:HH:mm:ss.fff}] => Orders: {openOrders.Data.Length}, [{openOrders.IsSuccessfull}]";
                 }
-                return result;
+                return "";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        public string GetTimeBasedOnOptionHeader()
+        {
+            try
+            {
+                // "ddd, dd MMM yyyy HH:mm:ss"
+                DateTime sent;
+                DateTime recv;
+                Stopwatch stopwatch;
+
+                HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Options, "https://api2.mobinsb.com/Web/V1/Order/Post");
+                req.Headers.Add("Access-Control-Request-Headers", "authorization,content-type,x-requested-with");
+                req.Headers.Add("Access-Control-Request-Method", "POST");
+                sent = DateTime.Now;
+                stopwatch = Stopwatch.StartNew();
+                HttpResponseMessage httpResponse = SendHttpClient.SendAsync(req).Result;
+                stopwatch.Stop();
+                if (httpResponse.StatusCode == HttpStatusCode.NoContent)
+                {
+                    var mobinDate = httpResponse.Headers.Date;
+                    recv = new DateTime(
+                            mobinDate.Value.Year,
+                            mobinDate.Value.Month,
+                            mobinDate.Value.Day,
+                            mobinDate.Value.Hour,
+                            mobinDate.Value.Minute,
+                            mobinDate.Value.Second);
+                    recv = recv.ToLocalTime();
+                    return $"[{stopwatch.ElapsedMilliseconds:D3}ms][Recv: {recv:HH:mm:ss}][Sent: {sent:HH:mm:ss.fff}] => Options";
+                }
+                return "";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        public string GetTimeBasedOnLoginHeader()
+        {
+            try
+            {
+                // "ddd, dd MMM yyyy HH:mm:ss"
+                DateTime sent;
+                DateTime recv;
+                Stopwatch stopwatch;
+
+                var req = new HttpRequestMessage(HttpMethod.Get, "https://silver.mobinsb.com/login");
+                req.Headers.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+                req.Headers.Add("Referer", "https://silver.mobinsb.com/");
+
+                sent = DateTime.Now;
+                stopwatch = Stopwatch.StartNew();
+                HttpResponseMessage httpResponse = SendHttpClient.SendAsync(req).Result;
+                stopwatch.Stop();
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    var mobinDate = httpResponse.Headers.Date;
+                    recv = new DateTime(
+                            mobinDate.Value.Year,
+                            mobinDate.Value.Month,
+                            mobinDate.Value.Day,
+                            mobinDate.Value.Hour,
+                            mobinDate.Value.Minute,
+                            mobinDate.Value.Second);
+                    recv = recv.ToLocalTime();
+                    return $"[{stopwatch.ElapsedMilliseconds:D3}ms][Recv: {recv:HH:mm:ss}][Sent: {sent:HH:mm:ss.fff}] => Login";
+                }
+                return "";
             }
             catch (Exception ex)
             {
