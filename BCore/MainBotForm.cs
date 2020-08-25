@@ -5,24 +5,14 @@ using BCore.Lib;
 using BotCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.WebSockets;
-using System.Text;
-using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 using System.Windows.Forms;
 
 namespace BCore
@@ -80,20 +70,25 @@ namespace BCore
         {
             if (can)
             {
-                LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).OrderBy(d => d.CreatedDateTime).ToListAsync();
+                using (var dbt = new ApplicationDbContext())
+                {
+                    LoadedOrders = await dbt.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).OrderBy(d => d.CreatedDateTime).ToListAsync();
+                    var x = await dbt.BSettings.Where(c => c.Key == "apitoken").FirstAsync();
+                    MobinAgent.Token = x.Value;
+                }
+
                 if (LoadedOrders.Any())
                 {
                     LoadStartAndEndTime(tb_hh.Text.Trim(), tb_mm.Text.Trim(), tb_ss.Text.Trim(), tb_ms.Text.Trim(), tb_duration.Text.Trim());
                     lbl_endTime.Text = $"End: {_EndTime:HH:mm:ss.fff}";
                     Interval = int.Parse(tb_interval.Text.Trim());
-                    await InitHttpRequestMessageArray();
+                    InitHttpRequestMessageArray();
                 }
             }
         }
 
-        private async Task InitHttpRequestMessageArray()
+        private void InitHttpRequestMessageArray()
         {
-            MobinAgent.Token = (await db.BSettings.Where(c => c.Key == "apitoken").FirstOrDefaultAsync()).Value;
             StepWait = (Interval + LoadedOrders.Count - 1) / LoadedOrders.Count;
             int reqSize = (int)(_EndTime.Subtract(_StartTime).TotalMilliseconds / StepWait);
             reqSize = (reqSize / LoadedOrders.Count) * LoadedOrders.Count;
@@ -143,6 +138,7 @@ namespace BCore
         {
             if (can)
             {
+                MobinBroker.ResultOfThreads = "";
                 ((Button)sender).Enabled = false;
                 ((Button)sender).Text = "Running...";
                 await Task.Factory.StartNew(() => SendOrderRequests());

@@ -81,10 +81,9 @@
             // 
             // btn_start
             // 
-            this.btn_start.Location = new System.Drawing.Point(101, 228);
-            this.btn_start.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btn_start.Location = new System.Drawing.Point(115, 304);
             this.btn_start.Name = "btn_start";
-            this.btn_start.Size = new System.Drawing.Size(85, 22);
+            this.btn_start.Size = new System.Drawing.Size(97, 29);
             this.btn_start.TabIndex = 0;
             this.btn_start.Text = "Start";
             this.btn_start.UseVisualStyleBackColor = true;
@@ -107,10 +106,9 @@
             this.lv_orders.GridLines = true;
             this.lv_orders.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lv_orders.HideSelection = false;
-            this.lv_orders.Location = new System.Drawing.Point(10, 61);
-            this.lv_orders.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.lv_orders.Location = new System.Drawing.Point(11, 81);
             this.lv_orders.Name = "lv_orders";
-            this.lv_orders.Size = new System.Drawing.Size(659, 163);
+            this.lv_orders.Size = new System.Drawing.Size(753, 217);
             this.lv_orders.TabIndex = 2;
             this.lv_orders.UseCompatibleStateImageBehavior = false;
             this.lv_orders.View = System.Windows.Forms.View.Details;
@@ -167,21 +165,19 @@
             // tb_logs
             // 
             this.tb_logs.AcceptsReturn = true;
-            this.tb_logs.Location = new System.Drawing.Point(10, 254);
-            this.tb_logs.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tb_logs.Location = new System.Drawing.Point(11, 339);
             this.tb_logs.Multiline = true;
             this.tb_logs.Name = "tb_logs";
             this.tb_logs.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tb_logs.Size = new System.Drawing.Size(659, 234);
+            this.tb_logs.Size = new System.Drawing.Size(753, 311);
             this.tb_logs.TabIndex = 0;
             this.tb_logs.WordWrap = false;
             // 
             // btn_load
             // 
-            this.btn_load.Location = new System.Drawing.Point(10, 228);
-            this.btn_load.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btn_load.Location = new System.Drawing.Point(11, 304);
             this.btn_load.Name = "btn_load";
-            this.btn_load.Size = new System.Drawing.Size(85, 22);
+            this.btn_load.Size = new System.Drawing.Size(97, 29);
             this.btn_load.TabIndex = 4;
             this.btn_load.Text = "Load";
             this.btn_load.UseVisualStyleBackColor = true;
@@ -189,11 +185,10 @@
             // 
             // tb_duration
             // 
-            this.tb_duration.Location = new System.Drawing.Point(83, 34);
-            this.tb_duration.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tb_duration.Location = new System.Drawing.Point(102, 45);
             this.tb_duration.MaxLength = 4;
             this.tb_duration.Name = "tb_duration";
-            this.tb_duration.Size = new System.Drawing.Size(42, 23);
+            this.tb_duration.Size = new System.Drawing.Size(47, 27);
             this.tb_duration.TabIndex = 1;
             this.tb_duration.Text = "3";
             this.tb_duration.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -201,38 +196,37 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(10, 37);
+            this.label1.Location = new System.Drawing.Point(11, 49);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(69, 15);
+            this.label1.Size = new System.Drawing.Size(86, 20);
             this.label1.TabIndex = 5;
             this.label1.Text = "Duration(s):";
             // 
             // tb_interval
             // 
-            this.tb_interval.Location = new System.Drawing.Point(204, 34);
-            this.tb_interval.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tb_interval.Location = new System.Drawing.Point(246, 45);
             this.tb_interval.MaxLength = 3;
             this.tb_interval.Name = "tb_interval";
-            this.tb_interval.Size = new System.Drawing.Size(42, 23);
+            this.tb_interval.Size = new System.Drawing.Size(47, 27);
             this.tb_interval.TabIndex = 2;
-            this.tb_interval.Text = "300";
+            this.tb_interval.Text = "303";
             this.tb_interval.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(129, 37);
+            this.label2.Location = new System.Drawing.Point(154, 49);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(73, 15);
+            this.label2.Size = new System.Drawing.Size(90, 20);
             this.label2.TabIndex = 5;
             this.label2.Text = "Interval(ms):";
             // 
             // lbl_starttime
             // 
             this.lbl_starttime.AutoSize = true;
-            this.lbl_starttime.Location = new System.Drawing.Point(250, 37);
+            this.lbl_starttime.Location = new System.Drawing.Point(299, 49);
             this.lbl_starttime.Name = "lbl_starttime";
-            this.lbl_starttime.Size = new System.Drawing.Size(63, 15);
+            this.lbl_starttime.Size = new System.Drawing.Size(80, 20);
             this.lbl_starttime.TabIndex = 5;
             this.lbl_starttime.Text = "Start Time:";
             this.lbl_starttime.Click += new System.EventHandler(this.lbl_starttime_Click);
@@ -240,11 +234,10 @@
             // tb_hh
             // 
             this.tb_hh.BackColor = System.Drawing.Color.LightYellow;
-            this.tb_hh.Location = new System.Drawing.Point(317, 34);
-            this.tb_hh.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tb_hh.Location = new System.Drawing.Point(380, 45);
             this.tb_hh.MaxLength = 2;
             this.tb_hh.Name = "tb_hh";
-            this.tb_hh.Size = new System.Drawing.Size(32, 23);
+            this.tb_hh.Size = new System.Drawing.Size(36, 27);
             this.tb_hh.TabIndex = 3;
             this.tb_hh.Text = "08";
             this.tb_hh.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -252,29 +245,28 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(349, 37);
+            this.label4.Location = new System.Drawing.Point(417, 49);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(10, 15);
+            this.label4.Size = new System.Drawing.Size(12, 20);
             this.label4.TabIndex = 7;
             this.label4.Text = ":";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(391, 37);
+            this.label5.Location = new System.Drawing.Point(465, 49);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(10, 15);
+            this.label5.Size = new System.Drawing.Size(12, 20);
             this.label5.TabIndex = 7;
             this.label5.Text = ":";
             // 
             // tb_mm
             // 
             this.tb_mm.BackColor = System.Drawing.Color.LightYellow;
-            this.tb_mm.Location = new System.Drawing.Point(360, 34);
-            this.tb_mm.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tb_mm.Location = new System.Drawing.Point(429, 45);
             this.tb_mm.MaxLength = 2;
             this.tb_mm.Name = "tb_mm";
-            this.tb_mm.Size = new System.Drawing.Size(32, 23);
+            this.tb_mm.Size = new System.Drawing.Size(36, 27);
             this.tb_mm.TabIndex = 4;
             this.tb_mm.Text = "29";
             this.tb_mm.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -282,20 +274,19 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(433, 37);
+            this.label6.Location = new System.Drawing.Point(513, 49);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(10, 15);
+            this.label6.Size = new System.Drawing.Size(12, 20);
             this.label6.TabIndex = 7;
             this.label6.Text = ":";
             // 
             // tb_ss
             // 
             this.tb_ss.BackColor = System.Drawing.Color.LightYellow;
-            this.tb_ss.Location = new System.Drawing.Point(402, 34);
-            this.tb_ss.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tb_ss.Location = new System.Drawing.Point(477, 45);
             this.tb_ss.MaxLength = 2;
             this.tb_ss.Name = "tb_ss";
-            this.tb_ss.Size = new System.Drawing.Size(32, 23);
+            this.tb_ss.Size = new System.Drawing.Size(36, 27);
             this.tb_ss.TabIndex = 5;
             this.tb_ss.Text = "57";
             this.tb_ss.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -303,11 +294,10 @@
             // tb_ms
             // 
             this.tb_ms.BackColor = System.Drawing.Color.LightYellow;
-            this.tb_ms.Location = new System.Drawing.Point(446, 34);
-            this.tb_ms.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tb_ms.Location = new System.Drawing.Point(528, 45);
             this.tb_ms.MaxLength = 3;
             this.tb_ms.Name = "tb_ms";
-            this.tb_ms.Size = new System.Drawing.Size(37, 23);
+            this.tb_ms.Size = new System.Drawing.Size(42, 27);
             this.tb_ms.TabIndex = 6;
             this.tb_ms.Text = "000";
             this.tb_ms.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -317,18 +307,17 @@
             this.lbl_endTime.AutoSize = true;
             this.lbl_endTime.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_endTime.ForeColor = System.Drawing.Color.DarkGreen;
-            this.lbl_endTime.Location = new System.Drawing.Point(489, 37);
+            this.lbl_endTime.Location = new System.Drawing.Point(577, 49);
             this.lbl_endTime.Name = "lbl_endTime";
-            this.lbl_endTime.Size = new System.Drawing.Size(38, 15);
+            this.lbl_endTime.Size = new System.Drawing.Size(49, 20);
             this.lbl_endTime.TabIndex = 8;
             this.lbl_endTime.Text = "End: -";
             // 
             // btn_delete_orders
             // 
-            this.btn_delete_orders.Location = new System.Drawing.Point(581, 228);
-            this.btn_delete_orders.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btn_delete_orders.Location = new System.Drawing.Point(664, 304);
             this.btn_delete_orders.Name = "btn_delete_orders";
-            this.btn_delete_orders.Size = new System.Drawing.Size(88, 22);
+            this.btn_delete_orders.Size = new System.Drawing.Size(101, 29);
             this.btn_delete_orders.TabIndex = 10;
             this.btn_delete_orders.Text = "Delete";
             this.btn_delete_orders.UseVisualStyleBackColor = true;
@@ -344,29 +333,29 @@
             this.toolStripMenuItem4});
             this.MainConsoleMenu.Location = new System.Drawing.Point(0, 0);
             this.MainConsoleMenu.Name = "MainConsoleMenu";
-            this.MainConsoleMenu.Padding = new System.Windows.Forms.Padding(5, 2, 0, 2);
-            this.MainConsoleMenu.Size = new System.Drawing.Size(1042, 24);
+            this.MainConsoleMenu.Padding = new System.Windows.Forms.Padding(6, 3, 0, 3);
+            this.MainConsoleMenu.Size = new System.Drawing.Size(1191, 30);
             this.MainConsoleMenu.TabIndex = 12;
             this.MainConsoleMenu.Text = "menuStrip1";
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(49, 20);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(61, 24);
             this.toolStripMenuItem1.Text = "Order";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.OrderMenuItemClick);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(70, 20);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(87, 24);
             this.toolStripMenuItem2.Text = "Symboles";
             this.toolStripMenuItem2.Click += new System.EventHandler(this.SymboleMenuItemClick);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(39, 20);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(49, 24);
             this.toolStripMenuItem3.Text = "Test";
             this.toolStripMenuItem3.Click += new System.EventHandler(this.TestSendOrderOpenOrderMenuItemClick);
             // 
@@ -376,20 +365,20 @@
             this.toolStripMenuItem6,
             this.toolStripMenuItem7});
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(42, 20);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(52, 24);
             this.toolStripMenuItem4.Text = "User";
             // 
             // toolStripMenuItem6
             // 
             this.toolStripMenuItem6.Name = "toolStripMenuItem6";
-            this.toolStripMenuItem6.Size = new System.Drawing.Size(119, 22);
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(146, 26);
             this.toolStripMenuItem6.Text = "Account";
             this.toolStripMenuItem6.Click += new System.EventHandler(this.AccountMenuItemClick);
             // 
             // toolStripMenuItem7
             // 
             this.toolStripMenuItem7.Name = "toolStripMenuItem7";
-            this.toolStripMenuItem7.Size = new System.Drawing.Size(119, 22);
+            this.toolStripMenuItem7.Size = new System.Drawing.Size(146, 26);
             this.toolStripMenuItem7.Text = "Login";
             this.toolStripMenuItem7.Click += new System.EventHandler(this.LoginMenuItemClick);
             // 
@@ -398,9 +387,9 @@
             this.lbl_ws_time.AutoSize = true;
             this.lbl_ws_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_ws_time.ForeColor = System.Drawing.Color.Red;
-            this.lbl_ws_time.Location = new System.Drawing.Point(707, 87);
+            this.lbl_ws_time.Location = new System.Drawing.Point(808, 116);
             this.lbl_ws_time.Name = "lbl_ws_time";
-            this.lbl_ws_time.Size = new System.Drawing.Size(80, 15);
+            this.lbl_ws_time.Size = new System.Drawing.Size(102, 20);
             this.lbl_ws_time.TabIndex = 14;
             this.lbl_ws_time.Text = "WS: 00:00:00";
             this.lbl_ws_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -416,9 +405,9 @@
             this.lbl_done.AutoSize = true;
             this.lbl_done.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.lbl_done.ForeColor = System.Drawing.Color.White;
-            this.lbl_done.Location = new System.Drawing.Point(191, 230);
+            this.lbl_done.Location = new System.Drawing.Point(218, 307);
             this.lbl_done.Name = "lbl_done";
-            this.lbl_done.Size = new System.Drawing.Size(21, 19);
+            this.lbl_done.Size = new System.Drawing.Size(24, 23);
             this.lbl_done.TabIndex = 15;
             this.lbl_done.Text = "--";
             // 
@@ -433,9 +422,9 @@
             this.lbl_pc_time.AutoSize = true;
             this.lbl_pc_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_pc_time.ForeColor = System.Drawing.Color.CornflowerBlue;
-            this.lbl_pc_time.Location = new System.Drawing.Point(712, 70);
+            this.lbl_pc_time.Location = new System.Drawing.Point(814, 93);
             this.lbl_pc_time.Name = "lbl_pc_time";
-            this.lbl_pc_time.Size = new System.Drawing.Size(75, 15);
+            this.lbl_pc_time.Size = new System.Drawing.Size(97, 20);
             this.lbl_pc_time.TabIndex = 14;
             this.lbl_pc_time.Text = "PC: 00:00:00";
             this.lbl_pc_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -443,12 +432,11 @@
             // tb_ws_logs
             // 
             this.tb_ws_logs.AcceptsReturn = true;
-            this.tb_ws_logs.Location = new System.Drawing.Point(675, 159);
-            this.tb_ws_logs.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tb_ws_logs.Location = new System.Drawing.Point(771, 212);
             this.tb_ws_logs.Multiline = true;
             this.tb_ws_logs.Name = "tb_ws_logs";
             this.tb_ws_logs.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tb_ws_logs.Size = new System.Drawing.Size(351, 330);
+            this.tb_ws_logs.Size = new System.Drawing.Size(401, 439);
             this.tb_ws_logs.TabIndex = 0;
             this.tb_ws_logs.WordWrap = false;
             // 
@@ -463,9 +451,9 @@
             this.lbl_login.AutoSize = true;
             this.lbl_login.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_login.ForeColor = System.Drawing.Color.Red;
-            this.lbl_login.Location = new System.Drawing.Point(696, 139);
+            this.lbl_login.Location = new System.Drawing.Point(795, 185);
             this.lbl_login.Name = "lbl_login";
-            this.lbl_login.Size = new System.Drawing.Size(91, 15);
+            this.lbl_login.Size = new System.Drawing.Size(118, 20);
             this.lbl_login.TabIndex = 14;
             this.lbl_login.Text = "Login: 00:00:00";
             this.lbl_login.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -475,9 +463,9 @@
             this.lbl_option_time.AutoSize = true;
             this.lbl_option_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_option_time.ForeColor = System.Drawing.Color.Red;
-            this.lbl_option_time.Location = new System.Drawing.Point(688, 121);
+            this.lbl_option_time.Location = new System.Drawing.Point(786, 161);
             this.lbl_option_time.Name = "lbl_option_time";
-            this.lbl_option_time.Size = new System.Drawing.Size(99, 15);
+            this.lbl_option_time.Size = new System.Drawing.Size(127, 20);
             this.lbl_option_time.TabIndex = 14;
             this.lbl_option_time.Text = "Option: 00:00:00";
             this.lbl_option_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -487,9 +475,9 @@
             this.lbl_openorders_time.AutoSize = true;
             this.lbl_openorders_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_openorders_time.ForeColor = System.Drawing.Color.Red;
-            this.lbl_openorders_time.Location = new System.Drawing.Point(688, 104);
+            this.lbl_openorders_time.Location = new System.Drawing.Point(786, 139);
             this.lbl_openorders_time.Name = "lbl_openorders_time";
-            this.lbl_openorders_time.Size = new System.Drawing.Size(99, 15);
+            this.lbl_openorders_time.Size = new System.Drawing.Size(126, 20);
             this.lbl_openorders_time.TabIndex = 14;
             this.lbl_openorders_time.Text = "Orders: 00:00:00";
             this.lbl_openorders_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -508,10 +496,10 @@
             // 
             // MainBotForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1042, 496);
+            this.ClientSize = new System.Drawing.Size(1191, 661);
             this.Controls.Add(this.lbl_login);
             this.Controls.Add(this.lbl_option_time);
             this.Controls.Add(this.lbl_openorders_time);
@@ -539,7 +527,6 @@
             this.Controls.Add(this.btn_start);
             this.Controls.Add(this.MainConsoleMenu);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.MaximizeBox = false;
             this.Name = "MainBotForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

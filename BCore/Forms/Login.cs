@@ -2,14 +2,8 @@
 using BCore.Lib;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace BCore.Forms
@@ -30,6 +24,13 @@ namespace BCore.Forms
         {
             tb_username.Text = (await db.BSettings.Where(s => s.Key == "username").FirstOrDefaultAsync()).Value;
             tb_password.Text = (await db.BSettings.Where(s => s.Key == "password").FirstOrDefaultAsync()).Value;
+
+            if (await mobin.InitCookies())
+            {
+                pb_captcha.Image = await mobin.GetCaptcha();
+            }
+            else
+                MessageBox.Show("init failed.try again");
         }
 
         private async void btn_init_cookies_Click(object sender, EventArgs e)
@@ -37,7 +38,7 @@ namespace BCore.Forms
             if (await mobin.InitCookies())
                 MessageBox.Show("init done.");
             else
-                MessageBox.Show("init failed.");
+                MessageBox.Show("init failed. try again");
         }
 
         private async void btn_refresh_Click(object sender, EventArgs e)
