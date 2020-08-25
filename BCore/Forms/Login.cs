@@ -52,6 +52,8 @@ namespace BCore.Forms
             {
                 lbl_api_token.Text = "ApiToken: " + output.Substring(0, output.IndexOf("@@@"));
                 lbl_bourse_code.Text = "BourseCode: " + output.Substring(output.IndexOf("@@@") + 3);
+                var mainForm = Application.OpenForms.OfType<MainBotForm>().FirstOrDefault();
+                mainForm.UpdateToken(output.Substring(0, output.IndexOf("@@@")));
             }
         }
     }

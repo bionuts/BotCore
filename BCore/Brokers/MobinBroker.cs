@@ -288,7 +288,7 @@ namespace BCore.Lib
             try
             {
                 sent = DateTime.Now;
-                calibre_time = $"[OpenOrderTime:{order_time:HH:mm:ss.fff}][OptionTime:{option_time:HH:mm:ss.fff}][LoginTime:{login_time:HH:mm:ss.fff}]";
+                calibre_time = $"OpenOrderTime:{order_time:HH:mm:ss.fff}, OptionTime:{option_time:HH:mm:ss.fff}, LoginTime:{login_time:HH:mm:ss.fff}";
                 _stopwatch.Start();
                 HttpResponseMessage httpResponse = SendHttpClient.SendAsync(paramObject.REQ).Result;
                 _stopwatch.Stop();
@@ -298,17 +298,17 @@ namespace BCore.Lib
                     OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
                     if (orderRespond.IsSuccessfull)
                         CeaseFire[paramObject.WhichOne] = true;
-                    result = $"[{sent:HH:mm:ss.fff}] [{_stopwatch.ElapsedMilliseconds:D3}ms], {calibre_time} , [ID:{paramObject.ID}] => {paramObject.SYM:-10} " +
-                        $",ThreadID: {Thread.CurrentThread.ManagedThreadId:D3} [{orderRespond.IsSuccessfull}] Desc: {orderRespond.MessageDesc}\n";
+                    result = $"[{sent:HH:mm:ss.fff}] [{_stopwatch.ElapsedMilliseconds:D3}ms] [ID:{paramObject.ID}] [Count: {paramObject.Count}], [{calibre_time}] => {paramObject.SYM:-10} " +
+                        $",T_{Thread.CurrentThread.ManagedThreadId:D3} [{orderRespond.IsSuccessfull}] Desc: {orderRespond.MessageDesc}\n";
                 }
                 else
                 {
-                    result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {paramObject.SYM},Sent: {sent:HH:mm:ss.fff}, Error: {httpResponse.StatusCode}\n";
+                    result = $"[{sent:HH:mm:ss.fff}] T_{Thread.CurrentThread.ManagedThreadId}, [ID:{paramObject.ID}], Sym: {paramObject.SYM}, Error: {httpResponse.StatusCode}\n";
                 }
             }
             catch (Exception ex)
             {
-                result = $"T_{Thread.CurrentThread.ManagedThreadId}, Sym: {paramObject.SYM},Sent: {DateTime.Now:HH:mm:ss.fff}, Error: {ex.Message}\n";
+                result = $"[{DateTime.Now:HH:mm:ss.fff}] T_{Thread.CurrentThread.ManagedThreadId}, [ID:{paramObject.ID}], Sym: {paramObject.SYM},Error: {ex.Message}\n";
             }
             lock (locker)
             {

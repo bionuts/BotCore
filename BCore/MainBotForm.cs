@@ -108,7 +108,8 @@ namespace BCore
                     ID = LoadedOrders[whichOne].Id,
                     SYM = LoadedOrders[whichOne].SymboleName,
                     REQ = MobinAgent.GetSendingOrderRequestMessage(LoadedOrders[whichOne]),
-                    WhichOne = whichOne
+                    WhichOne = whichOne,
+                    Count = LoadedOrders[whichOne].Count--
                 };
                 whichOne++;
             }
@@ -123,9 +124,7 @@ namespace BCore
                 Thread.Sleep((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
                 for (int i = 0; i < size; i++)
                 {
-                    if (MobinAgent.CeaseFire[arr_params[i].WhichOne])
-                        continue;
-                    else
+                    if (!MobinAgent.CeaseFire[arr_params[i].WhichOne])
                     {
                         // study here for beter lunch of thread from pool
                         Task.Factory.StartNew(() => MobinAgent.SendReqThread(arr_params[i], ref OrdersTime, ref OptionTime, ref LoginTime));
@@ -273,19 +272,26 @@ namespace BCore
 
         private string SortResult(string result)
         {
-            string tmp = "";
-            List<string> lineList = new List<string>();
-            var lines = result.Split("\n");
-            foreach (var line in lines)
+            try
             {
-                if (!string.IsNullOrEmpty(line))
-                    lineList.Add(line);
-            }
+                string tmp = "";
+                List<string> lineList = new List<string>();
+                var lines = result.Split("\n");
+                foreach (var line in lines)
+                {
+                    if (!string.IsNullOrEmpty(line))
+                        lineList.Add(line);
+                }
 
-            lineList = lineList.OrderBy(p => p.Substring(1, p.IndexOf("]"))).ToList();
-            foreach (var line in lineList)
-                tmp += line + Environment.NewLine;
-            return tmp;
+                lineList = lineList.OrderBy(p => p.Substring(1, p.IndexOf("]"))).ToList();
+                foreach (var line in lineList)
+                    tmp += line + Environment.NewLine;
+                return tmp;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message + Environment.NewLine + result;
+            }
         }
 
         private void timer_cando_Tick(object sender, EventArgs e)
@@ -361,6 +367,11 @@ namespace BCore
         private void timer_login_Tick(object sender, EventArgs e)
         {
             SetWSLog(MobinAgent.GetTimeBasedOnLoginHeader(ref LoginTime) + Environment.NewLine);
+        }
+
+        public void UpdateToken(string token)
+        {
+            MobinAgent.Token = token;
         }
     }
 }
