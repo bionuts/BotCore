@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -10,11 +11,12 @@ namespace BCore.Lib
 {
     class MobinWebSocket
     {
-        private ClientWebSocket ClientWS;
-        Uri wsUri = new Uri("wss://push2v7.etadbir.com/lightstreamer");
+        private readonly ClientWebSocket ClientWS;
+        readonly Uri wsUri = new Uri("wss://push2v7.etadbir.com/lightstreamer");
         readonly ArraySegment<byte> WS_BUFFER;
         ArraySegment<byte> WS_SND_BUFFER;
         string wsRes = "";
+        Stopwatch stopwatch;
 
         public bool IS_OPEN
         {
@@ -31,7 +33,7 @@ namespace BCore.Lib
             ClientWS.Options.SetRequestHeader("Accept-Language", "en-US,en;q=0.9,la;q=0.8,fa;q=0.7,ar;q=0.6,fr;q=0.5");
             ClientWS.Options.SetRequestHeader("Cache-Control", "no-cache");*/
             // ClientWS.Options.SetRequestHeader("Connection", "Upgrade");
-            ClientWS.Options.SetRequestHeader("Host", "push2v7.etadbir.com");
+            // ClientWS.Options.SetRequestHeader("Host", "push2v7.etadbir.com");
             ClientWS.Options.SetRequestHeader("Origin", "https://silver.mobinsb.com");
             //ClientWS.Options.SetRequestHeader("Pragma", "no-cache");
             /*ClientWS.Options.SetRequestHeader("Sec-WebSocket-Extensions", "permessage-deflate; client_max_window_bits"); // ; client_max_window_bits"
@@ -50,7 +52,11 @@ namespace BCore.Lib
         {
             try
             {
+                stopwatch = Stopwatch.StartNew();
                 await ClientWS.ConnectAsync(wsUri, CancellationToken.None);
+                stopwatch.Stop();
+                long x = stopwatch.ElapsedMilliseconds;
+                Console.WriteLine(x);
                 if (ClientWS.State == WebSocketState.Open)
                 {
                     string[] sends = new string[2]; // 8

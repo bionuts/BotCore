@@ -595,6 +595,7 @@ namespace BCore.Lib
                 new KeyValuePair<string, string>("LS_polling","true"),
                 new KeyValuePair<string, string>("LS_polling_millis","0"),
                 new KeyValuePair<string, string>("LS_idle_millis","0"),
+                //  , p = "LS_cid\x3dpcYgxn8m8 feOojyA1T681f3g2.pz479mDv\x26"
                 new KeyValuePair<string, string>("LS_cid","pcYgxn8m8 feOojyA1T681f3g2.pz479mDv"),
                 new KeyValuePair<string, string>("LS_adapter_set","STOCKLISTDEMO_REMOTE"),
                 new KeyValuePair<string, string>("LS_user","777&msb01473118"),

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Net.Http;
@@ -316,20 +317,26 @@ namespace BCore
             LoginTime = LoginTime.AddSeconds(1);
 
             lbl_pc_time.Text = $"PC: {PcTime:hh:mm:ss}";
-            lbl_ws_time.Text = $"WS: {WsTime:hh:mm:ss} [{(int)PcTime.Subtract(WsTime).TotalMilliseconds:D4} ms]";
-            lbl_openorders_time.Text = $"Orders: {OrdersTime:hh:mm:ss} [{(int)PcTime.Subtract(OrdersTime).TotalMilliseconds:D4} ms]";
-            lbl_option_time.Text = $"Option: {OptionTime:hh:mm:ss} [{(int)PcTime.Subtract(OptionTime).TotalMilliseconds:D4} ms]";
-            lbl_login.Text = $"Login: {LoginTime:hh:mm:ss} [{(int)PcTime.Subtract(LoginTime).TotalMilliseconds:D4} ms]";
+            lbl_ws_time.Text = $"WS: {WsTime:hh:mm:ss} [{(int)PcTime.Subtract(WsTime).TotalMilliseconds} ms]";
+            lbl_openorders_time.Text = $"Orders: {OrdersTime:hh:mm:ss} [{(int)PcTime.Subtract(OrdersTime).TotalMilliseconds} ms]";
+            lbl_option_time.Text = $"Option: {OptionTime:hh:mm:ss} [{(int)PcTime.Subtract(OptionTime).TotalMilliseconds} ms]";
+            lbl_login.Text = $"Login: {LoginTime:hh:mm:ss} [{(int)PcTime.Subtract(LoginTime).TotalMilliseconds} ms]";
         }
 
+        Stopwatch stopwatch1;
         private async void StartReceiveDataFromWS()
         {
             string line;
+            Console.WriteLine($"freq: {Stopwatch.Frequency:N0}");
+            Console.WriteLine($"high: {Stopwatch.IsHighResolution}");
             while (MobinAgent.MobinWebSocket.IS_OPEN)
             {
                 line = await MobinAgent.MobinWebSocket.ReceiveDataFromWebSocket();
+                stopwatch1 = Stopwatch.StartNew();
                 if (Utilities.GetTimeFromString(line, out string tmp))
                 {
+                    stopwatch1.Stop();
+                    Console.WriteLine(stopwatch1.ElapsedTicks);
                     string[] timeValues = tmp.Split(":");
                     WsTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day,
                     DateTime.Now.Hour, int.Parse(timeValues[1]), int.Parse(timeValues[2]), WsTime.Millisecond);
