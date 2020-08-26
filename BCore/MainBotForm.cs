@@ -122,7 +122,7 @@ namespace BCore
                     if (!MobinAgent.CeaseFire[arr_params[i].WhichOne])
                     {
                         // study here for beter lunch of thread from pool
-                        Task.Factory.StartNew(() => MobinAgent.SendReqThread(arr_params[i], ref OrdersTime, ref OptionTime, ref LoginTime));
+                        Task.Factory.StartNew(() => MobinAgent.SendReqThread(arr_params[i], ref WsTime, ref OrdersTime, ref OptionTime, ref LoginTime));
                         Thread.Sleep(StepWait);
                     }
                 }
@@ -316,10 +316,10 @@ namespace BCore
             LoginTime = LoginTime.AddSeconds(1);
 
             lbl_pc_time.Text = $"PC: {PcTime:hh:mm:ss}";
-            lbl_ws_time.Text = $"WS: {WsTime:hh:mm:ss} [{PcTime.Subtract(WsTime).TotalMilliseconds}]";
-            lbl_openorders_time.Text = $"Orders: {OrdersTime:hh:mm:ss} [{PcTime.Subtract(OrdersTime).TotalMilliseconds}]";
-            lbl_option_time.Text = $"Option: {OptionTime:hh:mm:ss} [{PcTime.Subtract(OptionTime).TotalMilliseconds}]";
-            lbl_login.Text = $"Login: {LoginTime:hh:mm:ss} [{PcTime.Subtract(LoginTime).TotalMilliseconds}]";
+            lbl_ws_time.Text = $"WS: {WsTime:hh:mm:ss} [{(int)PcTime.Subtract(WsTime).TotalMilliseconds:D4} ms]";
+            lbl_openorders_time.Text = $"Orders: {OrdersTime:hh:mm:ss} [{(int)PcTime.Subtract(OrdersTime).TotalMilliseconds:D4} ms]";
+            lbl_option_time.Text = $"Option: {OptionTime:hh:mm:ss} [{(int)PcTime.Subtract(OptionTime).TotalMilliseconds:D4} ms]";
+            lbl_login.Text = $"Login: {LoginTime:hh:mm:ss} [{(int)PcTime.Subtract(LoginTime).TotalMilliseconds:D4} ms]";
         }
 
         private async void StartReceiveDataFromWS()
