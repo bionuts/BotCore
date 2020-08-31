@@ -38,8 +38,7 @@
             this.price = new System.Windows.Forms.ColumnHeader();
             this.total = new System.Windows.Forms.ColumnHeader();
             this.orderType = new System.Windows.Forms.ColumnHeader();
-            this.times = new System.Windows.Forms.ColumnHeader();
-            this.hit = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
             this.tb_logs = new System.Windows.Forms.TextBox();
             this.btn_load = new System.Windows.Forms.Button();
             this.tb_duration = new System.Windows.Forms.TextBox();
@@ -100,15 +99,14 @@
             this.price,
             this.total,
             this.orderType,
-            this.times,
-            this.hit});
+            this.columnHeader2});
             this.lv_orders.FullRowSelect = true;
             this.lv_orders.GridLines = true;
             this.lv_orders.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lv_orders.HideSelection = false;
             this.lv_orders.Location = new System.Drawing.Point(11, 81);
             this.lv_orders.Name = "lv_orders";
-            this.lv_orders.Size = new System.Drawing.Size(753, 217);
+            this.lv_orders.Size = new System.Drawing.Size(915, 217);
             this.lv_orders.TabIndex = 2;
             this.lv_orders.UseCompatibleStateImageBehavior = false;
             this.lv_orders.View = System.Windows.Forms.View.Details;
@@ -129,20 +127,19 @@
             // count
             // 
             this.count.Name = "count";
-            this.count.Text = "Count";
-            this.count.Width = 70;
+            this.count.Text = "#";
             // 
             // price
             // 
             this.price.Name = "price";
-            this.price.Text = "Price";
-            this.price.Width = 95;
+            this.price.Text = "$";
+            this.price.Width = 80;
             // 
             // total
             // 
             this.total.Name = "total";
             this.total.Text = "Total";
-            this.total.Width = 130;
+            this.total.Width = 110;
             // 
             // orderType
             // 
@@ -150,17 +147,10 @@
             this.orderType.Text = "Type";
             this.orderType.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // times
+            // columnHeader2
             // 
-            this.times.Name = "times";
-            this.times.Text = "Times";
-            this.times.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // hit
-            // 
-            this.hit.Name = "hit";
-            this.hit.Text = "Hits";
-            this.hit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.columnHeader2.Text = "Users";
+            this.columnHeader2.Width = 380;
             // 
             // tb_logs
             // 
@@ -169,7 +159,7 @@
             this.tb_logs.Multiline = true;
             this.tb_logs.Name = "tb_logs";
             this.tb_logs.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tb_logs.Size = new System.Drawing.Size(753, 311);
+            this.tb_logs.Size = new System.Drawing.Size(915, 311);
             this.tb_logs.TabIndex = 0;
             this.tb_logs.WordWrap = false;
             // 
@@ -315,7 +305,7 @@
             // 
             // btn_delete_orders
             // 
-            this.btn_delete_orders.Location = new System.Drawing.Point(664, 304);
+            this.btn_delete_orders.Location = new System.Drawing.Point(825, 305);
             this.btn_delete_orders.Name = "btn_delete_orders";
             this.btn_delete_orders.Size = new System.Drawing.Size(101, 29);
             this.btn_delete_orders.TabIndex = 10;
@@ -334,7 +324,7 @@
             this.MainConsoleMenu.Location = new System.Drawing.Point(0, 0);
             this.MainConsoleMenu.Name = "MainConsoleMenu";
             this.MainConsoleMenu.Padding = new System.Windows.Forms.Padding(6, 3, 0, 3);
-            this.MainConsoleMenu.Size = new System.Drawing.Size(1191, 30);
+            this.MainConsoleMenu.Size = new System.Drawing.Size(1345, 30);
             this.MainConsoleMenu.TabIndex = 12;
             this.MainConsoleMenu.Text = "menuStrip1";
             // 
@@ -387,7 +377,7 @@
             this.lbl_ws_time.AutoSize = true;
             this.lbl_ws_time.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_ws_time.ForeColor = System.Drawing.Color.Red;
-            this.lbl_ws_time.Location = new System.Drawing.Point(833, 76);
+            this.lbl_ws_time.Location = new System.Drawing.Point(972, 81);
             this.lbl_ws_time.Name = "lbl_ws_time";
             this.lbl_ws_time.Size = new System.Drawing.Size(136, 28);
             this.lbl_ws_time.TabIndex = 14;
@@ -422,7 +412,7 @@
             this.lbl_pc_time.AutoSize = true;
             this.lbl_pc_time.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_pc_time.ForeColor = System.Drawing.Color.CornflowerBlue;
-            this.lbl_pc_time.Location = new System.Drawing.Point(840, 48);
+            this.lbl_pc_time.Location = new System.Drawing.Point(979, 53);
             this.lbl_pc_time.Name = "lbl_pc_time";
             this.lbl_pc_time.Size = new System.Drawing.Size(129, 28);
             this.lbl_pc_time.TabIndex = 14;
@@ -432,11 +422,12 @@
             // tb_ws_logs
             // 
             this.tb_ws_logs.AcceptsReturn = true;
-            this.tb_ws_logs.Location = new System.Drawing.Point(771, 175);
+            this.tb_ws_logs.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.tb_ws_logs.Location = new System.Drawing.Point(934, 174);
             this.tb_ws_logs.Multiline = true;
             this.tb_ws_logs.Name = "tb_ws_logs";
             this.tb_ws_logs.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tb_ws_logs.Size = new System.Drawing.Size(401, 476);
+            this.tb_ws_logs.Size = new System.Drawing.Size(399, 476);
             this.tb_ws_logs.TabIndex = 0;
             this.tb_ws_logs.WordWrap = false;
             // 
@@ -451,7 +442,7 @@
             this.lbl_option_time.AutoSize = true;
             this.lbl_option_time.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_option_time.ForeColor = System.Drawing.Color.Red;
-            this.lbl_option_time.Location = new System.Drawing.Point(799, 132);
+            this.lbl_option_time.Location = new System.Drawing.Point(938, 137);
             this.lbl_option_time.Name = "lbl_option_time";
             this.lbl_option_time.Size = new System.Drawing.Size(170, 28);
             this.lbl_option_time.TabIndex = 14;
@@ -463,7 +454,7 @@
             this.lbl_openorders_time.AutoSize = true;
             this.lbl_openorders_time.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_openorders_time.ForeColor = System.Drawing.Color.Red;
-            this.lbl_openorders_time.Location = new System.Drawing.Point(801, 104);
+            this.lbl_openorders_time.Location = new System.Drawing.Point(940, 109);
             this.lbl_openorders_time.Name = "lbl_openorders_time";
             this.lbl_openorders_time.Size = new System.Drawing.Size(168, 28);
             this.lbl_openorders_time.TabIndex = 14;
@@ -501,7 +492,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(1191, 661);
+            this.ClientSize = new System.Drawing.Size(1345, 661);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.lbl_option_time);
@@ -568,7 +559,6 @@
         //private System.Windows.Forms.MenuStrip MainMenuStrip;
         private System.Windows.Forms.Button btn_delete_orders;
         private System.Windows.Forms.ColumnHeader orderId;
-        private System.Windows.Forms.ColumnHeader times;
         private System.Windows.Forms.MenuStrip MainConsoleMenu;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
@@ -577,7 +567,6 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem6;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem7;
         private System.Windows.Forms.ColumnHeader price;
-        private System.Windows.Forms.ColumnHeader hit;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.Label lbl_ws_time;
         private System.Windows.Forms.Timer timer_cando;
@@ -591,5 +580,6 @@
         private System.Windows.Forms.Timer timer_option;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
     }
 }

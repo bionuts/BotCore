@@ -2,6 +2,7 @@
 using BotCore.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -10,11 +11,8 @@ namespace BCore.Forms
 {
     public partial class OrderForm : Form
     {
-        private readonly ApplicationDbContext db;
-
         public OrderForm()
         {
-            db = new ApplicationDbContext();
             InitializeComponent();
         }
 
@@ -26,40 +24,60 @@ namespace BCore.Forms
 
         private async Task ReloadSymboles()
         {
-            var symboles = await db.BSymboles.ToListAsync();
-            if (symboles.Count > 0)
+            using (var db = new ApplicationDbContext())
             {
-                cb_symboles.DataSource = symboles;
+
+                var symboles = await db.BSymboles.ToListAsync();
+                if (symboles.Count > 0)
+                {
+                    cb_symboles.DataSource = symboles;
+                }
             }
         }
 
         private async void btn_send_order_Click(object sender, EventArgs e)
         {
             Button button = sender as Button;
-            if (tb_count.Text.Trim() != "" && tb_price.Text.Trim() != "")
+            if (tb_count.Text.Trim() != "" && tb_price.Text.Trim() != "" && lv_accounts.SelectedItems.Count > 0)
             {
                 try
                 {
-                    var order = new BOrder
+                    using (var db = new ApplicationDbContext())
                     {
-                        SymboleName = cb_symboles.GetItemText(cb_symboles.SelectedItem),
-                        SymboleCode = cb_symboles.SelectedValue.ToString(),
-                        OrderType = (button.Name == "btn_buy" ? "BUY" : "SELL"),
-                        Count = int.Parse(tb_count.Text.Trim()),
-                        Price = decimal.Parse(tb_price.Text.Trim()),
-                        CreatedDateTime = DateTime.Now,
-                        Status = "",
-                        OrderId = "0"
-                    };
-                    db.BOrders.Add(order);
-                    if (await db.SaveChangesAsync() > 0)
-                    {
-                        tb_count.Text = "";
-                        // tb_price.Text = "";
-                        lbl_total.Text = "0";
+                        BOrder order = new BOrder
+                        {
+                            SymboleName = cb_symboles.GetItemText(cb_symboles.SelectedItem),
+                            SymboleCode = cb_symboles.SelectedValue.ToString(),
+                            OrderType = (button.Name == "btn_buy" ? "BUY" : "SELL"),
+                            Count = int.Parse(tb_count.Text.Trim()),
+                            Price = decimal.Parse(tb_price.Text.Trim()),
+                            CreatedDateTime = DateTime.Now,
+                            Status = "",
+                            OrderId = "0",
+                            OrderAccounts = new List<BOrderAccounts>()
+                        };
+
+                        foreach (ListViewItem sitem in lv_accounts.SelectedItems)
+                        {
+                            var userid = int.Parse(sitem.SubItems[0].Text);
+                            BOrderAccounts tmp = new BOrderAccounts 
+                            { 
+                                UserId = userid
+                            };
+                            order.OrderAccounts.Add(tmp);
+                        }
+                        db.BOrders.Add(order);
+
+                        if (await db.SaveChangesAsync() > 0)
+                        {
+                            tb_count.Text = "";
+                            tb_price.Text = "";
+                            lbl_total.Text = "0";
+
+                            var mainForm = Application.OpenForms.OfType<MainBotForm>().FirstOrDefault();
+                            await mainForm.LoadOrdersToListView();
+                        }
                     }
-                    var mainForm = Application.OpenForms.OfType<MainBotForm>().FirstOrDefault();
-                    await mainForm.LoadOrdersToListView();
                 }
                 catch (Exception ex)
                 {

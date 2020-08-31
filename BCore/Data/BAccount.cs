@@ -25,5 +25,7 @@ namespace BotCore.Data
         public string BCode { get; set; }
 
         public DateTime? TokenDate { get; set; }
+
+        public IList<BOrderAccounts> OrderAccounts { get; set; }
     }
 }

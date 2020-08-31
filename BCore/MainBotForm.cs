@@ -156,10 +156,20 @@ namespace BCore
         public async Task LoadOrdersToListView()
         {
             lv_orders.Items.Clear();
-            LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).OrderBy(d => d.CreatedDateTime).ToListAsync();
+            LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today)
+                .Include(x => x.OrderAccounts)
+                .ThenInclude(x=>x.BAccount)
+                .OrderBy(d => d.CreatedDateTime).ToListAsync();
+            string users;
             foreach (var order in LoadedOrders)
             {
                 decimal templong = order.Count * order.Price;
+                users = "";
+                foreach (var acc in order.OrderAccounts)
+                {
+                    users += " , " + acc.BAccount.Name;
+                }
+
                 var row = new string[]
                 {
                     order.Id.ToString(),
@@ -168,8 +178,7 @@ namespace BCore
                     order.Price.ToString("N0"),
                     templong.ToString("N0"),
                     order.OrderType,
-                    "0",
-                    "0"
+                    users.Substring(3)
                 };
                 var lv_item = new ListViewItem(row)
                 {

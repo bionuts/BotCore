@@ -145,20 +145,20 @@
             // columnHeader2
             // 
             this.columnHeader2.Text = "Name";
-            this.columnHeader2.Width = 100;
+            this.columnHeader2.Width = 120;
             // 
             // columnHeader3
             // 
             this.columnHeader3.Text = "Username";
-            this.columnHeader3.Width = 90;
+            this.columnHeader3.Width = 120;
             // 
             // lv_accounts
             // 
-            this.lv_accounts.CheckBoxes = true;
             this.lv_accounts.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1,
             this.columnHeader2,
             this.columnHeader3});
+            this.lv_accounts.FullRowSelect = true;
             this.lv_accounts.GridLines = true;
             this.lv_accounts.HideSelection = false;
             this.lv_accounts.Location = new System.Drawing.Point(245, 12);

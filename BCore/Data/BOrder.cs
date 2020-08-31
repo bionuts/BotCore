@@ -34,5 +34,7 @@ namespace BotCore.Data
 
         [Required]
         public string OrderId { get; set; }
+
+        public IList<BOrderAccounts> OrderAccounts { get; set; }
     }
 }

@@ -53,21 +53,17 @@ namespace BCore.Forms
                 {
                     if (lv_accounts.SelectedItems.Count > 0)
                     {
-                        foreach (ListViewItem sitem in lv_accounts.SelectedItems)
+                        var id = int.Parse(lv_accounts.SelectedItems[0].SubItems[0].Text);
+                        var username = lv_accounts.SelectedItems[0].SubItems[2].Text;
+                        var password = lv_accounts.SelectedItems[0].SubItems[3].Text;
+                        string output = await mobin.Login(username, password, tb_captcha.Text.Trim());
+                        if (output != "")
                         {
-                            var id = int.Parse(sitem.SubItems[0].Text);
-                            var username = sitem.SubItems[2].Text;
-                            var password = sitem.SubItems[3].Text;
-                            string output = await mobin.Login(username, password, tb_captcha.Text.Trim());
-                            if (output != "")
-                            {
-                                var acc = await db.BAccounts.FindAsync(id);
-                                acc.BCode = output.Substring(output.IndexOf("@@@") + 3);
-                                acc.Token = output.Substring(0, output.IndexOf("@@@"));
-                                acc.TokenDate = DateTime.Now;
-                                db.Update(acc);
-                            }
-
+                            var acc = await db.BAccounts.FindAsync(id);
+                            acc.BCode = output.Substring(output.IndexOf("@@@") + 3);
+                            acc.Token = output.Substring(0, output.IndexOf("@@@"));
+                            acc.TokenDate = DateTime.Now;
+                            db.Update(acc);
                         }
                         await db.SaveChangesAsync();
                         await ReLoadListView();

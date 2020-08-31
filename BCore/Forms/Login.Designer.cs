@@ -31,7 +31,6 @@
             this.btn_login = new System.Windows.Forms.Button();
             this.pb_captcha = new System.Windows.Forms.PictureBox();
             this.btn_refresh = new System.Windows.Forms.Button();
-            this.btn_init_cookies = new System.Windows.Forms.Button();
             this.tb_captcha = new System.Windows.Forms.TextBox();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
             this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
@@ -46,11 +45,12 @@
             // 
             // btn_login
             // 
-            this.btn_login.Location = new System.Drawing.Point(310, 449);
+            this.btn_login.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.btn_login.Location = new System.Drawing.Point(564, 449);
             this.btn_login.Name = "btn_login";
-            this.btn_login.Size = new System.Drawing.Size(216, 64);
+            this.btn_login.Size = new System.Drawing.Size(114, 68);
             this.btn_login.TabIndex = 2;
-            this.btn_login.Text = "login";
+            this.btn_login.Text = "Login";
             this.btn_login.UseVisualStyleBackColor = true;
             this.btn_login.Click += new System.EventHandler(this.btn_login_Click);
             // 
@@ -59,7 +59,7 @@
             this.pb_captcha.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pb_captcha.Location = new System.Drawing.Point(12, 449);
             this.pb_captcha.Name = "pb_captcha";
-            this.pb_captcha.Size = new System.Drawing.Size(212, 64);
+            this.pb_captcha.Size = new System.Drawing.Size(212, 68);
             this.pb_captcha.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pb_captcha.TabIndex = 3;
             this.pb_captcha.TabStop = false;
@@ -68,30 +68,24 @@
             // 
             this.btn_refresh.Location = new System.Drawing.Point(230, 449);
             this.btn_refresh.Name = "btn_refresh";
-            this.btn_refresh.Size = new System.Drawing.Size(74, 64);
+            this.btn_refresh.Size = new System.Drawing.Size(110, 68);
             this.btn_refresh.TabIndex = 2;
-            this.btn_refresh.Text = "R";
+            this.btn_refresh.Text = "Refresh";
             this.btn_refresh.UseVisualStyleBackColor = true;
             this.btn_refresh.Click += new System.EventHandler(this.btn_refresh_Click);
             // 
-            // btn_init_cookies
-            // 
-            this.btn_init_cookies.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.btn_init_cookies.Location = new System.Drawing.Point(656, 449);
-            this.btn_init_cookies.Name = "btn_init_cookies";
-            this.btn_init_cookies.Size = new System.Drawing.Size(216, 64);
-            this.btn_init_cookies.TabIndex = 5;
-            this.btn_init_cookies.Text = "Init Cookies";
-            this.btn_init_cookies.UseVisualStyleBackColor = true;
-            this.btn_init_cookies.Click += new System.EventHandler(this.btn_init_cookies_Click);
-            // 
             // tb_captcha
             // 
-            this.tb_captcha.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.tb_captcha.Location = new System.Drawing.Point(12, 519);
+            this.tb_captcha.AcceptsTab = true;
+            this.tb_captcha.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tb_captcha.Font = new System.Drawing.Font("Segoe UI", 17F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.tb_captcha.Location = new System.Drawing.Point(346, 449);
+            this.tb_captcha.MaxLength = 6;
             this.tb_captcha.Name = "tb_captcha";
-            this.tb_captcha.Size = new System.Drawing.Size(212, 41);
+            this.tb_captcha.AutoSize = false;
+            this.tb_captcha.Size = new System.Drawing.Size(212, 68);
             this.tb_captcha.TabIndex = 1;
+            this.tb_captcha.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // columnHeader1
             // 
@@ -121,6 +115,7 @@
             this.lv_accounts.GridLines = true;
             this.lv_accounts.HideSelection = false;
             this.lv_accounts.Location = new System.Drawing.Point(12, 12);
+            this.lv_accounts.MultiSelect = false;
             this.lv_accounts.Name = "lv_accounts";
             this.lv_accounts.Size = new System.Drawing.Size(860, 431);
             this.lv_accounts.TabIndex = 5;
@@ -152,10 +147,9 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(884, 572);
+            this.ClientSize = new System.Drawing.Size(884, 529);
             this.Controls.Add(this.lv_accounts);
             this.Controls.Add(this.tb_captcha);
-            this.Controls.Add(this.btn_init_cookies);
             this.Controls.Add(this.btn_refresh);
             this.Controls.Add(this.pb_captcha);
             this.Controls.Add(this.btn_login);
@@ -178,7 +172,6 @@
         private System.Windows.Forms.Button btn_login;
         private System.Windows.Forms.PictureBox pb_captcha;
         private System.Windows.Forms.Button btn_refresh;
-        private System.Windows.Forms.Button btn_init_cookies;
         private System.Windows.Forms.TextBox tb_captcha;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
