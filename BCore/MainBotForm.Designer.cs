@@ -71,11 +71,11 @@
             this.lbl_pc_time = new System.Windows.Forms.Label();
             this.tb_ws_logs = new System.Windows.Forms.TextBox();
             this.timer_stay_tune = new System.Windows.Forms.Timer(this.components);
-            this.lbl_login = new System.Windows.Forms.Label();
             this.lbl_option_time = new System.Windows.Forms.Label();
             this.lbl_openorders_time = new System.Windows.Forms.Label();
             this.timer_option = new System.Windows.Forms.Timer(this.components);
-            this.timer_login = new System.Windows.Forms.Timer(this.components);
+            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             this.MainConsoleMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -385,11 +385,11 @@
             // lbl_ws_time
             // 
             this.lbl_ws_time.AutoSize = true;
-            this.lbl_ws_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lbl_ws_time.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_ws_time.ForeColor = System.Drawing.Color.Red;
-            this.lbl_ws_time.Location = new System.Drawing.Point(808, 116);
+            this.lbl_ws_time.Location = new System.Drawing.Point(833, 76);
             this.lbl_ws_time.Name = "lbl_ws_time";
-            this.lbl_ws_time.Size = new System.Drawing.Size(102, 20);
+            this.lbl_ws_time.Size = new System.Drawing.Size(136, 28);
             this.lbl_ws_time.TabIndex = 14;
             this.lbl_ws_time.Text = "WS: 00:00:00";
             this.lbl_ws_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -420,11 +420,11 @@
             // lbl_pc_time
             // 
             this.lbl_pc_time.AutoSize = true;
-            this.lbl_pc_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lbl_pc_time.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_pc_time.ForeColor = System.Drawing.Color.CornflowerBlue;
-            this.lbl_pc_time.Location = new System.Drawing.Point(814, 93);
+            this.lbl_pc_time.Location = new System.Drawing.Point(840, 48);
             this.lbl_pc_time.Name = "lbl_pc_time";
-            this.lbl_pc_time.Size = new System.Drawing.Size(97, 20);
+            this.lbl_pc_time.Size = new System.Drawing.Size(129, 28);
             this.lbl_pc_time.TabIndex = 14;
             this.lbl_pc_time.Text = "PC: 00:00:00";
             this.lbl_pc_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -432,11 +432,11 @@
             // tb_ws_logs
             // 
             this.tb_ws_logs.AcceptsReturn = true;
-            this.tb_ws_logs.Location = new System.Drawing.Point(771, 212);
+            this.tb_ws_logs.Location = new System.Drawing.Point(771, 175);
             this.tb_ws_logs.Multiline = true;
             this.tb_ws_logs.Name = "tb_ws_logs";
             this.tb_ws_logs.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tb_ws_logs.Size = new System.Drawing.Size(401, 439);
+            this.tb_ws_logs.Size = new System.Drawing.Size(401, 476);
             this.tb_ws_logs.TabIndex = 0;
             this.tb_ws_logs.WordWrap = false;
             // 
@@ -446,26 +446,14 @@
             this.timer_stay_tune.Interval = 8000;
             this.timer_stay_tune.Tick += new System.EventHandler(this.timer_stay_tune_Tick);
             // 
-            // lbl_login
-            // 
-            this.lbl_login.AutoSize = true;
-            this.lbl_login.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.lbl_login.ForeColor = System.Drawing.Color.Red;
-            this.lbl_login.Location = new System.Drawing.Point(795, 185);
-            this.lbl_login.Name = "lbl_login";
-            this.lbl_login.Size = new System.Drawing.Size(118, 20);
-            this.lbl_login.TabIndex = 14;
-            this.lbl_login.Text = "Login: 00:00:00";
-            this.lbl_login.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // lbl_option_time
             // 
             this.lbl_option_time.AutoSize = true;
-            this.lbl_option_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lbl_option_time.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_option_time.ForeColor = System.Drawing.Color.Red;
-            this.lbl_option_time.Location = new System.Drawing.Point(786, 161);
+            this.lbl_option_time.Location = new System.Drawing.Point(799, 132);
             this.lbl_option_time.Name = "lbl_option_time";
-            this.lbl_option_time.Size = new System.Drawing.Size(127, 20);
+            this.lbl_option_time.Size = new System.Drawing.Size(170, 28);
             this.lbl_option_time.TabIndex = 14;
             this.lbl_option_time.Text = "Option: 00:00:00";
             this.lbl_option_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -473,11 +461,11 @@
             // lbl_openorders_time
             // 
             this.lbl_openorders_time.AutoSize = true;
-            this.lbl_openorders_time.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lbl_openorders_time.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.lbl_openorders_time.ForeColor = System.Drawing.Color.Red;
-            this.lbl_openorders_time.Location = new System.Drawing.Point(786, 139);
+            this.lbl_openorders_time.Location = new System.Drawing.Point(801, 104);
             this.lbl_openorders_time.Name = "lbl_openorders_time";
-            this.lbl_openorders_time.Size = new System.Drawing.Size(126, 20);
+            this.lbl_openorders_time.Size = new System.Drawing.Size(168, 28);
             this.lbl_openorders_time.TabIndex = 14;
             this.lbl_openorders_time.Text = "Orders: 00:00:00";
             this.lbl_openorders_time.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -488,11 +476,25 @@
             this.timer_option.Interval = 5000;
             this.timer_option.Tick += new System.EventHandler(this.timer_option_Tick);
             // 
-            // timer_login
+            // button1
             // 
-            this.timer_login.Enabled = true;
-            this.timer_login.Interval = 4000;
-            this.timer_login.Tick += new System.EventHandler(this.timer_login_Tick);
+            this.button1.Location = new System.Drawing.Point(303, 305);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(94, 29);
+            this.button1.TabIndex = 16;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(403, 304);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(94, 29);
+            this.button2.TabIndex = 17;
+            this.button2.Text = "button2";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // MainBotForm
             // 
@@ -500,7 +502,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1191, 661);
-            this.Controls.Add(this.lbl_login);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.lbl_option_time);
             this.Controls.Add(this.lbl_openorders_time);
             this.Controls.Add(this.tb_ws_logs);
@@ -583,10 +586,10 @@
         private System.Windows.Forms.Label lbl_pc_time;
         private System.Windows.Forms.TextBox tb_ws_logs;
         private System.Windows.Forms.Timer timer_stay_tune;
-        private System.Windows.Forms.Label lbl_login;
         private System.Windows.Forms.Label lbl_option_time;
         private System.Windows.Forms.Label lbl_openorders_time;
         private System.Windows.Forms.Timer timer_option;
-        private System.Windows.Forms.Timer timer_login;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
     }
 }

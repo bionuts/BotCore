@@ -32,7 +32,6 @@ namespace BCore
         private DateTime WsTime;
         private DateTime OrdersTime;
         private DateTime OptionTime;
-        private DateTime LoginTime;
         static volatile object locker = new object();
 
         private ThreadParamObject[] arr_params;
@@ -56,9 +55,14 @@ namespace BCore
             {
                 lbl_done.Text = "[connected]";
                 lbl_done.BackColor = Color.Green;
-                PcTime = WsTime = OrdersTime = OptionTime = LoginTime = DateTime.Now;
-                if (await MobinAgent.CreateSessionForWebSocket() && await MobinAgent.MobinWebSocket.StartWebSocket(MobinAgent.LS_Phase, MobinAgent.LS_Session))
-                    StartReceiveDataFromWS();
+                WsTime = OrdersTime = OptionTime = DateTime.Now;
+                /*if (await MobinAgent.CreateSessionForWebSocket() && await MobinAgent.MobinWebSocket.StartWebSocket(MobinAgent.LS_Phase, MobinAgent.LS_Session))
+                    StartReceiveDataFromWS();*/
+                await MobinAgent.CreateSessionForWebSocket();
+                /*await MobinAgent.MobinWebSocket.ConnectAsync();
+                await MobinAgent.MobinWebSocket.SendInitMessages(MobinAgent.LS_Phase, MobinAgent.LS_Session);
+                await MobinAgent.MobinWebSocket.GetClockMessages(MobinAgent.LS_Session);
+                StartReceiveDataFromWS();*/
             }
             else
             {
@@ -117,13 +121,14 @@ namespace BCore
             try
             {
                 int size = arr_params.Length;
+                string times;
                 Thread.Sleep((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
                 for (int i = 0; i < size; i++)
                 {
                     if (!MobinAgent.CeaseFire[arr_params[i].WhichOne])
                     {
-                        // study here for beter lunch of thread from pool
-                        Task.Factory.StartNew(() => MobinAgent.SendReqThread(arr_params[i], ref WsTime, ref OrdersTime, ref OptionTime, ref LoginTime));
+                        times = $"WS:{WsTime:HH:mm:ss.fff}, Order:{OrdersTime:HH:mm:ss.fff}, Option:{OptionTime:HH:mm:ss.fff}";
+                        Task.Factory.StartNew(() => MobinAgent.SendReqThread(arr_params[i], times));
                         Thread.Sleep(StepWait);
                     }
                 }
@@ -314,34 +319,25 @@ namespace BCore
             WsTime = WsTime.AddSeconds(1);
             OrdersTime = OrdersTime.AddSeconds(1);
             OptionTime = OptionTime.AddSeconds(1);
-            LoginTime = LoginTime.AddSeconds(1);
 
             lbl_pc_time.Text = $"PC: {PcTime:hh:mm:ss}";
             lbl_ws_time.Text = $"WS: {WsTime:hh:mm:ss} [{(int)PcTime.Subtract(WsTime).TotalMilliseconds} ms]";
             lbl_openorders_time.Text = $"Orders: {OrdersTime:hh:mm:ss} [{(int)PcTime.Subtract(OrdersTime).TotalMilliseconds} ms]";
             lbl_option_time.Text = $"Option: {OptionTime:hh:mm:ss} [{(int)PcTime.Subtract(OptionTime).TotalMilliseconds} ms]";
-            lbl_login.Text = $"Login: {LoginTime:hh:mm:ss} [{(int)PcTime.Subtract(LoginTime).TotalMilliseconds} ms]";
         }
 
-        Stopwatch stopwatch1;
         private async void StartReceiveDataFromWS()
         {
             string line;
-            Console.WriteLine($"freq: {Stopwatch.Frequency:N0}");
-            Console.WriteLine($"high: {Stopwatch.IsHighResolution}");
             while (MobinAgent.MobinWebSocket.IS_OPEN)
             {
                 line = await MobinAgent.MobinWebSocket.ReceiveDataFromWebSocket();
-                stopwatch1 = Stopwatch.StartNew();
                 if (Utilities.GetTimeFromString(line, out string tmp))
                 {
-                    stopwatch1.Stop();
-                    Console.WriteLine(stopwatch1.ElapsedTicks);
                     string[] timeValues = tmp.Split(":");
                     WsTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day,
                     DateTime.Now.Hour, int.Parse(timeValues[1]), int.Parse(timeValues[2]), WsTime.Millisecond);
                     SetWSLog(line + Environment.NewLine);
-                    tb_ws_logs.ScrollToCaret();
                 }
             }
             tb_ws_logs.AppendText("Socket has been Closed!!!" + Environment.NewLine);
@@ -367,14 +363,39 @@ namespace BCore
             SetWSLog(MobinAgent.GetTimeBasedOnOptionHeader(ref OptionTime) + Environment.NewLine);
         }
 
-        private void timer_login_Tick(object sender, EventArgs e)
-        {
-            SetWSLog(MobinAgent.GetTimeBasedOnLoginHeader(ref LoginTime) + Environment.NewLine);
-        }
-
         public void UpdateToken(string token)
         {
             MobinAgent.Token = token;
+        }
+
+        public static void DisplayTimerProperties()
+        {
+            // Display the timer frequency and resolution.
+            if (Stopwatch.IsHighResolution)
+            {
+                Console.WriteLine("Operations timed using the system's high-resolution performance counter.");
+            }
+            else
+            {
+                Console.WriteLine("Operations timed using the DateTime class.");
+            }
+
+            long frequency = Stopwatch.Frequency;
+            Console.WriteLine("  Timer frequency in ticks per second = {0}",
+                frequency);
+            long nanosecPerTick = (1000L * 1000L * 1000L) / frequency;
+            Console.WriteLine("  Timer is accurate within {0} nanoseconds",
+                nanosecPerTick);
+        }
+
+        private async void button1_Click(object sender, EventArgs e)
+        {
+            tb_logs.AppendText(await MobinAgent.MobinWebSocket.ConnectAsync());
+        }
+
+        private async void button2_Click(object sender, EventArgs e)
+        {
+            tb_logs.AppendText(await MobinAgent.MobinWebSocket.SendInitMessages(MobinAgent.LS_Phase, MobinAgent.LS_Session));
         }
     }
 }

@@ -15,7 +15,6 @@ namespace BCore.Lib
         readonly Uri wsUri = new Uri("wss://push2v7.etadbir.com/lightstreamer");
         readonly ArraySegment<byte> WS_BUFFER;
         ArraySegment<byte> WS_SND_BUFFER;
-        string wsRes = "";
         Stopwatch stopwatch;
 
         public bool IS_OPEN
@@ -48,6 +47,81 @@ namespace BCore.Lib
             WS_SND_BUFFER = new ArraySegment<byte>(new byte[4096]);
         }
 
+        public async Task<string> ConnectAsync()
+        {
+            try
+            {
+                stopwatch = Stopwatch.StartNew();
+                await ClientWS.ConnectAsync(wsUri, CancellationToken.None);
+                stopwatch.Stop();
+                if (ClientWS.State == WebSocketState.Open)
+                {
+                    return $"WS_Connected: {stopwatch.ElapsedMilliseconds}";
+                }
+                return "NULL";
+            }
+            catch (Exception ex)
+            {
+                return $"WS Connect(): {ex.Message}";
+            }
+        }
+
+        string register, getclock;
+        public async Task<string> SendInitMessages(int phase, string session)
+        {
+            try
+            {
+                if (IS_OPEN)
+                {
+                    wsRes = "";
+                    register = $"bind_session{Environment.NewLine}LS_session={session}&LS_phase={phase + 2}&LS_cause=loop1&LS_container=lsc&";
+                    WS_SND_BUFFER = new ArraySegment<byte>(Encoding.UTF8.GetBytes(register));
+                    stopwatch = Stopwatch.StartNew();
+                    await ClientWS.SendAsync(WS_SND_BUFFER, WebSocketMessageType.Text, true, CancellationToken.None);
+                    var result = await ClientWS.ReceiveAsync(WS_BUFFER, CancellationToken.None);
+                    wsRes += Encoding.UTF8.GetString(WS_BUFFER.Array, 0, result.Count);
+                    while (!result.EndOfMessage)
+                    {
+                        wsRes += Encoding.UTF8.GetString(WS_BUFFER.Array, 0, result.Count);
+                    }
+                    stopwatch.Stop();
+                    return $"SendInitMessages: {stopwatch.ElapsedMilliseconds} ms, Result: {wsRes.Length}{Environment.NewLine}{wsRes}";
+                }
+                return "NULL";
+            }
+            catch (Exception ex)
+            {
+                return $"WS SendInitMessages(): {ex.Message}";
+            }
+        }
+
+        public async Task GetClockMessages(string session)
+        {
+            try
+            {
+                if (IS_OPEN)
+                {
+                    wsRes = "";
+                    getclock = $"control{Environment.NewLine}LS_mode=MERGE&LS_id=getclock&LS_schema=Key%20Type%20Value&LS_data_adapter=clock&LS_snapshot=false&LS_table=1&LS_req_phase=2&LS_win_phase=1&LS_op=add&LS_session={session}&";
+                    WS_SND_BUFFER = new ArraySegment<byte>(Encoding.UTF8.GetBytes(getclock));
+                    stopwatch = Stopwatch.StartNew();
+                    await ClientWS.SendAsync(WS_SND_BUFFER, WebSocketMessageType.Text, true, CancellationToken.None);
+                    var result = await ClientWS.ReceiveAsync(WS_BUFFER, CancellationToken.None);
+                    wsRes += Encoding.UTF8.GetString(WS_BUFFER.Array, 0, result.Count);
+                    while (!result.EndOfMessage)
+                    {
+                        wsRes += Encoding.UTF8.GetString(WS_BUFFER.Array, 0, result.Count);
+                    }
+                    stopwatch.Stop();
+                    Console.WriteLine($"GetClockMessages: {stopwatch.ElapsedMilliseconds} ms, Result: {wsRes.Length}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"WS GetClockMessages(): {ex.Message}");
+            }
+        }
+
         public async Task<bool> StartWebSocket(int phase, string session)
         {
             try
@@ -55,8 +129,7 @@ namespace BCore.Lib
                 stopwatch = Stopwatch.StartNew();
                 await ClientWS.ConnectAsync(wsUri, CancellationToken.None);
                 stopwatch.Stop();
-                long x = stopwatch.ElapsedMilliseconds;
-                Console.WriteLine(x);
+                Console.WriteLine($"wscon: {stopwatch.ElapsedMilliseconds}");
                 if (ClientWS.State == WebSocketState.Open)
                 {
                     string[] sends = new string[2]; // 8
@@ -85,6 +158,7 @@ namespace BCore.Lib
             }
         }
 
+        private string wsRes = "";
         public async Task<string> ReceiveDataFromWebSocket()
         {
             try

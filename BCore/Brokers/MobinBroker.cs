@@ -279,16 +279,14 @@ namespace BCore.Lib
             return req;
         }
 
-        public void SendReqThread(ThreadParamObject paramObject, ref DateTime ws_time, ref DateTime order_time, ref DateTime option_time, ref DateTime login_time)
+        public void SendReqThread(ThreadParamObject paramObject, string times)
         {
-            string calibre_time;
             string result;
             DateTime sent;
             Stopwatch _stopwatch = new Stopwatch();
             try
             {
-                sent = DateTime.Now;
-                calibre_time = $"WSTime:{ws_time:HH:mm:ss.fff}, OrderTime:{order_time:HH:mm:ss.fff}, OptionTime:{option_time:HH:mm:ss.fff}, LoginTime:{login_time:HH:mm:ss.fff}";
+                sent = DateTime.Now;                
                 _stopwatch.Start();
                 HttpResponseMessage httpResponse = SendHttpClient.SendAsync(paramObject.REQ).Result;
                 _stopwatch.Stop();
@@ -298,8 +296,8 @@ namespace BCore.Lib
                     OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
                     if (orderRespond.IsSuccessfull)
                         CeaseFire[paramObject.WhichOne] = true;
-                    result = $"[{sent:HH:mm:ss.fff}] [{_stopwatch.ElapsedMilliseconds:D3}ms] [ID:{paramObject.ID}] [Count: {paramObject.Count}], [{calibre_time}] => {paramObject.SYM:-10} " +
-                        $",T_{Thread.CurrentThread.ManagedThreadId:D3} [{orderRespond.IsSuccessfull}] Desc: {orderRespond.MessageDesc}\n";
+                    result = $"[{sent:HH:mm:ss.fff}] [{_stopwatch.ElapsedMilliseconds:D3}ms] [ID:{paramObject.ID}]\t[{paramObject.SYM}]\t[Count:{paramObject.Count}]\t[{times}]" +
+                        $"\tT_{Thread.CurrentThread.ManagedThreadId}\t[{orderRespond.IsSuccessfull}]\tDesc: {orderRespond.MessageDesc}\n";
                 }
                 else
                 {
@@ -629,7 +627,6 @@ namespace BCore.Lib
             try
             {
                 DateTime sent;
-                // DateTime recv;
                 Stopwatch stopwatch;
 
                 var req = new HttpRequestMessage(HttpMethod.Get, "https://api2.mobinsb.com/Web/V1/Order/GetOpenOrder/OpenOrder");

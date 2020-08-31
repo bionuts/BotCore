@@ -16,5 +16,6 @@ namespace BCore.Data
         public DbSet<BOrder> BOrders { get; set; }
         public DbSet<BSymbole> BSymboles { get; set; }
         public DbSet<BSetting> BSettings { get; set; }
+        public DbSet<BAccount> BAccounts { get; set; }
     }
 }

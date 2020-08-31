@@ -21,6 +21,7 @@ namespace BCore.Forms
         private async void OrderForm_Load(object sender, EventArgs e)
         {
             await ReloadSymboles();
+            await ReLoadListView();
         }
 
         private async Task ReloadSymboles()
@@ -54,8 +55,8 @@ namespace BCore.Forms
                     if (await db.SaveChangesAsync() > 0)
                     {
                         tb_count.Text = "";
-                        tb_price.Text = "";
-                        lbl_total.Text = "Total: 0";
+                        // tb_price.Text = "";
+                        lbl_total.Text = "0";
                     }
                     var mainForm = Application.OpenForms.OfType<MainBotForm>().FirstOrDefault();
                     await mainForm.LoadOrdersToListView();
@@ -72,7 +73,30 @@ namespace BCore.Forms
             if (tb_count.Text != "" && tb_price.Text != "")
             {
                 var tot = long.Parse(tb_count.Text.Trim()) * long.Parse(tb_price.Text.Trim());
-                lbl_total.Text = $"Total: {tot:N0}";
+                lbl_total.Text = $"{tot:N0}";
+            }
+        }
+
+        private async Task ReLoadListView()
+        {
+            using (var dbt = new ApplicationDbContext())
+            {
+                lv_accounts.Items.Clear();
+                var accounts = await dbt.BAccounts.OrderByDescending(d => d.TokenDate).ToListAsync();
+                if (accounts.Count > 0)
+                {
+                    foreach (var acc in accounts)
+                    {
+                        var row = new string[]
+                        {
+                        acc.Id.ToString(),
+                        acc.Name,
+                        acc.Username
+                        };
+                        var lvItem = new ListViewItem(row);
+                        lv_accounts.Items.Add(lvItem);
+                    }
+                }
             }
         }
     }
