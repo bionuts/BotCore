@@ -433,7 +433,6 @@
             // 
             // timer_stay_tune
             // 
-            this.timer_stay_tune.Enabled = true;
             this.timer_stay_tune.Interval = 8000;
             this.timer_stay_tune.Tick += new System.EventHandler(this.timer_stay_tune_Tick);
             // 
@@ -463,7 +462,6 @@
             // 
             // timer_option
             // 
-            this.timer_option.Enabled = true;
             this.timer_option.Interval = 5000;
             this.timer_option.Tick += new System.EventHandler(this.timer_option_Tick);
             // 

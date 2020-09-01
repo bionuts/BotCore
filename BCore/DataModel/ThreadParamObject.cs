@@ -12,5 +12,6 @@ namespace BCore.DataModel
         public HttpRequestMessage REQ { get; set; }
         public int WhichOne { get; set; }
         public int Count { get; set; }
+        public int AccountId { get; set; }
     }
 }

@@ -49,16 +49,16 @@ namespace BCore
         private async void MainBotForm_Load(object sender, EventArgs e)
         {
             await LoadOrdersToListView();
-            MobinAgent.Token = (await db.BSettings.Where(c => c.Key == "apitoken").FirstOrDefaultAsync()).Value;
+            // MobinAgent.Token = (await db.BSettings.Where(c => c.Key == "apitoken").FirstOrDefaultAsync()).Value;
             can = await Utilities.CanRunTheApp(GenHttp);
             if (can)
             {
-                lbl_done.Text = "[connected]";
+                lbl_done.Text = "[con]";
                 lbl_done.BackColor = Color.Green;
                 WsTime = OrdersTime = OptionTime = DateTime.Now;
                 /*if (await MobinAgent.CreateSessionForWebSocket() && await MobinAgent.MobinWebSocket.StartWebSocket(MobinAgent.LS_Phase, MobinAgent.LS_Session))
                     StartReceiveDataFromWS();*/
-                await MobinAgent.CreateSessionForWebSocket();
+                // await MobinAgent.CreateSessionForWebSocket();
                 /*await MobinAgent.MobinWebSocket.ConnectAsync();
                 await MobinAgent.MobinWebSocket.SendInitMessages(MobinAgent.LS_Phase, MobinAgent.LS_Session);
                 await MobinAgent.MobinWebSocket.GetClockMessages(MobinAgent.LS_Session);
@@ -66,7 +66,7 @@ namespace BCore
             }
             else
             {
-                lbl_done.Text = "[disconnected]";
+                lbl_done.Text = "[discon]";
                 lbl_done.BackColor = Color.Red;
             }
         }
@@ -75,28 +75,70 @@ namespace BCore
         {
             if (can)
             {
-                using (var dbt = new ApplicationDbContext())
+                using (var db = new ApplicationDbContext())
                 {
-                    LoadedOrders = await dbt.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).OrderBy(d => d.CreatedDateTime).ToListAsync();
-                    var x = await dbt.BSettings.Where(c => c.Key == "apitoken").FirstAsync();
-                    MobinAgent.Token = x.Value;
-                }
+                    LoadedOrders = await db.BOrders
+                        .Where(o => o.CreatedDateTime.Date == DateTime.Today)
+                        .Include(x => x.OrderAccounts)
+                        .ThenInclude(x => x.BAccount)
+                        .OrderBy(d => d.CreatedDateTime)
+                        .ToListAsync();
 
-                if (LoadedOrders.Any())
-                {
-                    LoadStartAndEndTime(tb_hh.Text.Trim(), tb_mm.Text.Trim(), tb_ss.Text.Trim(), tb_ms.Text.Trim(), tb_duration.Text.Trim());
-                    lbl_endTime.Text = $"End: {_EndTime:HH:mm:ss.fff}";
-                    Interval = int.Parse(tb_interval.Text.Trim());
-                    InitHttpRequestMessageArray();
+                    // var x = await dbt.BSettings.Where(c => c.Key == "apitoken").FirstAsync();
+                    // MobinAgent.Token = x.Value;
+
+                    if (LoadedOrders.Any())
+                    {
+                        LoadStartAndEndTime(tb_hh.Text.Trim(), tb_mm.Text.Trim(), tb_ss.Text.Trim(), tb_ms.Text.Trim(), tb_duration.Text.Trim());
+                        Interval = int.Parse(tb_interval.Text.Trim());
+                        InitHttpRequestMessageArray();
+                    }
                 }
             }
         }
 
-        private void InitHttpRequestMessageArray()
+        private async void InitHttpRequestMessageArray()
         {
-            StepWait = (Interval + LoadedOrders.Count - 1) / LoadedOrders.Count;
-            int reqSize = (int)(_EndTime.Subtract(_StartTime).TotalMilliseconds / StepWait);
-            reqSize = (reqSize / LoadedOrders.Count) * LoadedOrders.Count;
+            Dictionary<int, List<int>> oset = new Dictionary<int, List<int>>();
+            List<int> useridList = new List<int>();
+            var users = await db.BOrders
+                        .Where(o => o.CreatedDateTime.Date == DateTime.Today)
+                        .Select(r => new { r.OrderAccounts })
+                        .ToListAsync();
+            foreach (var u in users)
+            {
+                foreach (var ao in u.OrderAccounts)
+                {
+                    if (!useridList.Contains(ao.UserId))
+                    {
+                        useridList.Add(ao.UserId);
+                    }
+                }
+            }
+
+            var xlist = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).ToListAsync();
+            List<int> xorders;
+            foreach (var u in useridList)
+            {
+                xorders = new List<int>();
+                foreach (var x in xlist)
+                {
+                    foreach (var oa in x.OrderAccounts)
+                    {
+                        if (oa.UserId == u)
+                            xorders.Add(oa.OrderID);
+                    }
+                }
+                oset.Add(u, xorders);
+            }
+
+            StepWait = (Interval + useridList.Count - 1) / useridList.Count;
+            // StepWait = (Interval + LoadedOrders.Count - 1) / LoadedOrders.Count;
+            double ms = _EndTime.Subtract(_StartTime).TotalMilliseconds;
+
+            int reqSize = (int)((ms + StepWait - 1) / StepWait);
+
+            //reqSize = (reqSize / LoadedOrders.Count) * LoadedOrders.Count;
             arr_params = new ThreadParamObject[reqSize];
             bool[] ceaseFire = new bool[LoadedOrders.Count];
             int whichOne = 0;
@@ -155,23 +197,25 @@ namespace BCore
 
         public async Task LoadOrdersToListView()
         {
-            lv_orders.Items.Clear();
-            LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today)
-                .Include(x => x.OrderAccounts)
-                .ThenInclude(x=>x.BAccount)
-                .OrderBy(d => d.CreatedDateTime).ToListAsync();
-            string users;
-            foreach (var order in LoadedOrders)
+            using (var db = new ApplicationDbContext())
             {
-                decimal templong = order.Count * order.Price;
-                users = "";
-                foreach (var acc in order.OrderAccounts)
+                lv_orders.Items.Clear();
+                LoadedOrders = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today)
+                    .Include(x => x.OrderAccounts)
+                    .ThenInclude(x => x.BAccount)
+                    .OrderBy(d => d.CreatedDateTime).ToListAsync();
+                string users;
+                foreach (var order in LoadedOrders)
                 {
-                    users += " , " + acc.BAccount.Name;
-                }
+                    decimal templong = order.Count * order.Price;
+                    users = "";
+                    foreach (var acc in order.OrderAccounts)
+                    {
+                        users += " , " + acc.BAccount.Name;
+                    }
 
-                var row = new string[]
-                {
+                    var row = new string[]
+                    {
                     order.Id.ToString(),
                     order.SymboleName,
                     order.Count.ToString("N0"),
@@ -179,25 +223,27 @@ namespace BCore
                     templong.ToString("N0"),
                     order.OrderType,
                     users.Substring(3)
-                };
-                var lv_item = new ListViewItem(row)
-                {
-                    UseItemStyleForSubItems = false
-                };
-                lv_item.SubItems[5].BackColor = order.OrderType == "BUY" ? Color.LightGreen : Color.Red;
-                lv_orders.Items.Add(lv_item);
+                    };
+                    var lv_item = new ListViewItem(row)
+                    {
+                        UseItemStyleForSubItems = false
+                    };
+                    lv_item.SubItems[5].BackColor = order.OrderType == "BUY" ? Color.LightGreen : Color.Red;
+                    lv_orders.Items.Add(lv_item);
+                }
             }
         }
 
         private void LoadStartAndEndTime(string h, string m, string s, string ms, string duration)
         {
             DateTime tempNow = DateTime.Now;
-            this._StartTime = new DateTime(tempNow.Year, tempNow.Month, tempNow.Day,
+            _StartTime = new DateTime(tempNow.Year, tempNow.Month, tempNow.Day,
                 (h != "" ? int.Parse(h) : 8),
                 (m != "" ? int.Parse(m) : 29),
-                (s != "" ? int.Parse(s) : 58),
-                (ms != "" ? int.Parse(ms) : 800));
-            this._EndTime = _StartTime.AddSeconds((duration != "" ? double.Parse(duration) : 2.2));
+                (s != "" ? int.Parse(s) : 53),
+                (ms != "" ? int.Parse(ms) : 500));
+            _EndTime = _StartTime.AddSeconds((duration != "" ? double.Parse(duration) : 8.1));
+            lbl_endTime.Text = $"End: {_EndTime:HH:mm:ss.fff}";
         }
 
         private void lbl_starttime_Click(object sender, EventArgs e)
