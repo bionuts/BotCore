@@ -99,47 +99,40 @@ namespace BCore
 
         private async void InitHttpRequestMessageArray()
         {
-            Dictionary<int, List<int>> oset = new Dictionary<int, List<int>>();
-            List<int> useridList = new List<int>();
-            var users = await db.BOrders
-                        .Where(o => o.CreatedDateTime.Date == DateTime.Today)
-                        .Select(r => new { r.OrderAccounts })
-                        .ToListAsync();
-            foreach (var u in users)
+            List<MultiUserRequest> multiUserRequests = new List<MultiUserRequest>();
+            var Users = await (from order in db.BOrders
+                               join ord_acc in db.BOrderAccounts on order.Id equals ord_acc.OrderID
+                               join acc in db.BAccounts on ord_acc.UserId equals acc.Id
+                               where order.CreatedDateTime.Date == DateTime.Today
+                               select acc).Distinct().ToListAsync();
+
+            foreach (var user in Users)
             {
-                foreach (var ao in u.OrderAccounts)
-                {
-                    if (!useridList.Contains(ao.UserId))
-                    {
-                        useridList.Add(ao.UserId);
-                    }
-                }
+                var Orders = await (from order in db.BOrders
+                                    join ord_acc in db.BOrderAccounts on order.Id equals ord_acc.OrderID
+                                    join acc in db.BAccounts on ord_acc.UserId equals acc.Id
+                                    where order.CreatedDateTime.Date == DateTime.Today && acc.Id == user.Id
+                                    select order).ToListAsync();
+                multiUserRequests.Add(new MultiUserRequest { BAccount = user, Orders = Orders, Qline = 0 });
             }
 
-            var xlist = await db.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).ToListAsync();
-            List<int> xorders;
-            foreach (var u in useridList)
-            {
-                xorders = new List<int>();
-                foreach (var x in xlist)
-                {
-                    foreach (var oa in x.OrderAccounts)
-                    {
-                        if (oa.UserId == u)
-                            xorders.Add(oa.OrderID);
-                    }
-                }
-                oset.Add(u, xorders);
-            }
-
-            StepWait = (Interval + useridList.Count - 1) / useridList.Count;
-            // StepWait = (Interval + LoadedOrders.Count - 1) / LoadedOrders.Count;
-            double ms = _EndTime.Subtract(_StartTime).TotalMilliseconds;
-
-            int reqSize = (int)((ms + StepWait - 1) / StepWait);
-
-            //reqSize = (reqSize / LoadedOrders.Count) * LoadedOrders.Count;
+            StepWait = (Interval + Users.Count - 1) / Users.Count;
+            int reqSize = (int)((_EndTime.Subtract(_StartTime).TotalMilliseconds + StepWait - 1) / StepWait);
             arr_params = new ThreadParamObject[reqSize];
+
+            int user_idx = 0;
+            for (int j = 0; j < reqSize; j++)
+            {
+                arr_params[j] = new ThreadParamObject
+                {
+                    ID = multiUserRequests[user_idx++].Orders[multiUserRequests[user_idx++].Qline].Id,
+                    SYM = multiUserRequests[user_idx++].Orders[multiUserRequests[user_idx++].Qline].SymboleName,
+                    REQ = MobinAgent.GetSendingOrderRequestMessage(LoadedOrders[whichOne]),
+                    WhichOne = whichOne,
+                    Count = LoadedOrders[whichOne].Count--
+                };
+            }
+
             bool[] ceaseFire = new bool[LoadedOrders.Count];
             int whichOne = 0;
             for (int i = 0; i < reqSize; i++)

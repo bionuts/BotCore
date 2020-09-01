@@ -279,6 +279,34 @@ namespace BCore.Lib
             return req;
         }
 
+        public HttpRequestMessage GetSendingOrderRequestMessage(BOrder order, string token)
+        {
+            var req = new HttpRequestMessage(HttpMethod.Post, "/Web/V1/Order/Post");
+            req.Headers.Add("Authorization", $"BasicAuthentication {token}");
+            var payload = new OrderPayload
+            {
+                CautionAgreementSelected = false,
+                FinancialProviderId = 1,
+                IsSymbolCautionAgreement = false,
+                IsSymbolSepahAgreement = false,
+                SepahAgreementSelected = false,
+                isin = order.SymboleCode,
+                maxShow = 0,
+                minimumQuantity = 0,
+                orderCount = order.Count,
+                orderId = 0,
+                orderPrice = order.Price,
+                orderSide = (order.OrderType == "SELL" ? "86" : "65"), // SELL(86) , BUY(65)
+                orderValidity = 74,
+                orderValiditydate = null,
+                shortSellIncentivePercent = 0,
+                shortSellIsEnabled = false
+            };
+            string str_payload = JsonSerializer.Serialize(payload);
+            req.Content = new StringContent(str_payload, Encoding.UTF8, "application/json");
+            return req;
+        }
+
         public void SendReqThread(ThreadParamObject paramObject, string times)
         {
             string result;
@@ -286,7 +314,7 @@ namespace BCore.Lib
             Stopwatch _stopwatch = new Stopwatch();
             try
             {
-                sent = DateTime.Now;                
+                sent = DateTime.Now;
                 _stopwatch.Start();
                 HttpResponseMessage httpResponse = SendHttpClient.SendAsync(paramObject.REQ).Result;
                 _stopwatch.Stop();
