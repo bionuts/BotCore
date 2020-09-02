@@ -62,7 +62,7 @@
             this.btn_buy.ForeColor = System.Drawing.Color.Green;
             this.btn_buy.Location = new System.Drawing.Point(12, 203);
             this.btn_buy.Name = "btn_buy";
-            this.btn_buy.Size = new System.Drawing.Size(111, 36);
+            this.btn_buy.Size = new System.Drawing.Size(139, 36);
             this.btn_buy.TabIndex = 3;
             this.btn_buy.Text = "Buy";
             this.btn_buy.UseVisualStyleBackColor = false;
@@ -120,9 +120,10 @@
             // 
             this.btn_sell.BackColor = System.Drawing.Color.Red;
             this.btn_sell.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.btn_sell.Location = new System.Drawing.Point(128, 203);
+            this.btn_sell.ForeColor = System.Drawing.Color.White;
+            this.btn_sell.Location = new System.Drawing.Point(157, 203);
             this.btn_sell.Name = "btn_sell";
-            this.btn_sell.Size = new System.Drawing.Size(111, 36);
+            this.btn_sell.Size = new System.Drawing.Size(82, 36);
             this.btn_sell.TabIndex = 4;
             this.btn_sell.Text = "Sell";
             this.btn_sell.UseVisualStyleBackColor = false;

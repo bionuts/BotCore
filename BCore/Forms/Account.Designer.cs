@@ -87,7 +87,7 @@
             // 
             // btn_delete
             // 
-            this.btn_delete.Location = new System.Drawing.Point(12, 395);
+            this.btn_delete.Location = new System.Drawing.Point(12, 396);
             this.btn_delete.Name = "btn_delete";
             this.btn_delete.Size = new System.Drawing.Size(539, 39);
             this.btn_delete.TabIndex = 6;
@@ -120,6 +120,7 @@
             this.lv_accounts.GridLines = true;
             this.lv_accounts.HideSelection = false;
             this.lv_accounts.Location = new System.Drawing.Point(12, 66);
+            this.lv_accounts.MultiSelect = false;
             this.lv_accounts.Name = "lv_accounts";
             this.lv_accounts.Size = new System.Drawing.Size(539, 323);
             this.lv_accounts.TabIndex = 5;

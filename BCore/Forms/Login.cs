@@ -108,5 +108,42 @@ namespace BCore.Forms
                 }
             }
         }
+
+        private async void btn_master_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (var db = new ApplicationDbContext())
+                {
+                    if (lv_accounts.SelectedItems.Count == 1)
+                    {
+                        var username = lv_accounts.SelectedItems[0].SubItems[2].Text;
+                        var password = lv_accounts.SelectedItems[0].SubItems[3].Text;
+                        var token = lv_accounts.SelectedItems[0].SubItems[6].Text;
+
+                        var u = await db.BSettings.Where(s => s.Key == "username").FirstOrDefaultAsync();
+                        u.Value = username.Trim();
+                        db.BSettings.Update(u);
+
+                        var p = await db.BSettings.Where(s => s.Key == "password").FirstOrDefaultAsync();
+                        p.Value = password.Trim();
+                        db.BSettings.Update(p);
+
+                        var t = await db.BSettings.Where(s => s.Key == "apitoken").FirstOrDefaultAsync();
+                        t.Value = token.Trim();
+                        db.BSettings.Update(t);
+
+                        if (await db.SaveChangesAsync() > 0)
+                            MessageBox.Show("init done.");
+                        else
+                            MessageBox.Show("Error");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
     }
 }
