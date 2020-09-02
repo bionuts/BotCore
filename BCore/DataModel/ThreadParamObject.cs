@@ -5,13 +5,14 @@ using System.Text;
 
 namespace BCore.DataModel
 {
-    public class ThreadParamObject
+    public class RequestsVector
     {
-        public int ID { get; set; }
+        public int AccountID { get; set; }
+        public string AccountName { get; set; }
+        public int OrderID { get; set; }
         public string SYM { get; set; }
-        public HttpRequestMessage REQ { get; set; }
-        public int WhichOne { get; set; }
         public int Count { get; set; }
-        public int AccountId { get; set; }
+        public HttpRequestMessage REQ { get; set; }
+        public KeyValuePair<int, int> DicKey { get; set; }
     }
 }

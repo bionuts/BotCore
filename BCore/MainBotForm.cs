@@ -26,7 +26,8 @@ namespace BCore
         private DateTime _StartTime;
         private DateTime _EndTime;
         private int Interval;
-        private volatile bool can;
+        private volatile bool can = true;
+        private Dictionary<KeyValuePair<int, int>, bool> CeaseFire;
 
         private DateTime PcTime;
         private DateTime WsTime;
@@ -34,7 +35,7 @@ namespace BCore
         private DateTime OptionTime;
         static volatile object locker = new object();
 
-        private ThreadParamObject[] arr_params;
+        private RequestsVector[] requestsVectors;
         private readonly HttpClient GenHttp;
         private int StepWait;
 
@@ -49,8 +50,7 @@ namespace BCore
         private async void MainBotForm_Load(object sender, EventArgs e)
         {
             await LoadOrdersToListView();
-            // MobinAgent.Token = (await db.BSettings.Where(c => c.Key == "apitoken").FirstOrDefaultAsync()).Value;
-            can = await Utilities.CanRunTheApp(GenHttp);
+            // can = await Utilities.CanRunTheApp(GenHttp);
             if (can)
             {
                 lbl_done.Text = "[con]";
@@ -75,19 +75,10 @@ namespace BCore
         {
             if (can)
             {
-                using (var db = new ApplicationDbContext())
+                using (var dbt = new ApplicationDbContext())
                 {
-                    LoadedOrders = await db.BOrders
-                        .Where(o => o.CreatedDateTime.Date == DateTime.Today)
-                        .Include(x => x.OrderAccounts)
-                        .ThenInclude(x => x.BAccount)
-                        .OrderBy(d => d.CreatedDateTime)
-                        .ToListAsync();
-
-                    // var x = await dbt.BSettings.Where(c => c.Key == "apitoken").FirstAsync();
-                    // MobinAgent.Token = x.Value;
-
-                    if (LoadedOrders.Any())
+                    var t = await dbt.BOrders.Where(o => o.CreatedDateTime.Date == DateTime.Today).CountAsync();
+                    if (t > 0)
                     {
                         LoadStartAndEndTime(tb_hh.Text.Trim(), tb_mm.Text.Trim(), tb_ss.Text.Trim(), tb_ms.Text.Trim(), tb_duration.Text.Trim());
                         Interval = int.Parse(tb_interval.Text.Trim());
@@ -99,71 +90,77 @@ namespace BCore
 
         private async void InitHttpRequestMessageArray()
         {
-            List<MultiUserRequest> multiUserRequests = new List<MultiUserRequest>();
-            var Users = await (from order in db.BOrders
-                               join ord_acc in db.BOrderAccounts on order.Id equals ord_acc.OrderID
-                               join acc in db.BAccounts on ord_acc.UserId equals acc.Id
-                               where order.CreatedDateTime.Date == DateTime.Today
-                               select acc).Distinct().ToListAsync();
-
-            foreach (var user in Users)
+            try
             {
-                var Orders = await (from order in db.BOrders
-                                    join ord_acc in db.BOrderAccounts on order.Id equals ord_acc.OrderID
-                                    join acc in db.BAccounts on ord_acc.UserId equals acc.Id
-                                    where order.CreatedDateTime.Date == DateTime.Today && acc.Id == user.Id
-                                    select order).ToListAsync();
-                multiUserRequests.Add(new MultiUserRequest { BAccount = user, Orders = Orders, Qline = 0 });
-            }
-
-            StepWait = (Interval + Users.Count - 1) / Users.Count;
-            int reqSize = (int)((_EndTime.Subtract(_StartTime).TotalMilliseconds + StepWait - 1) / StepWait);
-            arr_params = new ThreadParamObject[reqSize];
-
-            int user_idx = 0;
-            for (int j = 0; j < reqSize; j++)
-            {
-                arr_params[j] = new ThreadParamObject
+                using (var dbb = new ApplicationDbContext())
                 {
-                    ID = multiUserRequests[user_idx++].Orders[multiUserRequests[user_idx++].Qline].Id,
-                    SYM = multiUserRequests[user_idx++].Orders[multiUserRequests[user_idx++].Qline].SymboleName,
-                    REQ = MobinAgent.GetSendingOrderRequestMessage(LoadedOrders[whichOne]),
-                    WhichOne = whichOne,
-                    Count = LoadedOrders[whichOne].Count--
-                };
-            }
+                    CeaseFire = new Dictionary<KeyValuePair<int, int>, bool>();
+                    List<MultiUserRequest> multiUserRequests = new List<MultiUserRequest>();
 
-            bool[] ceaseFire = new bool[LoadedOrders.Count];
-            int whichOne = 0;
-            for (int i = 0; i < reqSize; i++)
-            {
-                if (whichOne == LoadedOrders.Count) whichOne = 0;
-                arr_params[i] = new ThreadParamObject
-                {
-                    ID = LoadedOrders[whichOne].Id,
-                    SYM = LoadedOrders[whichOne].SymboleName,
-                    REQ = MobinAgent.GetSendingOrderRequestMessage(LoadedOrders[whichOne]),
-                    WhichOne = whichOne,
-                    Count = LoadedOrders[whichOne].Count--
-                };
-                whichOne++;
+                    var Users = await (from order in dbb.BOrders
+                                       join ord_acc in dbb.BOrderAccounts on order.Id equals ord_acc.OrderID
+                                       join acc in dbb.BAccounts on ord_acc.UserId equals acc.Id
+                                       where order.CreatedDateTime.Date == DateTime.Today
+                                       select acc).Distinct().ToListAsync();
+
+                    foreach (var user in Users)
+                    {
+                        var Orders = await (from order in dbb.BOrders
+                                            join ord_acc in dbb.BOrderAccounts on order.Id equals ord_acc.OrderID
+                                            join acc in dbb.BAccounts on ord_acc.UserId equals acc.Id
+                                            where order.CreatedDateTime.Date == DateTime.Today && acc.Id == user.Id
+                                            select order).ToListAsync();
+                        multiUserRequests.Add(new MultiUserRequest { BAccount = user, Orders = Orders, Qline = 0 });
+                        foreach (var o in Orders)
+                            CeaseFire.Add(new KeyValuePair<int, int>(user.Id, o.Id), false);
+                    }
+                    MobinBroker.CeaseFire = CeaseFire;
+
+                    StepWait = (Interval + Users.Count - 1) / Users.Count;
+                    int reqSize = (int)((_EndTime.Subtract(_StartTime).TotalMilliseconds + StepWait - 1) / StepWait);
+                    requestsVectors = new RequestsVector[reqSize];
+
+                    int WhichUser = 0;
+                    for (int j = 0; j < reqSize; j++)
+                    {
+                        requestsVectors[j] = new RequestsVector
+                        {
+                            AccountID = multiUserRequests[WhichUser].BAccount.Id,
+                            AccountName = multiUserRequests[WhichUser].BAccount.Name,
+                            OrderID = multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline].Id,
+                            SYM = multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline].SymboleName,
+                            REQ = MobinAgent.GetSendingOrderRequestMessage(multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline], multiUserRequests[WhichUser].BAccount.Token),
+                            DicKey = new KeyValuePair<int, int>(multiUserRequests[WhichUser].BAccount.Id, multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline].Id),
+                            Count = multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline].Count--
+                        };
+                        multiUserRequests[WhichUser].Qline++;
+                        if (multiUserRequests[WhichUser].Qline == multiUserRequests[WhichUser].Orders.Count) multiUserRequests[WhichUser].Qline = 0;
+                        WhichUser++;
+                        if (WhichUser == Users.Count) WhichUser = 0;
+                    }
+                }
             }
-            MobinAgent.CeaseFire = ceaseFire;
+            catch (Exception ex)
+            {
+                tb_logs.Text = "InitHttpRequestMessageArray(): " + ex.Message;
+            }
         }
 
         private void SendOrderRequests()
         {
             try
             {
-                int size = arr_params.Length;
+                int size = requestsVectors.Length;
                 string times;
                 Thread.Sleep((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
+                // Console.WriteLine($"WakeUP: {DateTime.Now:HH:mm:ss.fff}");
                 for (int i = 0; i < size; i++)
                 {
-                    if (!MobinAgent.CeaseFire[arr_params[i].WhichOne])
+                    if (!MobinBroker.CeaseFire[requestsVectors[i].DicKey])
                     {
+                        // Console.WriteLine($"NXT: {DateTime.Now:HH:mm:ss.fff}");
                         times = $"WS:{WsTime:HH:mm:ss.fff}, Order:{OrdersTime:HH:mm:ss.fff}, Option:{OptionTime:HH:mm:ss.fff}";
-                        Task.Factory.StartNew(() => MobinAgent.SendReqThread(arr_params[i], times));
+                        Task.Run(() => MobinAgent.SendReqThread(requestsVectors[i], times)); // must be optimize for start&run ASAP
                         Thread.Sleep(StepWait);
                     }
                 }
@@ -436,14 +433,14 @@ namespace BCore
                 nanosecPerTick);
         }
 
-        private async void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
-            tb_logs.AppendText(await MobinAgent.MobinWebSocket.ConnectAsync());
+            //tb_logs.AppendText(await MobinAgent.MobinWebSocket.ConnectAsync());
         }
 
-        private async void button2_Click(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)
         {
-            tb_logs.AppendText(await MobinAgent.MobinWebSocket.SendInitMessages(MobinAgent.LS_Phase, MobinAgent.LS_Session));
+            //tb_logs.AppendText(await MobinAgent.MobinWebSocket.SendInitMessages(MobinAgent.LS_Phase, MobinAgent.LS_Session));
         }
     }
 }

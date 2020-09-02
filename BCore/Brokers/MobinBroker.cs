@@ -21,7 +21,7 @@ namespace BCore.Lib
     class MobinBroker
     {
         private readonly ApplicationDbContext db;
-        private static readonly HttpClient SendHttpClient = SetHttpClientForSendingOrders();
+        public static readonly HttpClient SendHttpClient = SetHttpClientForSendingOrders();
         private readonly HttpClient GeneralHttpClient;
         public MobinWebSocket MobinWebSocket;
         private Stopwatch stopwatch;
@@ -30,7 +30,8 @@ namespace BCore.Lib
         static volatile object locker = new object();
 
         public static string ResultOfThreads { get; set; } = "";
-        public bool[] CeaseFire { get; set; }
+        // public static bool[] CeaseFire { get; set; }
+        public static Dictionary<KeyValuePair<int, int>, bool> CeaseFire;
         public string LS_Session { get; set; }
         public int LS_Phase { get; set; }
         public string Token { get; set; }
@@ -47,8 +48,8 @@ namespace BCore.Lib
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli,
                 AllowAutoRedirect = false,
-                Proxy = null,
-                UseProxy = false
+                UseProxy = false,
+                Proxy = null
             };
             serializeOptions = new JsonSerializerOptions
             {
@@ -307,7 +308,7 @@ namespace BCore.Lib
             return req;
         }
 
-        public void SendReqThread(ThreadParamObject paramObject, string times)
+        public void SendReqThread(RequestsVector paramObject, string times)
         {
             string result;
             DateTime sent;
@@ -315,6 +316,7 @@ namespace BCore.Lib
             try
             {
                 sent = DateTime.Now;
+                // Console.WriteLine($"IN: {sent:HH:mm:ss.fff}");
                 _stopwatch.Start();
                 HttpResponseMessage httpResponse = SendHttpClient.SendAsync(paramObject.REQ).Result;
                 _stopwatch.Stop();
@@ -323,18 +325,24 @@ namespace BCore.Lib
                     string content = httpResponse.Content.ReadAsStringAsync().Result;
                     OrderRespond orderRespond = JsonSerializer.Deserialize<OrderRespond>(content, serializeOptions);
                     if (orderRespond.IsSuccessfull)
-                        CeaseFire[paramObject.WhichOne] = true;
-                    result = $"[{sent:HH:mm:ss.fff}] [{_stopwatch.ElapsedMilliseconds:D3}ms] [ID:{paramObject.ID}]\t[{paramObject.SYM}]\t[Count:{paramObject.Count}]\t[{times}]" +
+                        CeaseFire[paramObject.DicKey] = true;
+                    result =
+                        $"[{sent:HH:mm:ss.fff}] [{_stopwatch.ElapsedMilliseconds:D3}ms] [User:{paramObject.AccountName}]\t" +
+                        $"[OID:{paramObject.OrderID}]\t[{paramObject.SYM}]\t[Count:{paramObject.Count}]\t[{times}]" +
                         $"\tT_{Thread.CurrentThread.ManagedThreadId}\t[{orderRespond.IsSuccessfull}]\tDesc: {orderRespond.MessageDesc}\n";
                 }
                 else
                 {
-                    result = $"[{sent:HH:mm:ss.fff}] T_{Thread.CurrentThread.ManagedThreadId}, [ID:{paramObject.ID}], Sym: {paramObject.SYM}, Error: {httpResponse.StatusCode}\n";
+                    result =
+                        $"[{sent:HH:mm:ss.fff}] T_{Thread.CurrentThread.ManagedThreadId}\t[User:{paramObject.AccountName}]\t" +
+                        $"[OID:{paramObject.OrderID}], Sym: {paramObject.SYM}, Error: {httpResponse.StatusCode}\n";
                 }
             }
             catch (Exception ex)
             {
-                result = $"[{DateTime.Now:HH:mm:ss.fff}] T_{Thread.CurrentThread.ManagedThreadId}, [ID:{paramObject.ID}], Sym: {paramObject.SYM},Error: {ex.Message}\n";
+                result =
+                    $"[{DateTime.Now:HH:mm:ss.fff}] T_{Thread.CurrentThread.ManagedThreadId}\t[User:{paramObject.AccountName}]\t" +
+                    $"[OID:{paramObject.OrderID}], Sym: {paramObject.SYM},Error: {ex.Message}\n";
             }
             lock (locker)
             {
@@ -481,7 +489,7 @@ namespace BCore.Lib
             return result;
         }
 
-        private static HttpClient SetHttpClientForSendingOrders(string token = "")
+        private static HttpClient SetHttpClientForSendingOrders()
         {
             HttpClientHandler httpHandler = new HttpClientHandler()
             {
@@ -498,7 +506,6 @@ namespace BCore.Lib
             http.DefaultRequestHeaders.Add("Accept", "*/*");
             http.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
             http.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9,la;q=0.8,fa;q=0.7,ar;q=0.6,fr;q=0.5");
-            if (!string.IsNullOrEmpty(token)) http.DefaultRequestHeaders.Add("Authorization", $"BasicAuthentication {token}");
             http.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
             http.DefaultRequestHeaders.Add("Connection", "keep-alive");
             http.DefaultRequestHeaders.Add("Host", "api2.mobinsb.com");
