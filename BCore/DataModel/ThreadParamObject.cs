@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 
 namespace BCore.DataModel
 {
@@ -13,6 +11,7 @@ namespace BCore.DataModel
         public string SYM { get; set; }
         public int Count { get; set; }
         public HttpRequestMessage REQ { get; set; }
-        public KeyValuePair<int, int> DicKey { get; set; }
+        // public KeyValuePair<int, int> DicKey { get; set; }
+        public Tuple<int, int> DicKey { get; set; }
     }
 }

@@ -20,14 +20,15 @@ namespace BCore
 {
     public partial class MainBotForm : Form
     {
-        private MobinBroker MobinAgent;
+        private readonly MobinBroker MobinAgent;
         private readonly ApplicationDbContext db;
         private List<BOrder> LoadedOrders;
         private DateTime _StartTime;
         private DateTime _EndTime;
         private int Interval;
         private volatile bool can = true;
-        private Dictionary<KeyValuePair<int, int>, bool> CeaseFire;
+        // private Dictionary<KeyValuePair<int, int>, bool> CeaseFire; // new Dictionary<(int, int), string>();
+        private Dictionary<Tuple<int, int>, bool> CeaseFire; // new Dictionary<(int, int), string>();
 
         private DateTime PcTime;
         private DateTime WsTime;
@@ -94,7 +95,8 @@ namespace BCore
             {
                 using (var dbb = new ApplicationDbContext())
                 {
-                    CeaseFire = new Dictionary<KeyValuePair<int, int>, bool>();
+                    // CeaseFire = new Dictionary<KeyValuePair<int, int>, bool>();
+                    CeaseFire = new Dictionary<Tuple<int, int>, bool>();
                     List<MultiUserRequest> multiUserRequests = new List<MultiUserRequest>();
 
                     var Users = await (from order in dbb.BOrders
@@ -112,7 +114,7 @@ namespace BCore
                                             select order).ToListAsync();
                         multiUserRequests.Add(new MultiUserRequest { BAccount = user, Orders = Orders, Qline = 0 });
                         foreach (var o in Orders)
-                            CeaseFire.Add(new KeyValuePair<int, int>(user.Id, o.Id), false);
+                            CeaseFire.Add(new Tuple<int, int>(user.Id, o.Id), false);
                     }
                     MobinBroker.CeaseFire = CeaseFire;
 
@@ -130,7 +132,8 @@ namespace BCore
                             OrderID = multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline].Id,
                             SYM = multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline].SymboleName,
                             REQ = MobinAgent.GetSendingOrderRequestMessage(multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline], multiUserRequests[WhichUser].BAccount.Token),
-                            DicKey = new KeyValuePair<int, int>(multiUserRequests[WhichUser].BAccount.Id, multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline].Id),
+                            // DicKey = new KeyValuePair<int, int>(multiUserRequests[WhichUser].BAccount.Id, multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline].Id),
+                            DicKey = new Tuple<int, int>(multiUserRequests[WhichUser].BAccount.Id, multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline].Id),
                             Count = multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline].Count--
                         };
                         multiUserRequests[WhichUser].Qline++;
@@ -146,22 +149,24 @@ namespace BCore
             }
         }
 
-        private void SendOrderRequests()
+        private async Task SendOrderRequests()
         {
             try
             {
                 int size = requestsVectors.Length;
                 string times;
-                Thread.Sleep((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
-                // Console.WriteLine($"WakeUP: {DateTime.Now:HH:mm:ss.fff}");
+                //Thread.Sleep((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
+                await Task.Delay((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
+                Console.WriteLine($"WakeUP: {DateTime.Now:HH:mm:ss.fff}");
                 for (int i = 0; i < size; i++)
                 {
                     if (!MobinBroker.CeaseFire[requestsVectors[i].DicKey])
                     {
-                        // Console.WriteLine($"NXT: {DateTime.Now:HH:mm:ss.fff}");
+                        Console.WriteLine($"NXT: {DateTime.Now:HH:mm:ss.fff}");
                         times = $"WS:{WsTime:HH:mm:ss.fff}, Order:{OrdersTime:HH:mm:ss.fff}, Option:{OptionTime:HH:mm:ss.fff}";
                         Task.Run(() => MobinAgent.SendReqThread(requestsVectors[i], times)); // must be optimize for start&run ASAP
-                        Thread.Sleep(StepWait);
+                        //Thread.Sleep(StepWait);
+                        await Task.Delay(StepWait);
                     }
                 }
                 tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text = SortResult(MobinBroker.ResultOfThreads); });
@@ -179,7 +184,8 @@ namespace BCore
                 MobinBroker.ResultOfThreads = "";
                 ((Button)sender).Enabled = false;
                 ((Button)sender).Text = "Running...";
-                await Task.Factory.StartNew(() => SendOrderRequests());
+                // await Task.Factory.StartNew(() => SendOrderRequests());
+                await SendOrderRequests();
                 ((Button)sender).Text = "Start";
                 ((Button)sender).Enabled = true;
             }

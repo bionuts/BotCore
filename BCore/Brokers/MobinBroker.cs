@@ -24,14 +24,14 @@ namespace BCore.Lib
         public static readonly HttpClient SendHttpClient = SetHttpClientForSendingOrders();
         private readonly HttpClient GeneralHttpClient;
         public MobinWebSocket MobinWebSocket;
-        private Stopwatch stopwatch;
         private readonly JsonSerializerOptions serializeOptions;
         private readonly HttpClientHandler httpHandler;
         static volatile object locker = new object();
 
         public static string ResultOfThreads { get; set; } = "";
         // public static bool[] CeaseFire { get; set; }
-        public static Dictionary<KeyValuePair<int, int>, bool> CeaseFire;
+        // public static Dictionary<KeyValuePair<int, int>, bool> CeaseFire;
+        public static Dictionary<Tuple<int, int>, bool> CeaseFire;
         public string LS_Session { get; set; }
         public int LS_Phase { get; set; }
         public string Token { get; set; }
@@ -316,7 +316,7 @@ namespace BCore.Lib
             try
             {
                 sent = DateTime.Now;
-                // Console.WriteLine($"IN: {sent:HH:mm:ss.fff}");
+                Console.WriteLine($"IN: {sent:HH:mm:ss.fff}, T_{Thread.CurrentThread.ManagedThreadId}");
                 _stopwatch.Start();
                 HttpResponseMessage httpResponse = SendHttpClient.SendAsync(paramObject.REQ).Result;
                 _stopwatch.Stop();
