@@ -29,6 +29,7 @@ namespace BCore
         private volatile bool can = true;
         // private Dictionary<KeyValuePair<int, int>, bool> CeaseFire; // new Dictionary<(int, int), string>();
         private Dictionary<Tuple<int, int>, bool> CeaseFire; // new Dictionary<(int, int), string>();
+        private List<MultiUserRequest> multiUserRequests;
 
         private DateTime PcTime;
         private DateTime WsTime;
@@ -97,7 +98,7 @@ namespace BCore
                 {
                     // CeaseFire = new Dictionary<KeyValuePair<int, int>, bool>();
                     CeaseFire = new Dictionary<Tuple<int, int>, bool>();
-                    List<MultiUserRequest> multiUserRequests = new List<MultiUserRequest>();
+                    multiUserRequests = new List<MultiUserRequest>();
 
                     var Users = await (from order in dbb.BOrders
                                        join ord_acc in dbb.BOrderAccounts on order.Id equals ord_acc.OrderID
@@ -149,14 +150,19 @@ namespace BCore
             }
         }
 
-        private async Task SendOrderRequests()
+        private void SendOrderRequests()
         {
             try
             {
+                int counter;
+                int buser;
+                int lastwait;
+                Tuple<int, int> tuser;
+
                 int size = requestsVectors.Length;
                 string times;
-                //Thread.Sleep((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
-                await Task.Delay((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
+                Thread.Sleep((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
+                // await Task.Delay((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
                 Console.WriteLine($"WakeUP: {DateTime.Now:HH:mm:ss.fff}");
                 for (int i = 0; i < size; i++)
                 {
@@ -165,8 +171,29 @@ namespace BCore
                         Console.WriteLine($"NXT: {DateTime.Now:HH:mm:ss.fff}");
                         times = $"WS:{WsTime:HH:mm:ss.fff}, Order:{OrdersTime:HH:mm:ss.fff}, Option:{OptionTime:HH:mm:ss.fff}";
                         Task.Run(() => MobinAgent.SendReqThread(requestsVectors[i], times)); // must be optimize for start&run ASAP
-                        //Thread.Sleep(StepWait);
-                        await Task.Delay(StepWait);
+                        Thread.Sleep(StepWait);
+                        // await Task.Delay(StepWait);
+                    }
+                    else
+                    {
+                        lastwait = StepWait;
+                        buser = 0;
+                        foreach (var m in multiUserRequests)
+                        {
+                            counter = 0;
+                            foreach (var o in m.Orders)
+                            {
+                                tuser = new Tuple<int, int>(m.BAccount.Id, o.Id);
+                                if (MobinBroker.CeaseFire[tuser])
+                                {
+                                    counter++;
+                                }
+                            }
+                            if (counter == m.Orders.Count) buser++;
+                        }
+                        StepWait = (Interval + buser - 1) / buser;
+                        if (StepWait - lastwait > 0)
+                            Thread.Sleep(StepWait - lastwait);
                     }
                 }
                 tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text = SortResult(MobinBroker.ResultOfThreads); });
@@ -184,8 +211,8 @@ namespace BCore
                 MobinBroker.ResultOfThreads = "";
                 ((Button)sender).Enabled = false;
                 ((Button)sender).Text = "Running...";
-                // await Task.Factory.StartNew(() => SendOrderRequests());
-                await SendOrderRequests();
+                await Task.Factory.StartNew(() => SendOrderRequests());
+                // await SendOrderRequests();
                 ((Button)sender).Text = "Start";
                 ((Button)sender).Enabled = true;
             }
