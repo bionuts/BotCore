@@ -11,36 +11,55 @@ namespace BCore.Forms
 {
     public partial class Login : Form
     {
-        private readonly ApplicationDbContext db;
         private MobinBroker mobin;
 
         public Login()
         {
-            db = new ApplicationDbContext();
             mobin = new MobinBroker();
             InitializeComponent();
         }
 
         private async void Login_Load(object sender, EventArgs e)
         {
-            await ReLoadListView();
-            if (await mobin.InitCookies())
-                pb_captcha.Image = await mobin.GetCaptcha();
-            else
-                MessageBox.Show("init failed.Try again");
+            try
+            {
+                await ReLoadListView();
+                if (await mobin.InitCookies())
+                    pb_captcha.Image = await mobin.GetCaptcha();
+                else
+                    MessageBox.Show("init failed.Try again");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Login_Load(): " + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private async void btn_init_cookies_Click(object sender, EventArgs e)
         {
-            if (await mobin.InitCookies())
-                MessageBox.Show("init done.");
-            else
-                MessageBox.Show("init failed. try again");
+            try
+            {
+                if (await mobin.InitCookies())
+                    MessageBox.Show("init done.");
+                else
+                    MessageBox.Show("init failed. try again");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("btn_init_cookies_Click(): " + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private async void btn_refresh_Click(object sender, EventArgs e)
         {
-            pb_captcha.Image = await mobin.GetCaptcha();
+            try
+            {
+                pb_captcha.Image = await mobin.GetCaptcha();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("btn_refresh_Click(): " + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private async void btn_login_Click(object sender, EventArgs e)
@@ -72,14 +91,6 @@ namespace BCore.Forms
             }
             btn_login.Text = "Login";
             btn_login.Enabled = Enabled;
-            /*string output = await mobin.Login(tb_username.Text, tb_password.Text, tb_captcha.Text.Trim());
-            if (output != "")
-            {
-                lbl_api_token.Text = "ApiToken: " + output.Substring(0, output.IndexOf("@@@"));
-                lbl_bourse_code.Text = "BourseCode: " + output.Substring(output.IndexOf("@@@") + 3);
-                var mainForm = Application.OpenForms.OfType<MainBotForm>().FirstOrDefault();
-                mainForm.UpdateToken(output.Substring(0, output.IndexOf("@@@")));
-            }*/
         }
 
         private async Task ReLoadListView()
@@ -134,7 +145,7 @@ namespace BCore.Forms
                         db.BSettings.Update(t);
 
                         if (await db.SaveChangesAsync() > 0)
-                            MessageBox.Show("init done.");
+                            MessageBox.Show("Master User Selected.", "Master User", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         else
                             MessageBox.Show("Error");
                     }
@@ -142,7 +153,7 @@ namespace BCore.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                MessageBox.Show("btn_master_Click(): " + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

@@ -42,9 +42,10 @@
             // 
             // btn_add_sym
             // 
-            this.btn_add_sym.Location = new System.Drawing.Point(341, 33);
+            this.btn_add_sym.Location = new System.Drawing.Point(299, 26);
+            this.btn_add_sym.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btn_add_sym.Name = "btn_add_sym";
-            this.btn_add_sym.Size = new System.Drawing.Size(102, 29);
+            this.btn_add_sym.Size = new System.Drawing.Size(89, 23);
             this.btn_add_sym.TabIndex = 0;
             this.btn_add_sym.Text = "Add";
             this.btn_add_sym.UseVisualStyleBackColor = true;
@@ -52,33 +53,35 @@
             // 
             // tb_sym_code
             // 
-            this.tb_sym_code.Location = new System.Drawing.Point(178, 34);
+            this.tb_sym_code.Location = new System.Drawing.Point(157, 26);
+            this.tb_sym_code.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tb_sym_code.Name = "tb_sym_code";
-            this.tb_sym_code.Size = new System.Drawing.Size(157, 27);
+            this.tb_sym_code.Size = new System.Drawing.Size(138, 23);
             this.tb_sym_code.TabIndex = 1;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(178, 11);
+            this.label1.Location = new System.Drawing.Point(157, 8);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(47, 20);
+            this.label1.Size = new System.Drawing.Size(38, 15);
             this.label1.TabIndex = 2;
             this.label1.Text = "Code:";
             // 
             // tb_sym_name
             // 
-            this.tb_sym_name.Location = new System.Drawing.Point(15, 34);
+            this.tb_sym_name.Location = new System.Drawing.Point(14, 26);
+            this.tb_sym_name.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tb_sym_name.Name = "tb_sym_name";
-            this.tb_sym_name.Size = new System.Drawing.Size(157, 27);
+            this.tb_sym_name.Size = new System.Drawing.Size(138, 23);
             this.tb_sym_name.TabIndex = 1;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(15, 11);
+            this.label2.Location = new System.Drawing.Point(14, 8);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(52, 20);
+            this.label2.Size = new System.Drawing.Size(42, 15);
             this.label2.TabIndex = 2;
             this.label2.Text = "Name:";
             // 
@@ -91,10 +94,11 @@
             this.lv_symboles.FullRowSelect = true;
             this.lv_symboles.GridLines = true;
             this.lv_symboles.HideSelection = false;
-            this.lv_symboles.Location = new System.Drawing.Point(15, 68);
+            this.lv_symboles.Location = new System.Drawing.Point(13, 55);
+            this.lv_symboles.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.lv_symboles.MultiSelect = false;
             this.lv_symboles.Name = "lv_symboles";
-            this.lv_symboles.Size = new System.Drawing.Size(428, 261);
+            this.lv_symboles.Size = new System.Drawing.Size(375, 370);
             this.lv_symboles.TabIndex = 3;
             this.lv_symboles.UseCompatibleStateImageBehavior = false;
             this.lv_symboles.View = System.Windows.Forms.View.Details;
@@ -115,9 +119,10 @@
             // 
             // btn_delete_sym
             // 
-            this.btn_delete_sym.Location = new System.Drawing.Point(15, 335);
+            this.btn_delete_sym.Location = new System.Drawing.Point(13, 429);
+            this.btn_delete_sym.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btn_delete_sym.Name = "btn_delete_sym";
-            this.btn_delete_sym.Size = new System.Drawing.Size(428, 42);
+            this.btn_delete_sym.Size = new System.Drawing.Size(374, 32);
             this.btn_delete_sym.TabIndex = 0;
             this.btn_delete_sym.Text = "Delete";
             this.btn_delete_sym.UseVisualStyleBackColor = true;
@@ -125,10 +130,10 @@
             // 
             // SymboleForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(458, 387);
+            this.ClientSize = new System.Drawing.Size(401, 472);
             this.Controls.Add(this.btn_delete_sym);
             this.Controls.Add(this.lv_symboles);
             this.Controls.Add(this.label2);
@@ -136,6 +141,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.tb_sym_code);
             this.Controls.Add(this.btn_add_sym);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "SymboleForm";
