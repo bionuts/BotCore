@@ -166,10 +166,9 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Account";
-            this.ShowInTaskbar = false;
+            this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Account";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.Account_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

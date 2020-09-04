@@ -52,6 +52,7 @@ namespace BCore.Forms
 
         private async void btn_refresh_Click(object sender, EventArgs e)
         {
+            tb_captcha.Text = "";
             try
             {
                 pb_captcha.Image = await mobin.GetCaptcha();

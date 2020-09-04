@@ -113,12 +113,12 @@ namespace BCore.Lib
                         wsRes += Encoding.UTF8.GetString(WS_BUFFER.Array, 0, result.Count);
                     }
                     stopwatch.Stop();
-                    Console.WriteLine($"GetClockMessages: {stopwatch.ElapsedMilliseconds} ms, Result: {wsRes.Length}");
+                    //Console.WriteLine($"GetClockMessages: {stopwatch.ElapsedMilliseconds} ms, Result: {wsRes.Length}");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"WS GetClockMessages(): {ex.Message}");
+                //Console.WriteLine($"WS GetClockMessages(): {ex.Message}");
             }
         }
 
@@ -129,7 +129,7 @@ namespace BCore.Lib
                 stopwatch = Stopwatch.StartNew();
                 await ClientWS.ConnectAsync(wsUri, CancellationToken.None);
                 stopwatch.Stop();
-                Console.WriteLine($"wscon: {stopwatch.ElapsedMilliseconds}");
+                //Console.WriteLine($"wscon: {stopwatch.ElapsedMilliseconds}");
                 if (ClientWS.State == WebSocketState.Open)
                 {
                     string[] sends = new string[2]; // 8

@@ -47,10 +47,9 @@
             // btn_login
             // 
             this.btn_login.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.btn_login.Location = new System.Drawing.Point(300, 9);
-            this.btn_login.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btn_login.Location = new System.Drawing.Point(343, 12);
             this.btn_login.Name = "btn_login";
-            this.btn_login.Size = new System.Drawing.Size(108, 34);
+            this.btn_login.Size = new System.Drawing.Size(123, 45);
             this.btn_login.TabIndex = 2;
             this.btn_login.Text = "Login";
             this.btn_login.UseVisualStyleBackColor = true;
@@ -59,20 +58,18 @@
             // pb_captcha
             // 
             this.pb_captcha.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pb_captcha.Location = new System.Drawing.Point(10, 9);
-            this.pb_captcha.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pb_captcha.Location = new System.Drawing.Point(11, 12);
             this.pb_captcha.Name = "pb_captcha";
-            this.pb_captcha.Size = new System.Drawing.Size(126, 34);
+            this.pb_captcha.Size = new System.Drawing.Size(144, 45);
             this.pb_captcha.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pb_captcha.TabIndex = 3;
             this.pb_captcha.TabStop = false;
             // 
             // btn_refresh
             // 
-            this.btn_refresh.Location = new System.Drawing.Point(142, 9);
-            this.btn_refresh.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btn_refresh.Location = new System.Drawing.Point(162, 12);
             this.btn_refresh.Name = "btn_refresh";
-            this.btn_refresh.Size = new System.Drawing.Size(48, 34);
+            this.btn_refresh.Size = new System.Drawing.Size(55, 45);
             this.btn_refresh.TabIndex = 2;
             this.btn_refresh.Text = "R";
             this.btn_refresh.UseVisualStyleBackColor = true;
@@ -83,11 +80,10 @@
             this.tb_captcha.AcceptsTab = true;
             this.tb_captcha.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tb_captcha.Font = new System.Drawing.Font("Segoe UI", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.tb_captcha.Location = new System.Drawing.Point(195, 9);
-            this.tb_captcha.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.tb_captcha.Location = new System.Drawing.Point(223, 12);
             this.tb_captcha.MaxLength = 6;
             this.tb_captcha.Name = "tb_captcha";
-            this.tb_captcha.Size = new System.Drawing.Size(100, 34);
+            this.tb_captcha.Size = new System.Drawing.Size(114, 41);
             this.tb_captcha.TabIndex = 1;
             // 
             // columnHeader1
@@ -117,11 +113,10 @@
             this.lv_accounts.FullRowSelect = true;
             this.lv_accounts.GridLines = true;
             this.lv_accounts.HideSelection = false;
-            this.lv_accounts.Location = new System.Drawing.Point(10, 47);
-            this.lv_accounts.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.lv_accounts.Location = new System.Drawing.Point(11, 63);
             this.lv_accounts.MultiSelect = false;
             this.lv_accounts.Name = "lv_accounts";
-            this.lv_accounts.Size = new System.Drawing.Size(753, 330);
+            this.lv_accounts.Size = new System.Drawing.Size(860, 439);
             this.lv_accounts.TabIndex = 5;
             this.lv_accounts.UseCompatibleStateImageBehavior = false;
             this.lv_accounts.View = System.Windows.Forms.View.Details;
@@ -148,10 +143,9 @@
             // 
             // btn_master
             // 
-            this.btn_master.Location = new System.Drawing.Point(657, 9);
-            this.btn_master.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btn_master.Location = new System.Drawing.Point(751, 12);
             this.btn_master.Name = "btn_master";
-            this.btn_master.Size = new System.Drawing.Size(106, 34);
+            this.btn_master.Size = new System.Drawing.Size(121, 45);
             this.btn_master.TabIndex = 7;
             this.btn_master.Text = "Master User";
             this.btn_master.UseVisualStyleBackColor = true;
@@ -159,21 +153,20 @@
             // 
             // Login
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(774, 384);
+            this.ClientSize = new System.Drawing.Size(885, 512);
             this.Controls.Add(this.btn_master);
             this.Controls.Add(this.lv_accounts);
             this.Controls.Add(this.tb_captcha);
             this.Controls.Add(this.btn_refresh);
             this.Controls.Add(this.pb_captcha);
             this.Controls.Add(this.btn_login);
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Login";
-            this.ShowInTaskbar = false;
+            this.ShowIcon = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Login";

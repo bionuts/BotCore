@@ -108,13 +108,13 @@ namespace BCore
 
                     foreach (var user in Users)
                     {
-                        var Orders = await (from order in dbb.BOrders
-                                            join ord_acc in dbb.BOrderAccounts on order.Id equals ord_acc.OrderID
-                                            join acc in dbb.BAccounts on ord_acc.UserId equals acc.Id
-                                            where order.CreatedDateTime.Date == DateTime.Today && acc.Id == user.Id
-                                            select order).ToListAsync();
-                        multiUserRequests.Add(new MultiUserRequest { BAccount = user, Orders = Orders, Qline = 0 });
-                        foreach (var o in Orders)
+                        List<BOrder> userOrders = await (from order in dbb.BOrders
+                                                         join ord_acc in dbb.BOrderAccounts on order.Id equals ord_acc.OrderID
+                                                         join acc in dbb.BAccounts on ord_acc.UserId equals acc.Id
+                                                         where order.CreatedDateTime.Date == DateTime.Today && acc.Id == user.Id
+                                                         select order).ToListAsync();
+                        multiUserRequests.Add(new MultiUserRequest { BAccount = user, Orders = userOrders, Qline = 0 });
+                        foreach (var o in userOrders)
                             CeaseFire.Add(new Tuple<int, int>(user.Id, o.Id), false);
                     }
                     MobinBroker.CeaseFire = CeaseFire;
@@ -154,46 +154,22 @@ namespace BCore
         {
             try
             {
-                int counter;
-                int buser;
-                int lastwait;
-                Tuple<int, int> tuser;
-
                 int size = requestsVectors.Length;
+                // DateTime nxt;
                 string times;
-                Thread.Sleep((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
-                // await Task.Delay((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
-                Console.WriteLine($"WakeUP: {DateTime.Now:HH:mm:ss.fff}");
+                Thread.Sleep((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds); // await Task.Delay((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
+
+                //Console.WriteLine($"WakeUP: {DateTime.Now:HH:mm:ss.fff}");
                 for (int i = 0; i < size; i++)
                 {
                     if (!MobinBroker.CeaseFire[requestsVectors[i].DicKey])
                     {
-                        Console.WriteLine($"NXT: {DateTime.Now:HH:mm:ss.fff}");
+                        //Console.WriteLine($"NXT: {DateTime.Now:HH:mm:ss.fff}");
                         times = $"WS:{WsTime:HH:mm:ss.fff}, Order:{OrdersTime:HH:mm:ss.fff}, Option:{OptionTime:HH:mm:ss.fff}";
+                        //nxt = DateTime.Now.AddMilliseconds(StepWait);
                         Task.Run(() => MobinAgent.SendReqThread(requestsVectors[i], times)); // must be optimize for start&run ASAP
-                        Thread.Sleep(StepWait);
-                        // await Task.Delay(StepWait);
-                    }
-                    else
-                    {
-                        lastwait = StepWait;
-                        buser = 0;
-                        foreach (var m in multiUserRequests)
-                        {
-                            counter = 0;
-                            foreach (var o in m.Orders)
-                            {
-                                tuser = new Tuple<int, int>(m.BAccount.Id, o.Id);
-                                if (MobinBroker.CeaseFire[tuser])
-                                {
-                                    counter++;
-                                }
-                            }
-                            if (counter == m.Orders.Count) buser++;
-                        }
-                        StepWait = (Interval + buser - 1) / buser;
-                        if (StepWait - lastwait > 0)
-                            Thread.Sleep(StepWait - lastwait);
+                        Thread.Sleep(StepWait); // await Task.Delay(StepWait);
+                        // while (nxt.Subtract(DateTime.Now).TotalMilliseconds > 0) ; // wait here until next stepwait (ms)
                     }
                 }
                 tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text = SortResult(MobinBroker.ResultOfThreads); });
@@ -474,6 +450,31 @@ namespace BCore
         private void button2_Click(object sender, EventArgs e)
         {
             //tb_logs.AppendText(await MobinAgent.MobinWebSocket.SendInitMessages(MobinAgent.LS_Phase, MobinAgent.LS_Session));
+        }
+
+        private async void btn_start_time_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!timer_stay_tune.Enabled && !timer_option.Enabled) // start timers
+                {
+                    string token = (await db.BSettings.Where(s => s.Key == "apitoken").FirstOrDefaultAsync()).Value;
+                    MobinAgent.Token = token;
+                    timer_stay_tune.Enabled = true;
+                    timer_option.Enabled = true;
+                    ((Button)sender).Text = "STOP";
+                }
+                else
+                {
+                    timer_stay_tune.Enabled = false;
+                    timer_option.Enabled = false;
+                    ((Button)sender).Text = "START";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("btn_start_time_Click(): " + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

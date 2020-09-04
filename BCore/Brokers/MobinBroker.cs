@@ -315,9 +315,9 @@ namespace BCore.Lib
             Stopwatch _stopwatch = new Stopwatch();
             try
             {
-                sent = DateTime.Now;
-                Console.WriteLine($"IN: {sent:HH:mm:ss.fff}, T_{Thread.CurrentThread.ManagedThreadId}");
+                // Console.WriteLine($"IN: {sent:HH:mm:ss.fff}, T_{Thread.CurrentThread.ManagedThreadId}");
                 _stopwatch.Start();
+                sent = DateTime.Now;
                 HttpResponseMessage httpResponse = SendHttpClient.SendAsync(paramObject.REQ).Result;
                 _stopwatch.Stop();
                 if (httpResponse.IsSuccessStatusCode)
@@ -327,22 +327,22 @@ namespace BCore.Lib
                     if (orderRespond.IsSuccessfull)
                         CeaseFire[paramObject.DicKey] = true;
                     result =
-                        $"[{sent:HH:mm:ss.fff}] [{_stopwatch.ElapsedMilliseconds:D3}ms] [User:{paramObject.AccountName}]\t" +
-                        $"[OID:{paramObject.OrderID}]\t[{paramObject.SYM}]\t[Count:{paramObject.Count}]\t[{times}]" +
-                        $"\tT_{Thread.CurrentThread.ManagedThreadId}\t[{orderRespond.IsSuccessfull}]\tDesc: {orderRespond.MessageDesc}\n";
+                        $"[{sent:HH:mm:ss.fff}] [{_stopwatch.ElapsedMilliseconds:D4}ms]\t[OrderID: {paramObject.OrderID}]\t[User: {paramObject.AccountName,-20}]\t" +
+                        $"[Sym: {paramObject.SYM}]\t[Count: {paramObject.Count}]\t[T_{Thread.CurrentThread.ManagedThreadId:D3}]\t[{times}]\t" +
+                        $"[{orderRespond.IsSuccessfull}]\tDesc: {orderRespond.MessageDesc}\n";
                 }
                 else
                 {
                     result =
-                        $"[{sent:HH:mm:ss.fff}] T_{Thread.CurrentThread.ManagedThreadId}\t[User:{paramObject.AccountName}]\t" +
-                        $"[OID:{paramObject.OrderID}], Sym: {paramObject.SYM}, Error: {httpResponse.StatusCode}\n";
+                        $"[{sent:HH:mm:ss.fff}]\t[T_{Thread.CurrentThread.ManagedThreadId:D3}]\t[User:{paramObject.AccountName,-20}]\t" +
+                        $"[OID:{paramObject.OrderID}] [Sym: {paramObject.SYM}]\t[Error: {httpResponse.StatusCode}]\n";
                 }
             }
             catch (Exception ex)
             {
                 result =
-                    $"[{DateTime.Now:HH:mm:ss.fff}] T_{Thread.CurrentThread.ManagedThreadId}\t[User:{paramObject.AccountName}]\t" +
-                    $"[OID:{paramObject.OrderID}], Sym: {paramObject.SYM},Error: {ex.Message}\n";
+                    $"[{DateTime.Now:HH:mm:ss.fff}]\t[Count: {paramObject.Count}]\t[T_{Thread.CurrentThread.ManagedThreadId:D3}]\t[User:{paramObject.AccountName,-20}]\t" +
+                    $"[OID:{paramObject.OrderID}]\t[Sym: {paramObject.SYM}]\t[Error: {ex.Message}]\n";
             }
             lock (locker)
             {
@@ -352,10 +352,10 @@ namespace BCore.Lib
 
         public async Task<string> SendOrder(BOrder order)
         {
-            string result = "";
             DateTime sent;
             Stopwatch _stopwatch = new Stopwatch();
             HttpRequestMessage req = GetSendingOrderRequestMessage(order);
+            string result;
             try
             {
                 sent = DateTime.Now;
@@ -588,17 +588,17 @@ namespace BCore.Lib
 
         public string StayTuneHttpClient(ref DateTime order_time)
         {
+            DateTime sent;
+            Stopwatch stopwatch;
+            HttpResponseMessage httpResponse = null;
+            var req = new HttpRequestMessage(HttpMethod.Get, "https://api2.mobinsb.com/Web/V1/Order/GetOpenOrder/OpenOrder");
+            req.Headers.Add("Authorization", $"BasicAuthentication {Token}");
+
             try
             {
-                DateTime sent;
-                Stopwatch stopwatch;
-
-                var req = new HttpRequestMessage(HttpMethod.Get, "https://api2.mobinsb.com/Web/V1/Order/GetOpenOrder/OpenOrder");
-                req.Headers.Add("Authorization", $"BasicAuthentication {Token}");
-
                 sent = DateTime.Now;
                 stopwatch = Stopwatch.StartNew();
-                HttpResponseMessage httpResponse = SendHttpClient.SendAsync(req).Result;
+                httpResponse = SendHttpClient.SendAsync(req).Result;
                 stopwatch.Stop();
                 if (httpResponse.IsSuccessStatusCode)
                 {
@@ -620,7 +620,11 @@ namespace BCore.Lib
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                return "StayTuneHttpClient(): " + ex.Message;
+            }
+            finally
+            {
+                if (httpResponse != null) httpResponse.Dispose();
             }
         }
 
@@ -656,7 +660,7 @@ namespace BCore.Lib
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                return "GetTimeBasedOnOptionHeader(): " + ex.Message;
             }
             finally
             {
