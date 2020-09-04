@@ -57,8 +57,8 @@ namespace BCore
                 lbl_done.Text = "[con]";
                 lbl_done.BackColor = Color.Green;
                 WsTime = OrdersTime = OptionTime = DateTime.Now;
-                /*if (await MobinAgent.CreateSessionForWebSocket() && await MobinAgent.MobinWebSocket.StartWebSocket(MobinAgent.LS_Phase, MobinAgent.LS_Session))
-                    StartReceiveDataFromWS();*/
+                if (await MobinAgent.CreateSessionForWebSocket() && await MobinAgent.MobinWebSocket.StartWebSocket(MobinAgent.LS_Phase, MobinAgent.LS_Session))
+                    StartReceiveDataFromWS();
                 // await MobinAgent.CreateSessionForWebSocket();
                 /*await MobinAgent.MobinWebSocket.ConnectAsync();
                 await MobinAgent.MobinWebSocket.SendInitMessages(MobinAgent.LS_Phase, MobinAgent.LS_Session);
@@ -169,7 +169,7 @@ namespace BCore
             try
             {
                 int size = requestsVectors.Length;
-                // DateTime nxt;
+                DateTime nxt;
                 string times;
                 Thread.Sleep((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds); // await Task.Delay((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
 
@@ -180,17 +180,22 @@ namespace BCore
                     {
                         //Console.WriteLine($"NXT: {DateTime.Now:HH:mm:ss.fff}");
                         times = $"WS:{WsTime:HH:mm:ss.fff}, Order:{OrdersTime:HH:mm:ss.fff}, Option:{OptionTime:HH:mm:ss.fff}";
-                        //nxt = DateTime.Now.AddMilliseconds(StepWait);
+                        nxt = DateTime.Now.AddMilliseconds(StepWait);
                         Task.Run(() => MobinAgent.SendReqThread(requestsVectors[i], times)); // must be optimize for start&run ASAP
-                        Thread.Sleep(StepWait); // await Task.Delay(StepWait);
-                        // while (nxt.Subtract(DateTime.Now).TotalMilliseconds > 0) ; // wait here until next stepwait (ms)
+                        // Thread.Sleep(StepWait); // await Task.Delay(StepWait);
+                        while (nxt.Subtract(DateTime.Now).TotalMilliseconds > 0) ; // wait here until next stepwait (ms)
                     }
                 }
-                tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text = SortResult(MobinBroker.ResultOfThreads); });
+                var resList = Utilities.CalDiff(Utilities.SortResult(MobinBroker.ResultOfThreads), _StartTime);
+                string tmp = "";
+                foreach (var line in resList)
+                    tmp += line + Environment.NewLine;
+
+                tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text = tmp; });
             }
             catch (Exception ex)
             {
-                tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text = $"[{ DateTime.Now:HH:mm:ss.fff}] {ex.Message}"; });
+                tb_logs.Invoke((MethodInvoker)delegate { tb_logs.Text = $"SendOrderRequests(): [{ DateTime.Now:HH:mm:ss.fff}] {ex.Message}"; });
             }
         }
 
@@ -339,30 +344,6 @@ namespace BCore
             }
         }
 
-        private string SortResult(string result)
-        {
-            try
-            {
-                string tmp = "";
-                List<string> lineList = new List<string>();
-                var lines = result.Split("\n");
-                foreach (var line in lines)
-                {
-                    if (!string.IsNullOrEmpty(line))
-                        lineList.Add(line);
-                }
-
-                lineList = lineList.OrderBy(p => p.Substring(1, p.IndexOf("]"))).ToList();
-                foreach (var line in lineList)
-                    tmp += line + Environment.NewLine;
-                return tmp;
-            }
-            catch (Exception ex)
-            {
-                return ex.Message + Environment.NewLine + result;
-            }
-        }
-
         private void timer_cando_Tick(object sender, EventArgs e)
         {
             bool tmp = Utilities.CanRunTheApp2(GenHttp);
@@ -453,16 +434,6 @@ namespace BCore
             long nanosecPerTick = (1000L * 1000L * 1000L) / frequency;
             Console.WriteLine("  Timer is accurate within {0} nanoseconds",
                 nanosecPerTick);
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            //tb_logs.AppendText(await MobinAgent.MobinWebSocket.ConnectAsync());
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            //tb_logs.AppendText(await MobinAgent.MobinWebSocket.SendInitMessages(MobinAgent.LS_Phase, MobinAgent.LS_Session));
         }
 
         private async void btn_start_time_Click(object sender, EventArgs e)

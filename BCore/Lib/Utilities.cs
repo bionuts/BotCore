@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -133,6 +134,71 @@ namespace BCore.Lib
                 return true;
             }
             return false;
+        }
+
+        public static List<string> SortResult(string result)
+        {
+            List<string> lineList = new List<string>();
+            var lines = result.Split("\n");
+            foreach (var line in lines)
+            {
+                if (!string.IsNullOrEmpty(line.Trim()))
+                    lineList.Add(line);
+            }
+            lineList = lineList.OrderBy(p => p.Substring(1, p.IndexOf("]"))).ToList();
+            return lineList;
+        }
+
+        public static List<string> CalDiff(List<string> SortedLines, DateTime start)
+        {
+            try
+            {
+                List<string> ExSortedLines = new List<string>();
+                string pattern = @"\[([0-1][0-9]|[2][0-3]):([0-5][0-9]):[0-5][0-9].[0-9][0-9][0-9]\]";
+                Regex timeRegex = new Regex(pattern);
+                Match timeMatch;
+                int startTimeMs = start.Millisecond;
+                int startTime_fisrtMs_diff, preMs, recentMs;
+                double sum = 0;
+
+                string firstLine = SortedLines[0];
+                timeMatch = timeRegex.Match(firstLine);
+                if (timeMatch.Success)
+                {
+                    preMs = int.Parse(timeMatch.Value.Substring(timeMatch.Value.IndexOf(".") + 1, 3));
+                    startTime_fisrtMs_diff = preMs >= startTimeMs ? preMs - startTimeMs : 1000 - startTimeMs + preMs;
+                    ExSortedLines.Add(firstLine.Insert(firstLine.IndexOf("]") + 2, $"[{startTime_fisrtMs_diff:D3}] "));
+
+                    int cnt = 0;
+                    for (int idx = 1; idx < SortedLines.Count; idx++)
+                    {
+                        timeMatch = timeRegex.Match(SortedLines[idx]);
+                        if (timeMatch.Success)
+                        {
+                            recentMs = int.Parse(timeMatch.Value.Substring(timeMatch.Value.IndexOf(".") + 1, 3));
+                            if (recentMs >= preMs)
+                            {
+                                sum += recentMs - preMs;
+                                ExSortedLines.Add(SortedLines[idx].Insert(SortedLines[idx].IndexOf("]") + 2, $"[{(recentMs - preMs):D3}] "));
+                            }
+                            else
+                            {
+                                sum += 1000 - preMs + recentMs;
+                                ExSortedLines.Add(SortedLines[idx].Insert(SortedLines[idx].IndexOf("]") + 2, $"[{(1000 - preMs + recentMs):D3}] "));
+                            }
+                            preMs = recentMs;
+                            cnt++;
+                        }
+                    }
+                    ExSortedLines.Add($"Mean StepWait: {Math.Round(sum / cnt, 2)} ms");
+                    return ExSortedLines;
+                }
+                return SortedLines;
+            }
+            catch
+            {
+                return SortedLines;
+            }
         }
     }
 }

@@ -315,7 +315,6 @@ namespace BCore.Lib
             Stopwatch _stopwatch = new Stopwatch();
             try
             {
-                // Console.WriteLine($"IN: {sent:HH:mm:ss.fff}, T_{Thread.CurrentThread.ManagedThreadId}");
                 _stopwatch.Start();
                 sent = DateTime.Now;
                 HttpResponseMessage httpResponse = SendHttpClient.SendAsync(paramObject.REQ).Result;
@@ -334,15 +333,15 @@ namespace BCore.Lib
                 else
                 {
                     result =
-                        $"[{sent:HH:mm:ss.fff}]\t[T_{Thread.CurrentThread.ManagedThreadId:D3}]\t[User:{paramObject.AccountName,-20}]\t" +
-                        $"[OID:{paramObject.OrderID}] [Sym: {paramObject.SYM}]\t[Error: {httpResponse.StatusCode}]\n";
+                        $"[{sent:HH:mm:ss.fff}] [OID:{paramObject.OrderID}]\t[User:{paramObject.AccountName,-20}]\t[Sym: {paramObject.SYM}]\t" +
+                        $"[Count: {paramObject.Count}]\t[T_{Thread.CurrentThread.ManagedThreadId:D3}]\t[False]\t[Error: {httpResponse.StatusCode}]\n";
                 }
             }
             catch (Exception ex)
             {
                 result =
-                    $"[{DateTime.Now:HH:mm:ss.fff}]\t[Count: {paramObject.Count}]\t[T_{Thread.CurrentThread.ManagedThreadId:D3}]\t[User:{paramObject.AccountName,-20}]\t" +
-                    $"[OID:{paramObject.OrderID}]\t[Sym: {paramObject.SYM}]\t[Error: {ex.Message}]\n";
+                    $"[{DateTime.Now:HH:mm:ss.fff}] [OID:{paramObject.OrderID}]\t[User:{paramObject.AccountName,-20}]\t" +
+                    $"[Sym: {paramObject.SYM}]\t[Count: {paramObject.Count}]\t[T_{Thread.CurrentThread.ManagedThreadId:D3}]\t[Error: {ex.Message}]\n";
             }
             lock (locker)
             {
