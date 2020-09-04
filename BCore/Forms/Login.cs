@@ -106,7 +106,7 @@ namespace BCore.Forms
                     {
                         var row = new string[]
                         {
-                        acc.Id.ToString(),
+                        acc.AccountId.ToString(),
                         acc.Name,
                         acc.Username,
                         acc.Password,

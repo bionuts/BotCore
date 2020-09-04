@@ -9,7 +9,7 @@ namespace BotCore.Data
     public class BAccount
     {
         [Key]
-        public int Id { get; set; }
+        public int AccountId { get; set; }
 
         [Required]
         public string Name { get; set; }
@@ -26,6 +26,6 @@ namespace BotCore.Data
 
         public DateTime? TokenDate { get; set; }
 
-        public IList<BOrderAccounts> OrderAccounts { get; set; }
+        public virtual ICollection<BOrderAccounts> OrderAccounts { get; set; }
     }
 }

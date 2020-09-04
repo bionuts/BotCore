@@ -10,7 +10,7 @@ namespace BotCore.Data
     public class BOrder
     {
         [Key]
-        public int Id { get; set; }
+        public int OrderId { get; set; }
 
         [Required]
         public string OrderType { get; set; }
@@ -30,11 +30,6 @@ namespace BotCore.Data
         [Required]
         public DateTime CreatedDateTime { get; set; }
 
-        public string Status { get; set; }
-
-        [Required]
-        public string OrderId { get; set; }
-
-        public IList<BOrderAccounts> OrderAccounts { get; set; }
+        public virtual ICollection<BOrderAccounts> OrderAccounts { get; set; }
     }
 }

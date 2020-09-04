@@ -26,8 +26,7 @@ namespace BCore
         private DateTime _StartTime;
         private DateTime _EndTime;
         private int Interval;
-        private volatile bool can = true;
-        // private Dictionary<KeyValuePair<int, int>, bool> CeaseFire; // new Dictionary<(int, int), string>();
+        private volatile bool can = false;
         private Dictionary<Tuple<int, int>, bool> CeaseFire; // new Dictionary<(int, int), string>();
         private List<MultiUserRequest> multiUserRequests;
 
@@ -52,7 +51,7 @@ namespace BCore
         private async void MainBotForm_Load(object sender, EventArgs e)
         {
             await LoadOrdersToListView();
-            // can = await Utilities.CanRunTheApp(GenHttp);
+            can = await Utilities.CanRunTheApp(GenHttp);
             if (can)
             {
                 lbl_done.Text = "[con]";
@@ -85,6 +84,7 @@ namespace BCore
                         LoadStartAndEndTime(tb_hh.Text.Trim(), tb_mm.Text.Trim(), tb_ss.Text.Trim(), tb_ms.Text.Trim(), tb_duration.Text.Trim());
                         Interval = int.Parse(tb_interval.Text.Trim());
                         InitHttpRequestMessageArray();
+                        lbl_endTime.Text = $"End: {_EndTime:HH:mm:ss.fff}";
                     }
                 }
             }
@@ -96,26 +96,39 @@ namespace BCore
             {
                 using (var dbb = new ApplicationDbContext())
                 {
-                    // CeaseFire = new Dictionary<KeyValuePair<int, int>, bool>();
                     CeaseFire = new Dictionary<Tuple<int, int>, bool>();
                     multiUserRequests = new List<MultiUserRequest>();
 
                     var Users = await (from order in dbb.BOrders
-                                       join ord_acc in dbb.BOrderAccounts on order.Id equals ord_acc.OrderID
-                                       join acc in dbb.BAccounts on ord_acc.UserId equals acc.Id
+                                       join ord_acc in dbb.BOrderAccounts on order.OrderId equals ord_acc.OrderID
+                                       join acc in dbb.BAccounts on ord_acc.AccountId equals acc.AccountId
                                        where order.CreatedDateTime.Date == DateTime.Today
                                        select acc).Distinct().ToListAsync();
 
                     foreach (var user in Users)
                     {
                         List<BOrder> userOrders = await (from order in dbb.BOrders
-                                                         join ord_acc in dbb.BOrderAccounts on order.Id equals ord_acc.OrderID
-                                                         join acc in dbb.BAccounts on ord_acc.UserId equals acc.Id
-                                                         where order.CreatedDateTime.Date == DateTime.Today && acc.Id == user.Id
+                                                         join ord_acc in dbb.BOrderAccounts on order.OrderId equals ord_acc.OrderID
+                                                         join acc in dbb.BAccounts on ord_acc.AccountId equals acc.AccountId
+                                                         where order.CreatedDateTime.Date == DateTime.Today && acc.AccountId == user.AccountId
                                                          select order).ToListAsync();
-                        multiUserRequests.Add(new MultiUserRequest { BAccount = user, Orders = userOrders, Qline = 0 });
+                        List<BOrder> tmp = new List<BOrder>();
                         foreach (var o in userOrders)
-                            CeaseFire.Add(new Tuple<int, int>(user.Id, o.Id), false);
+                        {
+                            tmp.Add(new BOrder
+                            {
+                                OrderId = o.OrderId,
+                                SymboleCode = o.SymboleCode,
+                                SymboleName = o.SymboleName,
+                                Count = o.Count,
+                                Price = o.Price,
+                                OrderType = o.OrderType,
+                                CreatedDateTime = o.CreatedDateTime,
+                                OrderAccounts = o.OrderAccounts
+                            });
+                            CeaseFire.Add(new Tuple<int, int>(user.AccountId, o.OrderId), false);
+                        }
+                        multiUserRequests.Add(new MultiUserRequest { BAccount = user, Orders = tmp, QPTR = 0 });
                     }
                     MobinBroker.CeaseFire = CeaseFire;
 
@@ -124,21 +137,22 @@ namespace BCore
                     requestsVectors = new RequestsVector[reqSize];
 
                     int WhichUser = 0;
+                    MultiUserRequest specific;
                     for (int j = 0; j < reqSize; j++)
                     {
+                        specific = multiUserRequests[WhichUser];
                         requestsVectors[j] = new RequestsVector
                         {
-                            AccountID = multiUserRequests[WhichUser].BAccount.Id,
-                            AccountName = multiUserRequests[WhichUser].BAccount.Name,
-                            OrderID = multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline].Id,
-                            SYM = multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline].SymboleName,
-                            REQ = MobinAgent.GetSendingOrderRequestMessage(multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline], multiUserRequests[WhichUser].BAccount.Token),
-                            // DicKey = new KeyValuePair<int, int>(multiUserRequests[WhichUser].BAccount.Id, multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline].Id),
-                            DicKey = new Tuple<int, int>(multiUserRequests[WhichUser].BAccount.Id, multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline].Id),
-                            Count = multiUserRequests[WhichUser].Orders[multiUserRequests[WhichUser].Qline].Count--
+                            AccountID = specific.BAccount.AccountId,
+                            AccountName = specific.BAccount.Name,
+                            OrderID = specific.Orders[specific.QPTR].OrderId,
+                            SYM = specific.Orders[specific.QPTR].SymboleName,
+                            REQ = MobinAgent.GetSendingOrderRequestMessage(specific.Orders[specific.QPTR], specific.BAccount.Token),
+                            DicKey = new Tuple<int, int>(specific.BAccount.AccountId, specific.Orders[specific.QPTR].OrderId),
+                            Count = specific.Orders[specific.QPTR].Count--
                         };
-                        multiUserRequests[WhichUser].Qline++;
-                        if (multiUserRequests[WhichUser].Qline == multiUserRequests[WhichUser].Orders.Count) multiUserRequests[WhichUser].Qline = 0;
+                        multiUserRequests[WhichUser].QPTR++;
+                        if (multiUserRequests[WhichUser].QPTR == multiUserRequests[WhichUser].Orders.Count) multiUserRequests[WhichUser].QPTR = 0;
                         WhichUser++;
                         if (WhichUser == Users.Count) WhichUser = 0;
                     }
@@ -215,7 +229,7 @@ namespace BCore
 
                     var row = new string[]
                     {
-                    order.Id.ToString(),
+                    order.OrderId.ToString(),
                     order.SymboleName,
                     order.Count.ToString("N0"),
                     order.Price.ToString("N0"),
@@ -242,7 +256,6 @@ namespace BCore
                 (s != "" ? int.Parse(s) : 53),
                 (ms != "" ? int.Parse(ms) : 500));
             _EndTime = _StartTime.AddSeconds((duration != "" ? double.Parse(duration) : 8.1));
-            lbl_endTime.Text = $"End: {_EndTime:HH:mm:ss.fff}";
         }
 
         private void lbl_starttime_Click(object sender, EventArgs e)

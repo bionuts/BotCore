@@ -42,8 +42,6 @@ namespace BCore.Forms
                         Count = int.Parse(tb_count.Text.Trim()),
                         Price = decimal.Parse(tb_price.Text.Trim()),
                         CreatedDateTime = DateTime.Now,
-                        Status = "",
-                        OrderId = "0"
                     };
                     tb_response.AppendText((await mobinBroker.SendOrder(order)).Replace("\n", Environment.NewLine));
                 }

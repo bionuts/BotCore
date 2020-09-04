@@ -16,18 +16,16 @@ namespace BCore.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<BOrderAccounts>().HasKey(oa => new { oa.OrderID, oa.UserId });
-            
+            // base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<BOrderAccounts>().HasKey(e => new { e.OrderID, e.AccountId });
+
             modelBuilder.Entity<BOrderAccounts>()
                 .HasOne(oa => oa.BOrder)
-                .WithMany(s => s.OrderAccounts)
-                .HasForeignKey(oa => oa.OrderID);
+                .WithMany(s => s.OrderAccounts);
 
             modelBuilder.Entity<BOrderAccounts>()
                 .HasOne(oa => oa.BAccount)
-                .WithMany(s => s.OrderAccounts)
-                .HasForeignKey(oa => oa.UserId);
+                .WithMany(s => s.OrderAccounts);
         }
 
         public DbSet<BOrder> BOrders { get; set; }

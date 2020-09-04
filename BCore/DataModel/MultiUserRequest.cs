@@ -9,6 +9,6 @@ namespace BCore.DataModel
     {
         public BAccount BAccount { get; set; }
         public List<BOrder> Orders { get; set; }
-        public int Qline { get; set; }
+        public int QPTR { get; set; }
     }
 }

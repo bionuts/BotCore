@@ -52,8 +52,6 @@ namespace BCore.Forms
                             Count = int.Parse(tb_count.Text.Trim()),
                             Price = decimal.Parse(tb_price.Text.Trim()),
                             CreatedDateTime = DateTime.Now,
-                            Status = "",
-                            OrderId = "0",
                             OrderAccounts = new List<BOrderAccounts>()
                         };
 
@@ -62,7 +60,7 @@ namespace BCore.Forms
                             var userid = int.Parse(sitem.SubItems[0].Text);
                             BOrderAccounts tmp = new BOrderAccounts 
                             { 
-                                UserId = userid
+                                AccountId = userid
                             };
                             order.OrderAccounts.Add(tmp);
                         }
@@ -107,7 +105,7 @@ namespace BCore.Forms
                     {
                         var row = new string[]
                         {
-                        acc.Id.ToString(),
+                        acc.AccountId.ToString(),
                         acc.Name,
                         acc.Username
                         };
