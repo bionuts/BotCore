@@ -169,6 +169,7 @@ namespace BCore
             try
             {
                 int size = requestsVectors.Length;
+                MobinBroker.ResultOfThreads = "";
                 DateTime nxt;
                 string times;
                 Thread.Sleep((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds); // await Task.Delay((int)_StartTime.Subtract(DateTime.Now).TotalMilliseconds);
@@ -185,7 +186,7 @@ namespace BCore
                         // Thread.Sleep(StepWait); // await Task.Delay(StepWait);
                         while (nxt.Subtract(DateTime.Now).TotalMilliseconds > 0) ; // wait here until next stepwait (ms)
                     }
-                }
+                }                
                 var resList = Utilities.CalDiff(Utilities.SortResult(MobinBroker.ResultOfThreads), _StartTime);
                 string tmp = "";
                 foreach (var line in resList)
