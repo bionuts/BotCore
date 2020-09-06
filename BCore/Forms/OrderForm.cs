@@ -31,6 +31,7 @@ namespace BCore.Forms
                 if (symboles.Count > 0)
                 {
                     cb_symboles.DataSource = symboles;
+                    cb_symboles.SelectedIndex = -1;
                 }
             }
         }
@@ -38,7 +39,7 @@ namespace BCore.Forms
         private async void btn_send_order_Click(object sender, EventArgs e)
         {
             Button button = sender as Button;
-            if (tb_count.Text.Trim() != "" && tb_price.Text.Trim() != "" && lv_accounts.SelectedItems.Count > 0)
+            if (tb_count.Text.Trim() != "" && tb_price.Text.Trim() != "" && lv_accounts.SelectedItems.Count > 0 && cb_symboles.SelectedIndex > -1)
             {
                 try
                 {
@@ -58,8 +59,8 @@ namespace BCore.Forms
                         foreach (ListViewItem sitem in lv_accounts.SelectedItems)
                         {
                             var userid = int.Parse(sitem.SubItems[0].Text);
-                            BOrderAccounts tmp = new BOrderAccounts 
-                            { 
+                            BOrderAccounts tmp = new BOrderAccounts
+                            {
                                 AccountId = userid
                             };
                             order.OrderAccounts.Add(tmp);
